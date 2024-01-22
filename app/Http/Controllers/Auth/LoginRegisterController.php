@@ -108,4 +108,33 @@ class LoginRegisterController extends Controller
             'message' => 'User is logged out successfully'
             ], 200);
     }
+
+    /**
+     * Get the profile of the authenticated user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function userProfile(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'User not authenticated.',
+            ], 401);
+        }
+
+        $response = [
+            'status' => 'success',
+            'message' => 'User profile retrieved successfully.',
+            'data' => [
+                'name' => $user->name,
+                'email' => $user->email,
+            ],
+        ];
+
+        return response()->json($response, 200);
+    }
 }

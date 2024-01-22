@@ -29,4 +29,5 @@ Route::controller(LoginRegisterController::class)->group(function() {
 // Protected routes of logout
 Route::middleware('auth:sanctum')->group( function () {
     Route::post('/logout', [LoginRegisterController::class, 'logout']);
+    Route::get('/user-profile', [LoginRegisterController::class, 'userProfile']);
 });
