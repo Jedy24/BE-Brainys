@@ -195,7 +195,9 @@ class LoginRegisterController extends Controller
         $token = $userCreated->createToken('token-name')->plainTextToken;
 
         $response = [
-            'user' => $userCreated,
+            'id' => $userCreated->id,
+            'name' => $userCreated->name,
+            'email' => $userCreated->email,
             'token' => $token,
         ];
 
