@@ -6,6 +6,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Socialite\Facades\Socialite;
+use GuzzleHttp\Exception\ClientException;
+use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
 use Validator;
 
 class LoginRegisterController extends Controller
@@ -78,7 +83,7 @@ class LoginRegisterController extends Controller
         if(!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Password does not match'
+                'message' => 'Invalid credential'
                 ], 401);
         }
 
@@ -136,5 +141,70 @@ class LoginRegisterController extends Controller
         ];
 
         return response()->json($response, 200);
+    }
+
+    /**
+     * Redirect the user to the Google authentication page.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function redirect($provider)
+    {
+        $validated = $this->validateProvider($provider);
+        if (!is_null($validated)) {
+            return $validated;
+        }
+        return Socialite::driver($provider)->stateless()->redirect();
+    }
+
+    /**
+     * Obtain the user information from Google.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function callback($provider)
+    {
+        $validated = $this->validateProvider($provider);
+        if (!is_null($validated)) {
+            return $validated;
+        }
+        try{
+            $user = Socialite::driver($provider)->stateless()->user();
+        } catch (ClientException $exception){
+            return response()->json(['error' => 'Invalid credentials provided.']);
+        }
+
+        $userCreated = User::firstOrCreate([
+            'email' => $user->getEmail(),
+        ],
+        [
+            'email_verified_at' => now(),
+            'name' => $user->getName(),
+            'status' => true,
+            'password' => Hash::make('123456789'),
+        ]);
+
+        $userCreated->providers()->updateOrCreate([
+            'provider' => $provider,
+            'provider_id' => $user->getId(),
+        ],
+        [
+            'avatar' => $user->getAvatar(),
+        ]);
+
+        $token = $userCreated->createToken('token-name')->plainTextToken;
+
+        $response = [
+            'user' => $userCreated,
+            'token' => $token,
+        ];
+
+        return response()->json($response, 200);
+    }
+
+    protected function validateProvider($provider){
+        if (!in_array($provider, ['facebook', 'github', 'google'])) {
+            return response()->json(['error' => 'Please login using facebook, github, or google'], 422);
+        }
     }
 }
