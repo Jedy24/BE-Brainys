@@ -31,3 +31,8 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::post('/logout', [LoginRegisterController::class, 'logout']);
     Route::get('/user-profile', [LoginRegisterController::class, 'userProfile']);
 });
+
+Route::get('login/{provider}', [LoginRegisterController::class, 'redirect']);
+Route::get('login/{provider}/callback', [LoginRegisterController::class, 'callback']);
+Route::post('login/{provider}/callback', [LoginRegisterController::class, 'callback']);
+
