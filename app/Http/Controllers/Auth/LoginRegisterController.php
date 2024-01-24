@@ -7,11 +7,12 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
-use Validator;
+use Illuminate\Support\Str;
 
 class LoginRegisterController extends Controller
 {
@@ -37,10 +38,13 @@ class LoginRegisterController extends Controller
             ], 403);
         }
 
+        $otp = rand(100000, 999999);
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password),
+            'otp' => $otp,
         ]);
 
         $data['token'] = $user->createToken($request->email)->plainTextToken;
@@ -208,5 +212,94 @@ class LoginRegisterController extends Controller
         if (!in_array($provider, ['facebook', 'github', 'google'])) {
             return response()->json(['error' => 'Please login using facebook, github, or google'], 422);
         }
+    }
+
+    /**
+     * Change the password for the authenticated user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function changePassword(Request $request)
+    {
+        $user = $request->user();
+
+        // Validate the request data
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Validation failed',
+                'data' => $validator->errors(),
+            ], 422);
+        }
+
+        // Check if the current password matches
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Current password is incorrect',
+            ], 401);
+        }
+
+        // Update the user's password
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Password changed successfully',
+        ], 200);
+    }
+
+        /**
+     * Verify OTP for the registered user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function verifyOtp(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'otp' => 'required|string|min:6|max:6',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Validation failed',
+                'data' => $validator->errors(),
+            ], 422);
+        }
+
+        // Check if email and OTP match
+        $user = User::where('email', $request->email)->where('otp', $request->otp)->first();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Invalid OTP or email',
+            ], 401);
+        }
+
+        // Clear OTP after successful verification
+        $user->otp = null;
+        $user->save();
+
+        $data['token'] = $user->createToken($request->email)->plainTextToken;
+        $data['user'] = $user;
+
+        $response = [
+            'status' => 'success',
+            'message' => 'User verified successfully. OTP is correct.',
+            'data' => $data,
+        ];
+
+        return response()->json($response, 200);
     }
 }
