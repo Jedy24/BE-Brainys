@@ -20,7 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Public routes of authentication (login & register)
+// Public routes of authentication
 Route::controller(LoginRegisterController::class)->group(function() {
     Route::post('/register', 'register');
     Route::post('/login', 'login');
