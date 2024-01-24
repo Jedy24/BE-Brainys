@@ -289,6 +289,7 @@ class LoginRegisterController extends Controller
 
         // Clear OTP after successful verification
         $user->otp = null;
+        $user->otp_verified_at = now();
         $user->save();
 
         $data['token'] = $user->createToken($request->email)->plainTextToken;
