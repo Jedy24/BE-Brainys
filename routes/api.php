@@ -25,6 +25,8 @@ Route::controller(LoginRegisterController::class)->group(function() {
     Route::post('/register', 'register');
     Route::post('/login', 'login');
     Route::post('verify-otp', 'verifyOtp');
+    Route::post('/forgot-password', 'forgotPassword');
+    Route::post('/reset-password', 'resetPassword');
 });
 
 // Protected routes
