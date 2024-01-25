@@ -37,6 +37,6 @@ Route::middleware('auth:sanctum')->group( function () {
 });
 
 // Route for google log-in
-Route::get('login/{providser}', [LoginRegisterController::class, 'redirect']);
+Route::get('login/{provider}', [LoginRegisterController::class, 'redirect']);
 Route::get('login/{provider}/callback', [LoginRegisterController::class, 'callback']);
 Route::post('login/{provider}/callback', [LoginRegisterController::class, 'callback']);
