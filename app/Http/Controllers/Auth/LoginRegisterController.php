@@ -14,6 +14,7 @@ use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use App\Notifications\OtpNotification;
+use App\Notifications\ResetPasswordNotification;
 
 class LoginRegisterController extends Controller
 {
@@ -259,7 +260,97 @@ class LoginRegisterController extends Controller
         ], 200);
     }
 
-        /**
+
+    /**
+     * Forgot password notification function.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function forgotPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Validasi gagal.',
+                'data' => $validator->errors(),
+            ], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Pengguna email tidak ditemukan.',
+            ], 404);
+        }
+
+        $token = Str::random(60);
+        $user->reset_token = $token;
+        $user->reset_token_expired = now()->addHours(1);
+        $user->save();
+
+        // Send reset password email notification
+        $user->notify(new ResetPasswordNotification($token));
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Reset password telah dikirim ke email.',
+            'reset_token' => $token,
+        ], 200);
+    }
+
+    /**
+     * Reset password function
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'new_password' => 'required|string|min:8|confirmed',
+            'reset_token' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Validasi gagal.',
+                'data' => $validator->errors(),
+            ], 422);
+        }
+
+        $user = User::where('email', $request->email)
+            ->where('reset_token', $request->reset_token)
+            ->where('reset_token_expired', '>', now())
+            ->first();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Reset token salah atau sudah kedaluwarsa.',
+            ], 401);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->reset_token = null;
+        $user->reset_token_expired = null;
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Reset password berhasil.',
+        ], 200);
+    }
+
+    /**
      * Verify OTP for the registered user.
      *
      * @param  \Illuminate\Http\Request  $request
