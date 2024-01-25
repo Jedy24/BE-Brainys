@@ -13,6 +13,7 @@ use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
+use App\Notifications\OtpNotification;
 
 class LoginRegisterController extends Controller
 {
@@ -33,7 +34,7 @@ class LoginRegisterController extends Controller
         if($validate->fails()){
             return response()->json([
                 'status' => 'failed',
-                'message' => 'An error occurred, please check your email or password!',
+                'message' => 'Terjadi kesalahan, email atau password salah!',
                 'data' => $validate->errors(),
             ], 403);
         }
@@ -47,12 +48,14 @@ class LoginRegisterController extends Controller
             'otp' => $otp,
         ]);
 
+        $user->notify(new OtpNotification($otp));
+
         $data['token'] = $user->createToken($request->email)->plainTextToken;
         $data['user'] = $user;
 
         $response = [
             'status' => 'success',
-            'message' => 'User is created successfully.',
+            'message' => 'Akun berhasil dibuat!',
             'data' => $data,
         ];
 
@@ -75,7 +78,7 @@ class LoginRegisterController extends Controller
         if($validate->fails()){
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Email or Password is incorrect!',
+                'message' => 'Email atau Password salah!',
                 'data' => $validate->errors(),
             ], 403);
         }
@@ -83,12 +86,12 @@ class LoginRegisterController extends Controller
         // Check if email exist
         $user = User::where('email', $request->email)->first();
 
-        // Check password with data in database
-        if(!$user || !Hash::check($request->password, $user->password)) {
+        // Check password & verified user
+        if (!$user || !$user->otp_verified_at || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Invalid credential'
-                ], 401);
+                'message' => 'Data salah atau Akun belum melakukan verifikasi OTP!',
+            ], 401);
         }
 
         $data['token'] = $user->createToken($request->email)->plainTextToken;
@@ -96,7 +99,7 @@ class LoginRegisterController extends Controller
 
         $response = [
             'status' => 'success',
-            'message' => 'User is logged in successfully.',
+            'message' => 'Berhasil masuk.',
             'data' => $data,
         ];
 
@@ -114,7 +117,7 @@ class LoginRegisterController extends Controller
         auth()->user()->tokens()->delete();
         return response()->json([
             'status' => 'success',
-            'message' => 'User is logged out successfully'
+            'message' => 'Berhasil keluar.'
             ], 200);
     }
 
@@ -131,13 +134,13 @@ class LoginRegisterController extends Controller
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'User not authenticated.',
+                'message' => 'Akun tidak terotentifikasi.',
             ], 401);
         }
 
         $response = [
             'status' => 'success',
-            'message' => 'User profile retrieved successfully.',
+            'message' => 'Data akun berhasil diambil!',
             'data' => [
                 'name' => $user->name,
                 'email' => $user->email,
@@ -210,7 +213,7 @@ class LoginRegisterController extends Controller
 
     protected function validateProvider($provider){
         if (!in_array($provider, ['facebook', 'github', 'google'])) {
-            return response()->json(['error' => 'Please login using facebook, github, or google'], 422);
+            return response()->json(['error' => 'Silakan masuk menggunakan akun Facebook, GitHub, atau Google'], 422);
         }
     }
 
@@ -233,7 +236,7 @@ class LoginRegisterController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Validation failed',
+                'message' => 'Validasi gagal.',
                 'data' => $validator->errors(),
             ], 422);
         }
@@ -242,7 +245,7 @@ class LoginRegisterController extends Controller
         if (!Hash::check($request->current_password, $user->password)) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Current password is incorrect',
+                'message' => 'Current password tidak sesuai.',
             ], 401);
         }
 
@@ -252,7 +255,7 @@ class LoginRegisterController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Password changed successfully',
+            'message' => 'Password berhasil diubah!',
         ], 200);
     }
 
@@ -272,7 +275,7 @@ class LoginRegisterController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Validation failed',
+                'message' => 'Validasi gagal',
                 'data' => $validator->errors(),
             ], 422);
         }
@@ -283,7 +286,7 @@ class LoginRegisterController extends Controller
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Invalid OTP or email',
+                'message' => 'Email atau OTP salah',
             ], 401);
         }
 
@@ -297,7 +300,7 @@ class LoginRegisterController extends Controller
 
         $response = [
             'status' => 'success',
-            'message' => 'User verified successfully. OTP is correct.',
+            'message' => 'Verifikasi berhasil!',
             'data' => $data,
         ];
 

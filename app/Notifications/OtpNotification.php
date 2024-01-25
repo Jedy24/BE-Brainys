@@ -11,12 +11,14 @@ class OtpNotification extends Notification
 {
     use Queueable;
 
+    public $otp;
+
     /**
      * Create a new notification instance.
      */
-    public function __construct(User $user)
+    public function __construct($otp)
     {
-        $this->user = $user;
+        $this->otp = $otp;
     }
 
     /**
@@ -35,11 +37,10 @@ class OtpNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                ->greeting('Hello, '.$this->user->name)
-                ->line('Your OTP is '.$this->user->token)
-                ->line('This OTP will expire in 5 minutes')
-                ->line('If you did not request an OTP, no further action is required.')
-                ->line('Thank you for using our application!');
+                ->subject('Kode OTP untuk Verifikasi')
+                ->line('Kode OTP untuk verifikasi adalah: ' . $this->otp)
+                ->action('Verifikasi Sekarang', url('/verify-otp'))
+                ->line('Jika anda tidak meminta kode OTP, abaikan pesan ini.');
     }
 
     /**
