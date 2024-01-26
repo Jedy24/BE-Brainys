@@ -51,7 +51,6 @@ class LoginRegisterController extends Controller
 
         $user->notify(new OtpNotification($otp));
 
-        $data['token'] = $user->createToken($request->email)->plainTextToken;
         $data['user'] = $user;
 
         $response = [
@@ -386,7 +385,6 @@ class LoginRegisterController extends Controller
         $user->otp_verified_at = now();
         $user->save();
 
-        $data['token'] = $user->createToken($request->email)->plainTextToken;
         $data['user'] = $user;
 
         $response = [
