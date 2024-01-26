@@ -37,8 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/change-password', [LoginRegisterController::class, 'changePassword']);
     Route::group(['prefix' => 'syllabus'], function () {
         Route::post('/generate', [SyllabusController::class, 'generate']);
-        // Route::post('/convert-to-word', [SyllabusController::class, 'convertToWord']);
-        // Route::post('/convert-to-word-2', [SyllabusController::class, 'convertToWordTEST']);
+        Route::post('/export-to-word', [SyllabusController::class, 'convertToWord']);
     });
 });
 
