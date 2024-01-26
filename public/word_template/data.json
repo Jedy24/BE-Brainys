@@ -1,0 +1,124 @@
+{
+    "success": true,
+    "message": "Request processed successfully",
+    "http_code": 200,
+    "data": {
+        "informasi_umum": {
+            "penyusun": "Nama penyusun",
+            "instansi": "Nama institusi",
+            "tahun_penyusunan": "Tahun penyusunan",
+            "jenjang_sekolah": "Kelas 8",
+            "mata_pelajaran": "Fisika",
+            "fase_kelas": "Semester 1",
+            "topik": "Listrik Dinamis",
+            "alokasi_waktu": "4 jam pelajaran per minggu",
+            "kompetensi_awal": "Menguasai dasar-dasar Fisika kelas 7"
+        },
+        "sarana_dan_prasarana": {
+            "sumber_belajar": "Buku teks, internet, video pembelajaran",
+            "lembar_kerja_peserta_didik": "Lembar kerja, kertas, pulpen, komputer (jika diperlukan)"
+        },
+        "komponen_pembelajaran": {
+            "perlengkapan_peserta_didik": [
+                "Buku teks",
+                "Lembar kerja",
+                "Alat tulis"
+            ],
+            "perlengkapan_guru": [
+                "Buku panduan guru",
+                "Alat peraga",
+                "Laptop/PC"
+            ]
+        },
+        "tujuan_kegiatan_pembelajaran": {
+            "tujuan_pembelajaran_bab": "Membekali siswa dengan pengetahuan tentang listrik dinamis",
+            "tujuan_pembelajaran_topik": [
+                "Mampu menjelaskan konsep arus listrik",
+                "Mampu menghitung tegangan, kuat arus, dan hambatan dalam rangkaian listrik sederhana"
+            ]
+        },
+        "pemahaman_bermakna": {
+            "topik": "Listrik Dinamis"
+        },
+        "pertanyaan_pemantik": [
+            "Apa yang dimaksud dengan arus listrik?",
+            "Bagaimana cara menghitung tegangan dalam rangkaian listrik?"
+        ],
+        "kompetensi_dasar": [
+            {
+                "nama_kompetensi_dasar": "Memahami konsep arus listrik",
+                "materi_pembelajaran": [
+                    {
+                        "materi": "Pengertian arus listrik",
+                        "indikator": "Mampu menjelaskan pengertian arus listrik secara benar",
+                        "nilai_karakter": "Kedisiplinan",
+                        "kegiatan_pembelajaran": "Diskusi kelompok tentang arus listrik",
+                        "alokasi_waktu": "2 jam",
+                        "penilaian": [
+                            {
+                                "jenis": "Tes tertulis",
+                                "bobot": 70
+                            },
+                            {
+                                "jenis": "Presentasi",
+                                "bobot": 30
+                            }
+                        ]
+                    },
+                    {
+                        "materi": "Jenis-jenis arus listrik",
+                        "indikator": "Mampu menyebutkan dan menjelaskan jenis-jenis arus listrik",
+                        "nilai_karakter": "Kerjasama",
+                        "kegiatan_pembelajaran": "Eksperimen untuk mengidentifikasi jenis-jenis arus listrik",
+                        "alokasi_waktu": "2 jam",
+                        "penilaian": [
+                            {
+                                "jenis": "Observasi praktikum",
+                                "bobot": 100
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "nama_kompetensi_dasar": "Menghitung tegangan, kuat arus, dan hambatan dalam rangkaian listrik sederhana",
+                "materi_pembelajaran": [
+                    {
+                        "materi": "Rumus tegangan, kuat arus, dan hambatan",
+                        "indikator": "Mampu menghitung tegangan, kuat arus, dan hambatan dalam rangkaian listrik sederhana menggunakan rumus yang benar",
+                        "nilai_karakter": "Kritis",
+                        "kegiatan_pembelajaran": "Pembelajaran langsung dengan contoh soal",
+                        "alokasi_waktu": "2 jam",
+                        "penilaian": [
+                            {
+                                "jenis": "Pemecahan soal",
+                                "bobot": 60
+                            },
+                            {
+                                "jenis": "Ujian",
+                                "bobot": 40
+                            }
+                        ]
+                    },
+                    {
+                        "materi": "Penerapan rumus dalam kehidupan sehari-hari",
+                        "indikator": "Mampu mengaplikasikan rumus tegangan, kuat arus, dan hambatan dalam situasi kehidupan sehari-hari",
+                        "nilai_karakter": "Kreativitas",
+                        "kegiatan_pembelajaran": "Studi kasus dan diskusi kelompok",
+                        "alokasi_waktu": "2 jam",
+                        "penilaian": [
+                            {
+                                "jenis": "Presentasi hasil diskusi",
+                                "bobot": 70
+                            },
+                            {
+                                "jenis": "Tugas tertulis",
+                                "bobot": 30
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
