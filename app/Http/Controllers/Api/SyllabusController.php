@@ -75,7 +75,7 @@ class SyllabusController extends Controller
 
             $data = $request->input('data');
 
-            $docxTemplate->merge($data, $outputPath, false, true);
+            $docxTemplate->merge($data, $outputPath, false, false);
 
             // Assuming the merge operation is successful
             $responseData = [
@@ -89,7 +89,7 @@ class SyllabusController extends Controller
         } catch (\Exception $e) {
             $errorResponse = [
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => $e,
                 'http_code' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
                 'data' => json_decode($e->getMessage(), true),
             ];
