@@ -27,7 +27,6 @@ class LoginRegisterController extends Controller
     public function register(Request $request)
     {
         $validate = Validator::make($request->all(), [
-            'name' => 'required|string|max:250',
             'email' => 'required|string|email:rfc,dns|max:250|unique:users,email',
             'password' => 'required|string|min:8|confirmed'
         ]);
@@ -43,7 +42,6 @@ class LoginRegisterController extends Controller
         $otp = rand(100000, 999999);
 
         $user = User::create([
-            'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'otp' => $otp,
@@ -92,6 +90,14 @@ class LoginRegisterController extends Controller
                 'status' => 'failed',
                 'message' => 'Data salah atau Akun belum melakukan verifikasi OTP!',
             ], 401);
+        }
+
+        // Check if the profile is completed
+        if (!$user->profile_completed) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Lengkapi profile Anda untuk melanjutkan.',
+            ], 403);
         }
 
         $data['token'] = $user->createToken($request->email)->plainTextToken;
@@ -144,6 +150,8 @@ class LoginRegisterController extends Controller
             'data' => [
                 'name' => $user->name,
                 'email' => $user->email,
+                'school_name' => $user->school_name,
+                'profession' => $user->profession,
             ],
         ];
 
@@ -383,13 +391,63 @@ class LoginRegisterController extends Controller
         // Clear OTP after successful verification
         $user->otp = null;
         $user->otp_verified_at = now();
+        $user->profile_completed = false;
+        $user->save();
+
+        $token = $user->createToken('otp-token')->plainTextToken;
+
+        $data['token'] = $token;
+        $data['user'] = $user;
+
+        $response = [
+            'status' => 'success',
+            'message' => 'Verifikasi berhasil! Silakan lengkapi profile untuk melanjutkan.',
+            'data' => $data,
+        ];
+
+        return response()->json($response, 200);
+    }
+
+    public function profile(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'school_name' => 'required|string|max:255',
+            'profession' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Validasi gagal',
+                'data' => $validator->errors(),
+            ], 422);
+        }
+
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Pengguna tidak ditemukan',
+            ], 404);
+        }
+
+        // Update user profile information
+        $user->update([
+            'name' => $request->name,
+            'school_name' => $request->school_name,
+            'profession' => $request->profession,
+        ]);
+
+        $user->profile_completed = true;
         $user->save();
 
         $data['user'] = $user;
 
         $response = [
             'status' => 'success',
-            'message' => 'Verifikasi berhasil!',
+            'message' => 'Profile berhasil dilengkapi!',
             'data' => $data,
         ];
 

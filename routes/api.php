@@ -34,6 +34,7 @@ Route::controller(LoginRegisterController::class)->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [LoginRegisterController::class, 'logout']);
     Route::get('/user-profile', [LoginRegisterController::class, 'userProfile']);
+    Route::post('/profile', [LoginRegisterController::class, 'profile']);
     Route::post('/change-password', [LoginRegisterController::class, 'changePassword']);
     Route::group(['prefix' => 'syllabus'], function () {
         Route::post('/generate', [SyllabusController::class, 'generate']);
