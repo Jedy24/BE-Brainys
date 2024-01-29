@@ -3,8 +3,9 @@
 use App\Http\Controllers\Api\SyllabusController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\Auth\LoginRegisterController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\AuthenticationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,21 +22,23 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// API routes for register & login
+Route::post('/register', [RegisterController::class, 'register']);
+Route::post('/login', [LoginController::class, 'login']);
+
 // Public routes of authentication
-Route::controller(LoginRegisterController::class)->group(function () {
-    Route::post('/register', 'register');
-    Route::post('/login', 'login');
-    Route::post('verify-otp', 'verifyOtp');
+Route::controller(AuthenticationController::class)->group(function () {
+    Route::post('/verify-otp', 'verifyOtp');
     Route::post('/forgot-password', 'forgotPassword');
     Route::post('/reset-password', 'resetPassword');
 });
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [LoginRegisterController::class, 'logout']);
-    Route::get('/user-profile', [LoginRegisterController::class, 'userProfile']);
-    Route::post('/profile', [LoginRegisterController::class, 'profile']);
-    Route::post('/change-password', [LoginRegisterController::class, 'changePassword']);
+    Route::post('/logout', [AuthenticationController::class, 'logout']);
+    Route::get('/user-profile', [AuthenticationController::class, 'userProfile']);
+    Route::post('/profile', [AuthenticationController::class, 'profile']);
+    Route::post('/change-password', [AuthenticationController::class, 'changePassword']);
     Route::group(['prefix' => 'syllabus'], function () {
         Route::post('/generate', [SyllabusController::class, 'generate']);
         Route::post('/export-to-word', [SyllabusController::class, 'convertToWord']);

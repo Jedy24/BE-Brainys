@@ -2,137 +2,21 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Models\User;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use App\Models\User;
 use Illuminate\Support\Facades\Validator;
-use Laravel\Socialite\Facades\Socialite;
-use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use App\Notifications\OtpNotification;
 use App\Notifications\ResetPasswordNotification;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
-class LoginRegisterController extends Controller
+class AuthenticationController extends Controller
 {
-     /**
-     * Register a new user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function register(Request $request)
-    {
-        $validate = Validator::make($request->all(), [
-            'email' => 'required|string|email:rfc,dns|max:250|unique:users,email',
-            'password' => 'required|string|min:8|confirmed'
-        ]);
-
-        if($validate->fails()){
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Terjadi kesalahan, email atau password salah!',
-                'data' => $validate->errors(),
-            ], 403);
-        }
-
-        $otp = rand(100000, 999999);
-
-        $user = User::create([
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'otp' => $otp,
-        ]);
-
-        $user->notify(new OtpNotification($otp));
-
-        $data['user'] = $user;
-
-        $response = [
-            'status' => 'success',
-            'message' => 'Akun berhasil dibuat!',
-            'data' => $data,
-        ];
-
-        return response()->json($response, 201);
-    }
-
-    /**
-     * Authenticate the user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function login(Request $request)
-    {
-        $validate = Validator::make($request->all(), [
-            'email' => 'required|string|email',
-            'password' => 'required|string'
-        ]);
-
-        if($validate->fails()){
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Email atau Password salah!',
-                'data' => $validate->errors(),
-            ], 403);
-        }
-
-        // Check if email exist
-        $user = User::where('email', $request->email)->first();
-
-        // Check password & verified user
-        if (!$user || !$user->otp_verified_at || !Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Data salah atau Akun belum melakukan verifikasi OTP!',
-            ], 401);
-        }
-
-        // Check if the profile is completed
-        if (!$user->profile_completed) {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Lengkapi profile Anda untuk melanjutkan.',
-            ], 403);
-        }
-
-        $data['token'] = $user->createToken($request->email)->plainTextToken;
-        $data['user'] = $user;
-
-        $response = [
-            'status' => 'success',
-            'message' => 'Berhasil masuk.',
-            'data' => $data,
-        ];
-
-        return response()->json($response, 200);
-    }
-
-    /**
-     * Log out the user from application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function logout(Request $request)
-    {
-        auth()->user()->tokens()->delete();
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Berhasil keluar.'
-            ], 200);
-    }
-
-    /**
-     * Get the profile of the authenticated user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    // Handle get profile user
     public function userProfile(Request $request)
     {
         $user = $request->user();
@@ -158,79 +42,17 @@ class LoginRegisterController extends Controller
         return response()->json($response, 200);
     }
 
-    /**
-     * Redirect the user to the Google authentication page.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function redirect($provider)
+    // Handle log-out function
+    public function logout(Request $request)
     {
-        $validated = $this->validateProvider($provider);
-        if (!is_null($validated)) {
-            return $validated;
-        }
-        return Socialite::driver($provider)->stateless()->redirect();
+        auth()->user()->tokens()->delete();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Berhasil keluar.'
+            ], 200);
     }
 
-    /**
-     * Obtain the user information from Google.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function callback($provider)
-    {
-        $validated = $this->validateProvider($provider);
-        if (!is_null($validated)) {
-            return $validated;
-        }
-        try{
-            $user = Socialite::driver($provider)->stateless()->user();
-        } catch (ClientException $exception){
-            return response()->json(['error' => 'Invalid credentials provided.']);
-        }
-
-        $userCreated = User::firstOrCreate([
-            'email' => $user->getEmail(),
-        ],
-        [
-            'email_verified_at' => now(),
-            'name' => $user->getName(),
-            'status' => true,
-            'password' => Hash::make('123456789'),
-        ]);
-
-        $userCreated->providers()->updateOrCreate([
-            'provider' => $provider,
-            'provider_id' => $user->getId(),
-        ],
-        [
-            'avatar' => $user->getAvatar(),
-        ]);
-
-        $token = $userCreated->createToken('token-name')->plainTextToken;
-
-        $response = [
-            'id' => $userCreated->id,
-            'name' => $userCreated->name,
-            'email' => $userCreated->email,
-            'token' => $token,
-        ];
-
-        return response()->json($response, 200);
-    }
-
-    protected function validateProvider($provider){
-        if (!in_array($provider, ['facebook', 'github', 'google'])) {
-            return response()->json(['error' => 'Silakan masuk menggunakan akun Facebook, GitHub, atau Google'], 422);
-        }
-    }
-
-    /**
-     * Change the password for the authenticated user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    // Handle change password function
     public function changePassword(Request $request)
     {
         $user = $request->user();
@@ -267,13 +89,7 @@ class LoginRegisterController extends Controller
         ], 200);
     }
 
-
-    /**
-     * Forgot password notification function.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    // Handle forgot password function
     public function forgotPassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -312,12 +128,7 @@ class LoginRegisterController extends Controller
         ], 200);
     }
 
-    /**
-     * Reset password function
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    // Handle reset password function
     public function resetPassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -357,12 +168,7 @@ class LoginRegisterController extends Controller
         ], 200);
     }
 
-    /**
-     * Verify OTP for the registered user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    // Handle verify OTP function
     public function verifyOtp(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -408,6 +214,7 @@ class LoginRegisterController extends Controller
         return response()->json($response, 200);
     }
 
+    // Handle profile registration
     public function profile(Request $request)
     {
         $validator = Validator::make($request->all(), [
