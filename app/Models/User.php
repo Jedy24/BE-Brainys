@@ -53,4 +53,9 @@ class User extends Authenticatable
     public function providers(){
         return $this->hasMany(Provider::class, 'user_id', 'id');
     }
+
+    public function syllabusHistory()
+    {
+        return $this->hasMany(SyllabusHistory::class, 'user_id', 'id');
+    }
 }

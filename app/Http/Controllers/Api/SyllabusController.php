@@ -8,7 +8,7 @@ use App\Services\OpenAIService;
 
 use Illuminate\Http\JsonResponse;
 use App\Http\Resources\APIResponse;
-
+use App\Models\SyllabusHistory;
 use icircle\Template\Docx\DocxTemplate;
 
 class SyllabusController extends Controller
@@ -46,22 +46,34 @@ class SyllabusController extends Controller
             // Assuming $parsedResponse is an array with the OpenAI response
 
             // Construct the response data for success
-            $responseData = [
-                'success' => true,
-                'message' => 'Request processed successfully',
-                'http_code' => JsonResponse::HTTP_OK,
-                'data' => $parsedResponse,
-            ];
+            $syllabusHistory = SyllabusHistory::create([
+                'subject' => $mataPelajaran,
+                'class' => $tingkatKelas,
+                'notes' => $addNotes,
+                'output_data' => $parsedResponse,
+                'user_id' => auth()->id(), // Assuming there is an authenticated user
+                // Add other fields if necessary
+            ]);
 
-            return new APIResponse($responseData);
+            // $responseData = [
+            //     'success' => true,
+            //     'message' => 'Request processed successfully',
+            //     'http_code' => JsonResponse::HTTP_OK,
+            //     'data' => $parsedResponse,
+            // ];
+
+            // return new APIResponse($responseData);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Request processed successfully',
+                'data' => $parsedResponse,
+            ], 200);
         } catch (\Exception $e) {
-            $errorResponse = [
-                'success' => false,
+            return response()->json([
+                'status' => 'failed',
                 'message' => $e->getMessage(),
-                'http_code' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
                 'data' => json_decode($e->getMessage(), true),
-            ];
-            return new APIResponse($errorResponse);
+            ], 500);
         }
     }
 
@@ -78,23 +90,17 @@ class SyllabusController extends Controller
             $docxTemplate->merge($data, $outputPath, false, false);
 
             // Assuming the merge operation is successful
-            $responseData = [
-                'success' => true,
+            return response()->json([
+                'status' => 'success',
                 'message' => 'Word document generated successfully',
-                'http_code' => JsonResponse::HTTP_OK,
                 'data' => ['output_path' => $outputPath, 'download_url' => url('word_output/' . basename($outputPath))],
-            ];
-
-            return new APIResponse($responseData);
+            ], 200);
         } catch (\Exception $e) {
-            $errorResponse = [
-                'success' => false,
-                'message' => $e,
-                'http_code' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage(),
                 'data' => json_decode($e->getMessage(), true),
-            ];
-
-            return new APIResponse($errorResponse);
+            ], 500);
         }
     }
 }
