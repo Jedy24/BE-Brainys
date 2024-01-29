@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\AuthenticationController;
+use App\Http\Controllers\Auth\SocialiteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +47,6 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 // Route for google log-in
-Route::get('login/{provider}', [LoginRegisterController::class, 'redirect']);
-Route::get('login/{provider}/callback', [LoginRegisterController::class, 'callback']);
-Route::post('login/{provider}/callback', [LoginRegisterController::class, 'callback']);
+Route::get('login/{provider}', [SocialiteController::class, 'redirect']);
+Route::get('login/{provider}/callback', [SocialiteController::class, 'callback']);
+Route::post('login/{provider}/callback', [SocialiteController::class, 'callback']);
