@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\OpenAIService;
 
-use Illuminate\Http\JsonResponse;
-use App\Http\Resources\APIResponse;
 use App\Models\SyllabusHistory;
 use icircle\Template\Docx\DocxTemplate;
 
@@ -43,24 +41,14 @@ class SyllabusController extends Controller
             $parsedResponse = json_decode($resMessage, true);
             // $parsedResponse = $resMessage;
 
-            // Assuming $parsedResponse is an array with the OpenAI response
-
             // Construct the response data for success
             $syllabusHistory = SyllabusHistory::create([
                 'subject' => $mataPelajaran,
                 'class' => $tingkatKelas,
                 'notes' => $addNotes,
                 'output_data' => $parsedResponse,
-                'user_id' => auth()->id(), // Assuming there is an authenticated user
-                // Add other fields if necessary
+                'user_id' => auth()->id(),
             ]);
-
-            // $responseData = [
-            //     'success' => true,
-            //     'message' => 'Request processed successfully',
-            //     'http_code' => JsonResponse::HTTP_OK,
-            //     'data' => $parsedResponse,
-            // ];
 
             // return new APIResponse($responseData);
             return response()->json([
@@ -94,6 +82,62 @@ class SyllabusController extends Controller
                 'status' => 'success',
                 'message' => 'Word document generated successfully',
                 'data' => ['output_path' => $outputPath, 'download_url' => url('word_output/' . basename($outputPath))],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage(),
+                'data' => json_decode($e->getMessage(), true),
+            ], 500);
+        }
+    }
+
+    public function history(Request $request)
+    {
+        try {
+            // Retrieve the authenticated user
+            $user = $request->user();
+
+            // Get syllabus histories for the authenticated user
+            $syllabusHistories = $user->syllabusHistory()->select(['id', 'subject', 'class', 'notes', 'created_at', 'updated_at', 'user_id'])->get();
+
+            // Return the response with syllabus histories data
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Syllabus histories retrieved successfully',
+                'data' => $syllabusHistories,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage(),
+                'data' => json_decode($e->getMessage(), true),
+            ], 500);
+        }
+    }
+
+    public function historyDetail(Request $request, $id)
+    {
+        try {
+            // Retrieve the authenticated user
+            $user = $request->user();
+
+            // Get a specific syllabus history by ID for the authenticated user
+            $syllabusHistory = $user->syllabusHistory()->find($id);
+
+            if (!$syllabusHistory) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Syllabus history not found',
+                    'data' => null,
+                ], 404);
+            }
+
+            // Return the response with syllabus history data
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Syllabus history retrieved successfully',
+                'data' => $syllabusHistory,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

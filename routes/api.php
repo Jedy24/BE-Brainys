@@ -41,9 +41,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile', [AuthenticationController::class, 'profile']);
     Route::post('/change-password', [AuthenticationController::class, 'changePassword']);
     Route::group(['prefix' => 'syllabus'], function () {
+        Route::get('/history', [SyllabusController::class, 'history']);
+        Route::get('/history/{id}', [SyllabusController::class, 'historyDetail']); // Menggunakan {id} sebagai parameter
         Route::post('/generate', [SyllabusController::class, 'generate']);
         Route::post('/export-to-word', [SyllabusController::class, 'convertToWord']);
-    });
+    });      
 });
 
 // Route for google log-in
