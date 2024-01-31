@@ -25,7 +25,7 @@ class RegisterController extends Controller
         if($validate->fails()){
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Terjadi kesalahan, email atau password salah!',
+                'message' => 'Terjadi kesalahan, periksa Email atau Password!',
                 'data' => $validate->errors(),
             ], 403);
         }

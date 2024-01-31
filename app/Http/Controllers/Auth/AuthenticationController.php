@@ -109,7 +109,7 @@ class AuthenticationController extends Controller
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Pengguna email tidak ditemukan.',
+                'message' => 'Email tidak ditemukan, periksa lagi Email Anda.',
             ], 404);
         }
 
@@ -190,7 +190,7 @@ class AuthenticationController extends Controller
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Email atau OTP salah',
+                'message' => 'Email atau OTP salah, silakan periksa kembali.',
             ], 401);
         }
 
@@ -207,7 +207,7 @@ class AuthenticationController extends Controller
 
         $response = [
             'status' => 'success',
-            'message' => 'Verifikasi berhasil! Silakan lengkapi profile untuk melanjutkan.',
+            'message' => 'Verifikasi berhasil! Silakan lengkapi profile untuk proses selanjutnya.',
             'data' => $data,
         ];
 
@@ -226,7 +226,7 @@ class AuthenticationController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Validasi gagal',
+                'message' => 'Validasi gagal.',
                 'data' => $validator->errors(),
             ], 422);
         }
@@ -236,7 +236,7 @@ class AuthenticationController extends Controller
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Pengguna tidak ditemukan',
+                'message' => 'Pengguna tidak ditemukan.',
             ], 404);
         }
 
@@ -254,7 +254,7 @@ class AuthenticationController extends Controller
 
         $response = [
             'status' => 'success',
-            'message' => 'Profile berhasil dilengkapi!',
+            'message' => 'Profile pengguna berhasil dilengkapi!',
             'data' => $data,
         ];
 

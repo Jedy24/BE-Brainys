@@ -23,7 +23,7 @@ class LoginController extends Controller
         if($validate->fails()){
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Email atau Password salah!',
+                'message' => 'Validasi gagal.',
                 'data' => $validate->errors(),
             ], 403);
         }
@@ -33,9 +33,24 @@ class LoginController extends Controller
 
         // Check password & verified user
         if (!$user || !$user->otp_verified_at || !Hash::check($request->password, $user->password)) {
+            $errorMessage = '';
+
+            // Email doesn't exist
+            if (!$user) {
+                $errorMessage = 'Email tidak ditemukan, periksa lagi Email Anda.';
+            }
+            // User not verified with OTP
+            elseif (!$user->otp_verified_at) {
+                $errorMessage = 'Akun belum melakukan verifikasi OTP, silakan melakukan verifikasi OTP.';
+            }
+            // Password is incorrect
+            elseif (!Hash::check($request->password, $user->password)) {
+                $errorMessage = 'Password salah, periksa lagi password Anda.';
+            }
+
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Data salah atau Akun belum melakukan verifikasi OTP!',
+                'message' => $errorMessage,
             ], 401);
         }
 
@@ -43,7 +58,7 @@ class LoginController extends Controller
         if (!$user->profile_completed) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Lengkapi profile Anda untuk melanjutkan.',
+                'message' => 'Lengkapi profile Anda sebelum melakukan log-in.',
             ], 403);
         }
 
