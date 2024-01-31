@@ -99,7 +99,17 @@ class SyllabusController extends Controller
             $user = $request->user();
 
             // Get syllabus histories for the authenticated user
-            $syllabusHistories = $user->syllabusHistory()->select(['id', 'subject', 'class', 'notes', 'created_at', 'updated_at', 'user_id'])->get();
+            $syllabusHistories = $user->syllabusHistory()
+                ->select(['id', 'subject', 'class', 'notes', 'created_at', 'updated_at', 'user_id'])
+                ->get();
+
+            if ($syllabusHistories->isEmpty()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No syllabus histories found for the user',
+                    'data' => [],
+                ], 200);
+            }
 
             // Return the response with syllabus histories data
             return response()->json([
@@ -115,6 +125,7 @@ class SyllabusController extends Controller
             ], 500);
         }
     }
+
 
     public function historyDetail(Request $request, $id)
     {
