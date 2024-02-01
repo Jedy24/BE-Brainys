@@ -43,6 +43,7 @@ class SyllabusController extends Controller
 
             // Construct the response data for success
             SyllabusHistory::create([
+                'name' => $syllabusName,
                 'subject' => $mataPelajaran,
                 'class' => $tingkatKelas,
                 'notes' => $addNotes,
@@ -100,7 +101,7 @@ class SyllabusController extends Controller
 
             // Get syllabus histories for the authenticated user
             $syllabusHistories = $user->syllabusHistory()
-                ->select(['id', 'subject', 'class', 'notes', 'created_at', 'updated_at', 'user_id'])
+                ->select(['id', 'name', 'subject', 'class', 'notes', 'created_at', 'updated_at', 'user_id'])
                 ->get();
 
             if ($syllabusHistories->isEmpty()) {
