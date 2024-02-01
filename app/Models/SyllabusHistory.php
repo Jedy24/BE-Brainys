@@ -12,7 +12,7 @@ class SyllabusHistory extends Model
     protected $fillable = [
         'name',
         'subject',
-        'class',
+        'grade',
         'notes',
         'output_data',
         'user_id'
