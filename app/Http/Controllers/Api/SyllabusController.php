@@ -37,12 +37,10 @@ class SyllabusController extends Controller
             // Send the message to OpenAI
             $resMessage = $this->openAI->sendMessage($prompt);
 
-            // Parse the response from OpenAI if needed
             $parsedResponse = json_decode($resMessage, true);
-            // $parsedResponse = $resMessage;
 
             // Construct the response data for success
-            $syllabusHistory = SyllabusHistory::create([
+            SyllabusHistory::create([
                 'subject' => $mataPelajaran,
                 'class' => $tingkatKelas,
                 'notes' => $addNotes,
@@ -53,7 +51,7 @@ class SyllabusController extends Controller
             // return new APIResponse($responseData);
             return response()->json([
                 'status' => 'success',
-                'message' => 'Request processed successfully',
+                'message' => 'Silabus berhasil dihasilkan',
                 'data' => $parsedResponse,
             ], 200);
         } catch (\Exception $e) {
@@ -80,7 +78,7 @@ class SyllabusController extends Controller
             // Assuming the merge operation is successful
             return response()->json([
                 'status' => 'success',
-                'message' => 'Word document generated successfully',
+                'message' => 'Dokumen word berhasil dibuat',
                 'data' => ['output_path' => $outputPath, 'download_url' => url('word_output/' . basename($outputPath))],
             ], 200);
         } catch (\Exception $e) {
@@ -106,16 +104,25 @@ class SyllabusController extends Controller
             if ($syllabusHistories->isEmpty()) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'No syllabus histories found for the user',
-                    'data' => [],
+                    'message' => 'Tidak ada riwayat silabus untuk akun anda!',
+                    'data' => [
+                        'generated_num' => 0,
+                        'items' => [],
+                    ],
                 ], 200);
             }
+
+            // Calculate the total generated syllabuses by the user
+            $generatedNum = $syllabusHistories->count();
 
             // Return the response with syllabus histories data
             return response()->json([
                 'status' => 'success',
-                'message' => 'Syllabus histories retrieved successfully',
-                'data' => $syllabusHistories,
+                'message' => 'Riwayat silabus ditampilkan',
+                'data' => [
+                    'generated_num' => $generatedNum,
+                    'items' => $syllabusHistories,
+                ],
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -125,6 +132,7 @@ class SyllabusController extends Controller
             ], 500);
         }
     }
+
 
 
     public function historyDetail(Request $request, $id)
