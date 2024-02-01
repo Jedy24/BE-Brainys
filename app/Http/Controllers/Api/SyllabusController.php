@@ -23,14 +23,16 @@ class SyllabusController extends Controller
         try {
             // Input validation
             $request->validate([
-                'pelajaran' => 'required',
-                'kelas' => 'required',
+                'name' => 'required',
+                'subject' => 'required',
+                'class' => 'required',
                 'notes' => 'required',
             ]);
 
             // Parameters
-            $mataPelajaran  = $request->input('pelajaran');
-            $tingkatKelas   = $request->input('kelas');
+            $syllabusName   = $request->input('name');
+            $mataPelajaran  = $request->input('subject');
+            $tingkatKelas   = $request->input('class');
             $addNotes       = $request->input('notes');
             $prompt         = $this->openAI->generateSyllabusPrompt($mataPelajaran, $tingkatKelas, $addNotes);
 
