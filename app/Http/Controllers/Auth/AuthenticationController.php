@@ -226,19 +226,12 @@ class AuthenticationController extends Controller
         /**Cek email dan kode OTP user */
         $user = User::where('email', $request->email)->where('otp', $request->otp)->first();
 
-        /**Jika email salah, maka muncul pesan error */
+        /**Jika user tidak ditemukan atau kode OTP salah, munculkan pesan error */
         if (!$user) {
+            $errorMessage = ($user) ? 'OTP salah, silakan periksa kembali.' : 'Email tidak ditemukan.';
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Email tidak ditemukan.',
-            ], 401);
-        }
-
-        /**Jika kode OTP salah, maka muncul pesan error */
-        if ($user->otp !== $request->otp) {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'OTP salah, silakan periksa kembali.',
+                'message' => $errorMessage,
             ], 401);
         }
 
