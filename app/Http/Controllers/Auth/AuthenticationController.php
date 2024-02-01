@@ -228,10 +228,9 @@ class AuthenticationController extends Controller
 
         /**Jika user tidak ditemukan atau kode OTP salah, munculkan pesan error */
         if (!$user) {
-            $errorMessage = ($user) ? 'OTP salah, silakan periksa kembali.' : 'Email tidak ditemukan.';
             return response()->json([
                 'status' => 'failed',
-                'message' => $errorMessage,
+                'message' => 'Email atau OTP salah, silakan periksa kembali.',
             ], 401);
         }
 
