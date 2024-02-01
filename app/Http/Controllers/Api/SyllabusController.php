@@ -25,14 +25,14 @@ class SyllabusController extends Controller
             $request->validate([
                 'name' => 'required',
                 'subject' => 'required',
-                'class' => 'required',
+                'grade' => 'required',
                 'notes' => 'required',
             ]);
 
             // Parameters
             $syllabusName   = $request->input('name');
             $mataPelajaran  = $request->input('subject');
-            $tingkatKelas   = $request->input('class');
+            $tingkatKelas   = $request->input('grade');
             $addNotes       = $request->input('notes');
             $prompt         = $this->openAI->generateSyllabusPrompt($mataPelajaran, $tingkatKelas, $addNotes);
 
@@ -45,7 +45,7 @@ class SyllabusController extends Controller
             SyllabusHistory::create([
                 'name' => $syllabusName,
                 'subject' => $mataPelajaran,
-                'class' => $tingkatKelas,
+                'grade' => $tingkatKelas,
                 'notes' => $addNotes,
                 'output_data' => $parsedResponse,
                 'user_id' => auth()->id(),
@@ -101,7 +101,7 @@ class SyllabusController extends Controller
 
             // Get syllabus histories for the authenticated user
             $syllabusHistories = $user->syllabusHistory()
-                ->select(['id', 'name', 'subject', 'class', 'notes', 'created_at', 'updated_at', 'user_id'])
+                ->select(['id', 'name', 'subject', 'grade', 'notes', 'created_at', 'updated_at', 'user_id'])
                 ->get();
 
             if ($syllabusHistories->isEmpty()) {

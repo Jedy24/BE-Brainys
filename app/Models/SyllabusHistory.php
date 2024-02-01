@@ -10,6 +10,7 @@ class SyllabusHistory extends Model
     use HasFactory;
 
     protected $fillable = [
+        'name',
         'subject',
         'class',
         'notes',
