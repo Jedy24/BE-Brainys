@@ -15,11 +15,13 @@ class LoginController extends Controller
 {
     public function login(Request $request)
     {
+        /**Validasi data user. */
         $validate = Validator::make($request->all(), [
             'email' => 'required|string|email',
             'password' => 'required|string'
         ]);
 
+        /**Jika validasi gagal maka muncul pesan error. */
         if($validate->fails()){
             return response()->json([
                 'status' => 'failed',
@@ -28,33 +30,34 @@ class LoginController extends Controller
             ], 403);
         }
 
-        // Check if email exist
+        /**Cek apakah email user ada atau tidak */
         $user = User::where('email', $request->email)->first();
 
-        // Check password & verified user
+        /**Cek password user dan status verifikasi OTP */
         if (!$user || !$user->otp_verified_at || !Hash::check($request->password, $user->password)) {
             $errorMessage = '';
 
-            // Email doesn't exist
+            /**Pesan error jika email user tidak ada. */
             if (!$user) {
                 $errorMessage = 'Email tidak ditemukan, periksa lagi Email Anda.';
             }
-            // User not verified with OTP
+            /**Pesan error jika user belum melakukan verifikasi OTP. */
             elseif (!$user->otp_verified_at) {
                 $errorMessage = 'Akun belum melakukan verifikasi OTP, silakan melakukan verifikasi OTP.';
             }
-            // Password is incorrect
+            /**Pesan error jika password tidak sesuai. */
             elseif (!Hash::check($request->password, $user->password)) {
                 $errorMessage = 'Password salah, periksa lagi password Anda.';
             }
 
+            /**Menampilkan pesan error. */
             return response()->json([
                 'status' => 'failed',
                 'message' => $errorMessage,
             ], 401);
         }
 
-        // Check if the profile is completed
+        /**Mengecek status kelengkapan profile. */
         if (!$user->profile_completed) {
             return response()->json([
                 'status' => 'failed',
@@ -62,15 +65,18 @@ class LoginController extends Controller
             ], 403);
         }
 
+        /**Generate token untuk digunakan pada fungsi setelah log-in atau protected API route. */
         $data['token'] = $user->createToken($request->email)->plainTextToken;
         $data['user'] = $user;
 
+        /**Response pesan sukses. */
         $response = [
             'status' => 'success',
             'message' => 'Berhasil masuk.',
             'data' => $data,
         ];
 
+        /**Mengembalikan nilai dalam bentuk JSON. */
         return response()->json($response, 200);
     }
 }

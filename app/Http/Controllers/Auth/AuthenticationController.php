@@ -21,6 +21,7 @@ class AuthenticationController extends Controller
     {
         $user = $request->user();
 
+        /**Message error jika token dari log-in salah. */
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
@@ -28,6 +29,7 @@ class AuthenticationController extends Controller
             ], 401);
         }
 
+        /**Mengambil data user berupa nama, email, nama sekolah, dan profesi. */
         $response = [
             'status' => 'success',
             'message' => 'Data akun berhasil diambil!',
@@ -39,12 +41,17 @@ class AuthenticationController extends Controller
             ],
         ];
 
+        /**Mengembalikan nilai dalam bentuk JSON */
         return response()->json($response, 200);
     }
 
     // Handle log-out function
     public function logout(Request $request)
     {
+        /**Menghapus token otentifikasi.
+         * Tanpa token tersebut maka user tidak dapat mengakses sumber daya.
+         * Mengembalikan nilai dalam bentuk JSON.
+         */
         auth()->user()->tokens()->delete();
         return response()->json([
             'status' => 'success',
@@ -57,12 +64,13 @@ class AuthenticationController extends Controller
     {
         $user = $request->user();
 
-        // Validate the request data
+        /**Validasi data user. */
         $validator = Validator::make($request->all(), [
             'current_password' => 'required|string',
             'new_password' => 'required|string|min:8|confirmed',
         ]);
 
+        /**Jika validasi gagal maka muncul pesan error. */
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'failed',
@@ -71,7 +79,9 @@ class AuthenticationController extends Controller
             ], 422);
         }
 
-        // Check if the current password matches
+        /**Cek kesamaan current password dengan password pada DB.
+         * Jika tidak sesuai maka muncul pesan error.
+         */
         if (!Hash::check($request->current_password, $user->password)) {
             return response()->json([
                 'status' => 'failed',
@@ -79,10 +89,15 @@ class AuthenticationController extends Controller
             ], 401);
         }
 
-        // Update the user's password
+        /**Jika validasi berhasil maka membuat password yang baru.
+         * Kemudian menyimpan data user.
+         */
         $user->password = Hash::make($request->new_password);
         $user->save();
 
+        /**Mengembalikan nilai dalam bentuk JSON.
+         * Menampilkan pesan sukses.
+         */
         return response()->json([
             'status' => 'success',
             'message' => 'Password berhasil diubah!',
@@ -92,10 +107,12 @@ class AuthenticationController extends Controller
     // Handle forgot password function
     public function forgotPassword(Request $request)
     {
+        /**Validasi data user. */
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
         ]);
 
+        /**Jika validasi gagal maka muncul pesan error. */
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'failed',
@@ -104,8 +121,10 @@ class AuthenticationController extends Controller
             ], 422);
         }
 
+        /**Mencari email user. */
         $user = User::where('email', $request->email)->first();
 
+        /**Jika email tidak ada maka muncul pesan error. */
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
@@ -113,14 +132,21 @@ class AuthenticationController extends Controller
             ], 404);
         }
 
+        /**Jika email ditemukan maka akan generate token dengan 60 karakter.
+         * Token tersebut digunakan untuk token reset password.
+         * Token reset memiliki masa aktif untuk satu jam.
+         */
         $token = Str::random(60);
         $user->reset_token = $token;
         $user->reset_token_expired = now()->addHours(1);
         $user->save();
 
-        // Send reset password email notification
+        /**Mengirim pesan reset password ke email. */
         $user->notify(new ResetPasswordNotification($token));
 
+        /**Mengembalikan nilai dalam bentuk JSON.
+         * Menampilkan pesan sukses.
+         */
         return response()->json([
             'status' => 'success',
             'message' => 'Reset password telah dikirim ke email.',
@@ -131,12 +157,14 @@ class AuthenticationController extends Controller
     // Handle reset password function
     public function resetPassword(Request $request)
     {
+        /**Validasi data user. */
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'new_password' => 'required|string|min:8|confirmed',
             'reset_token' => 'required|string',
         ]);
 
+        /**Jika validasi gagal maka muncul pesan error. */
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'failed',
@@ -145,11 +173,13 @@ class AuthenticationController extends Controller
             ], 422);
         }
 
+        /**Mencari data user dari email berupa token reset dan masa berlaku token reset. */
         $user = User::where('email', $request->email)
             ->where('reset_token', $request->reset_token)
             ->where('reset_token_expired', '>', now())
             ->first();
 
+        /**Jika data tidak sesuai maka muncul pesan error. */
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
@@ -157,11 +187,18 @@ class AuthenticationController extends Controller
             ], 401);
         }
 
+        /**Jika data sesuai maka akan membuat password baru.
+         * Token reset dan masa berlakunya akan dihapus.
+         * Menyimpan data user.
+         */
         $user->password = Hash::make($request->new_password);
         $user->reset_token = null;
         $user->reset_token_expired = null;
         $user->save();
 
+        /**Mengembalikan nilai dalam bentuk JSON.
+         * Menampilkan pesan sukses.
+         */
         return response()->json([
             'status' => 'success',
             'message' => 'Reset password berhasil.',
@@ -171,11 +208,13 @@ class AuthenticationController extends Controller
     // Handle verify OTP function
     public function verifyOtp(Request $request)
     {
+        /**Validasi data user. */
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'otp' => 'required|string|min:6|max:6',
         ]);
 
+        /**Jika validasi gagal maka muncul pesan error. */
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'failed',
@@ -184,45 +223,63 @@ class AuthenticationController extends Controller
             ], 422);
         }
 
-        // Check if email and OTP match
+        /**Cek email dan kode OTP user */
         $user = User::where('email', $request->email)->where('otp', $request->otp)->first();
 
+        /**Jika email salah, maka muncul pesan error */
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'Email atau OTP salah, silakan periksa kembali.',
+                'message' => 'Email tidak ditemukan.',
             ], 401);
         }
 
-        // Clear OTP after successful verification
+        /**Jika kode OTP salah, maka muncul pesan error */
+        if ($user->otp !== $request->otp) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'OTP salah, silakan periksa kembali.',
+            ], 401);
+        }
+
+        /**Jika verifikasi OTP berhasil, maka OTP akan dihapus.
+         * Setelah verifikasi OTP maka akan ada waktu verifikasinya sebagai bukti telah melakukan verifikasi OTP.
+         * Kelengkapan profile secara default bernilai false agar user diharuskan melengkapi profile sebelum melakukan log-in.
+         * Menyimpan data user.
+         */
         $user->otp = null;
         $user->otp_verified_at = now();
         $user->profile_completed = false;
         $user->save();
 
+        /**Generate token untuk melengkapi profile */
         $token = $user->createToken('otp-token')->plainTextToken;
 
         $data['token'] = $token;
         $data['user'] = $user;
 
+        /**Memunculkan pesan sukses setelah selesai verifikasi. */
         $response = [
             'status' => 'success',
             'message' => 'Verifikasi berhasil! Silakan lengkapi profile untuk proses selanjutnya.',
             'data' => $data,
         ];
 
+        /**Mengembalikan nilai dalam bentuk JSON. */
         return response()->json($response, 200);
     }
 
     // Handle profile registration
     public function profile(Request $request)
     {
+        /**Validasi data user. */
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'school_name' => 'required|string|max:255',
             'profession' => 'required|string|max:255',
         ]);
 
+        /**Jika validasi gagal maka muncul pesan error. */
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'failed',
@@ -231,8 +288,10 @@ class AuthenticationController extends Controller
             ], 422);
         }
 
+        /**Mencari user. */
         $user = $request->user();
 
+        /**Memunculkan pesan error jika user tidak ditemukan. */
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
@@ -240,24 +299,29 @@ class AuthenticationController extends Controller
             ], 404);
         }
 
-        // Update user profile information
+        /**Jika ditemukan maka akan memperbaharui data user. */
         $user->update([
             'name' => $request->name,
             'school_name' => $request->school_name,
             'profession' => $request->profession,
         ]);
 
+        /**Kelengkapan profile akan menjadi true sehingga user dapat melakukan log-in.
+         * Menyimpan data user.
+         */
         $user->profile_completed = true;
         $user->save();
 
         $data['user'] = $user;
 
+        /**Memunculkan pesan sukses setelah selesai melengkapi profile. */
         $response = [
             'status' => 'success',
             'message' => 'Profile pengguna berhasil dilengkapi!',
             'data' => $data,
         ];
 
+        /**Mengembalikan nilai dalam bentuk JSON. */
         return response()->json($response, 200);
     }
 }

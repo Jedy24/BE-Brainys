@@ -17,11 +17,13 @@ class RegisterController extends Controller
 {
     public function register(Request $request)
     {
+        /**Validasi data user. */
         $validate = Validator::make($request->all(), [
             'email' => 'required|string|email:rfc,dns|max:250|unique:users,email',
             'password' => 'required|string|min:8|confirmed'
         ]);
 
+        /**Jika validasi gagal maka muncul pesan error. */
         if($validate->fails()){
             return response()->json([
                 'status' => 'failed',
@@ -30,24 +32,29 @@ class RegisterController extends Controller
             ], 403);
         }
 
+        /**Generate kode OTP dengan 6 digit angka. */
         $otp = rand(100000, 999999);
 
+        /**Membuat akun user dan menampilkan kode OTP. */
         $user = User::create([
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'otp' => $otp,
         ]);
 
+        /**Mengirim kode OTP ke email user. */
         $user->notify(new OtpNotification($otp));
 
         $data['user'] = $user;
 
+        /**Pesan sukses */
         $response = [
             'status' => 'success',
             'message' => 'Akun berhasil dibuat!',
             'data' => $data,
         ];
 
+        /**Mengembalikan nilai dalam bentuk JSON. */
         return response()->json($response, 201);
     }
 }
