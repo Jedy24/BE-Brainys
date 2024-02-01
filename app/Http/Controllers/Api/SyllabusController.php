@@ -69,7 +69,7 @@ class SyllabusController extends Controller
             $templatePath = public_path('word_template/Syllabus_Template.docx');
 
             $docxTemplate = new DocxTemplate($templatePath);
-            $outputPath = public_path('word_output/Syllabus_' . md5(time() . '' . rand(1000, 9999)) . '.docx');
+            $outputPath = public_path('word_output/Syllabus_'.auth()->id().'-' . md5(time() . '' . rand(1000, 9999)) . '.docx');
 
             $data = $request->input('data');
 
