@@ -41,8 +41,7 @@ class OtpNotification extends Notification
                 ->line('Kode OTP untuk verifikasi adalah: ' . $this->otp)
                 ->action('Verifikasi Sekarang', url('/verify-otp'))
                 ->line('Jika anda tidak meminta kode OTP, abaikan pesan ini.')
-                ->salutation('Regards, Oasys Syllabus')
-                ->line('Jika Anda mengalami masalah pada tombol "Verifikasi Sekarang", salin URL dibawah pada web browser: ' . url('/verify-otp'));
+                ->salutation('Regards, Oasys Syllabus');
     }
 
     /**

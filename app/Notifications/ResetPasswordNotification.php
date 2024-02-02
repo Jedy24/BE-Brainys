@@ -41,7 +41,8 @@ class ResetPasswordNotification extends Notification
         return (new MailMessage)
             ->line('Anda menerima pesan reset password karena kami menerima pesan reset password untuk akun Anda.')
             ->action('Reset Password', $url)
-            ->line('Jika anda tidak merasa meminta reset password, abaikan pesan ini.');
+            ->line('Jika anda tidak merasa meminta reset password, abaikan pesan ini.')
+            ->salutation('Regards, Oasys Syllabus');
     }
 
     /**
