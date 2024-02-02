@@ -54,7 +54,6 @@ class SocialiteController extends Controller
             'email_verified_at' => now(),
             'name' => $user->getName(),
             'status' => true,
-            'password' => Hash::make('123456789'),
         ]);
 
         /**Relasi model providers dengan model Users.
