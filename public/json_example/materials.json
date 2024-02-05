@@ -1,0 +1,63 @@
+{
+    "informasi_umum": {
+        "identitas_modul": {
+            "nama_penyusun": "Nama Penyusun",
+            "satuan_pendidikan": "Satuan Pendidikan",
+            "fase_kelas": "Fase / Kelas",
+            "mata_pelajaran": "Mata Pelajaran",
+            "alokasi_waktu": "Alokasi Waktu"
+        },
+        "kompetensi_awal": "Kompetensi Awal (Berbentuk 1 Paragraf/Alinea)",
+        "profil_pelajar_pancasila": [],
+        "sarana_dan_prasarana": {
+            "sumber_belajar": "",
+            "lembar_kerja_peserta_didik": ""
+        },
+        "target_peserta_didik": "Target Peserta Didik (Berbentuk 1 Paragraf/Alinea)",
+        "model_pembelajaran": "Model Pembelajaran (Berbentuk 1 Paragraf/Alinea)"
+    },
+    "komponen_inti": {
+        "tujuan_pembelajaran": [
+            "Berbentuk Array dan buat sejumlah 3 item"
+        ],
+        "pemahaman_bermakna": [
+            "Berbentuk Array dan buat sejumlah banyaknya kegiatan_pembelajaran item"
+        ],
+        "pertanyaan_pemantik": [
+            "Berbentuk Array dan buat sejumlah banyaknya kegiatan_pembelajaran item"
+        ],
+        "kegiatan_pembelajaran": [
+            {
+                "nama_kompetensi_dasar": "",
+                "materi_pembelajaran": [
+                    {
+                        "materi": "",
+                        "indikator": "",
+                        "nilai_karakter": "",
+                        "kegiatan_pembelajaran": "",
+                        "alokasi_waktu": "",
+                        "penilaian": [
+                            {
+                                "jenis": "",
+                                "bobot": 0
+                            }
+                        ]
+                    },
+                    {
+                        "materi": "",
+                        "indikator": "",
+                        "nilai_karakter": "",
+                        "kegiatan_pembelajaran": "",
+                        "alokasi_waktu": "",
+                        "penilaian": [
+                            {
+                                "jenis": "",
+                                "bobot": 0
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

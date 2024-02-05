@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\MaterialController;
 use App\Http\Controllers\Api\SyllabusController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -43,11 +44,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/change-password', [AuthenticationController::class, 'changePassword']);
     Route::group(['prefix' => 'syllabus'], function () {
         Route::get('/history', [SyllabusController::class, 'history']);
-        Route::get('/history/{id}', [SyllabusController::class, 'historyDetail']); // Menggunakan {id} sebagai parameter
+        Route::get('/history/{id}', [SyllabusController::class, 'historyDetail']);
         Route::post('/generate', [SyllabusController::class, 'generate']);
         Route::post('/export-to-word', [SyllabusController::class, 'convertToWord']);
     });
+    Route::group(['prefix' => 'material'], function () {
+        Route::post('/generate', [MaterialController::class, 'generate']);
+    });
 });
+
 
 // Route for google log-in
 Route::get('login/{provider}', [SocialiteController::class, 'redirect']);

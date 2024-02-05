@@ -24,6 +24,181 @@ class OpenAIService
         ]);
     }
 
+    public function sendMessage($message)
+    {
+        try {
+            $data = [
+                'messages' => [
+                    [
+                        'role' => 'user',
+                        'content' => $message,
+                    ],
+                ],
+                'model' => 'gpt-3.5-turbo-1106',
+                'response_format' => ['type' => 'json_object']
+            ];
+
+            $response = $this->httpClient->post($this->endpoint, [
+                'json' => $data,
+            ]);
+
+            if ($response->getStatusCode() === 200) {
+                $arrResult = json_decode($response->getBody(), true);
+                $resultMessage = $arrResult["choices"][0]["message"]["content"];
+                return $resultMessage;
+            } else {
+                throw new \Exception('Error: Unexpected HTTP status code - ' . $response->getStatusCode());
+            }
+        } catch (RequestException $e) {
+            $message = $e->getResponse() ? $e->getResponse()->getBody()->getContents() : $e->getMessage();
+            $message = json_decode($message, true);
+            throw new \Exception('Error sending the message : ' . $message['error']['message']);
+        }
+    }
+
+    public function generateMaterialsPrompt($subject, $grade, $notes)
+    {
+        $prompt = 'Buatlah bahan ajar untuk mata pelajaran ' . $subject . ' pada tingkat kelas ' . $grade . ' dengan memperhatikan catatan khusus berikut: ' . $notes . '.
+        
+        Jelaskan identitas modul, kompetensi awal, profil pelajar terkait Pancasila (jika ada), serta sarana dan prasarana yang diperlukan. Tentukan juga target peserta didik dan model pembelajaran yang sesuai.
+
+        Selanjutnya, rinci tujuan pembelajaran, pemahaman bermakna, dan pertanyaan pemantik yang relevan untuk mencapai kompetensi yang ditetapkan. Terakhir, susun kegiatan pembelajaran dengan mencantumkan 4 objek kompetensi dasar. Setiap objek kompetensi dasar harus memiliki informasi tentang materi pembelajaran, indikator pencapaian, nilai karakter yang ingin ditanamkan, alokasi waktu, dan jenis penilaian beserta bobotnya.
+        
+        Pastikan setiap bagian memiliki informasi yang cukup dan relevan untuk membantu pendidik atau pembelajar memahami dan melaksanakan materi pembelajaran dengan efektif.
+        
+        Berikan saya output dengan format JSON seperti ini:
+            
+            {
+                "informasi_umum": {
+                    "identitas_modul": {
+                        "nama_penyusun": "Nama Penyusun",
+                        "satuan_pendidikan": "Satuan Pendidikan",
+                        "fase_kelas": "Fase / Kelas",
+                        "mata_pelajaran": "Mata Pelajaran",
+                        "alokasi_waktu": "Alokasi Waktu"
+                    },
+                    "kompetensi_awal": "Kompetensi Awal (Berbentuk 1 Paragraf/Alinea)",
+                    "profil_pelajar_pancasila": [],
+                    "sarana_dan_prasarana": {
+                        "sumber_belajar": "",
+                        "lembar_kerja_peserta_didik": ""
+                    },
+                    "target_peserta_didik": "Target Peserta Didik (Berbentuk 1 Paragraf/Alinea)",
+                    "model_pembelajaran": "Model Pembelajaran (Berbentuk 1 Paragraf/Alinea)"
+                },
+                "komponen_inti": {
+                    "tujuan_pembelajaran": [
+                        "Berbentuk Array dan buat sejumlah 3 item"
+                    ],
+                    "pemahaman_bermakna": [
+                        "Berbentuk Array dan buat sejumlah banyaknya kegiatan_pembelajaran item"
+                    ],
+                    "pertanyaan_pemantik": [
+                        "Berbentuk Array dan buat sejumlah banyaknya kegiatan_pembelajaran item"
+                    ],
+                    "kegiatan_pembelajaran": [
+                        {
+                            "nama_kompetensi_dasar": "",
+                            "materi_pembelajaran": [
+                                {
+                                    "materi": "",
+                                    "indikator": "",
+                                    "nilai_karakter": "",
+                                    "kegiatan_pembelajaran": "",
+                                    "alokasi_waktu": "",
+                                    "penilaian": [
+                                        {
+                                            "jenis": "",
+                                            "bobot": 0
+                                        }
+                                    ]
+                                },
+                                {
+                                    "materi": "",
+                                    "indikator": "",
+                                    "nilai_karakter": "",
+                                    "kegiatan_pembelajaran": "",
+                                    "alokasi_waktu": "",
+                                    "penilaian": [
+                                        {
+                                            "jenis": "",
+                                            "bobot": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "nama_kompetensi_dasar": "",
+                            "materi_pembelajaran": [
+                                {
+                                    "materi": "",
+                                    "indikator": "",
+                                    "nilai_karakter": "",
+                                    "kegiatan_pembelajaran": "",
+                                    "alokasi_waktu": "",
+                                    "penilaian": [
+                                        {
+                                            "jenis": "",
+                                            "bobot": 0
+                                        }
+                                    ]
+                                },
+                                {
+                                    "materi": "",
+                                    "indikator": "",
+                                    "nilai_karakter": "",
+                                    "kegiatan_pembelajaran": "",
+                                    "alokasi_waktu": "",
+                                    "penilaian": [
+                                        {
+                                            "jenis": "",
+                                            "bobot": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "nama_kompetensi_dasar": "",
+                            "materi_pembelajaran": [
+                                {
+                                    "materi": "",
+                                    "indikator": "",
+                                    "nilai_karakter": "",
+                                    "kegiatan_pembelajaran": "",
+                                    "alokasi_waktu": "",
+                                    "penilaian": [
+                                        {
+                                            "jenis": "",
+                                            "bobot": 0
+                                        }
+                                    ]
+                                },
+                                {
+                                    "materi": "",
+                                    "indikator": "",
+                                    "nilai_karakter": "",
+                                    "kegiatan_pembelajaran": "",
+                                    "alokasi_waktu": "",
+                                    "penilaian": [
+                                        {
+                                            "jenis": "",
+                                            "bobot": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                    ]
+                }
+            }
+            
+        ';
+
+        return $prompt;
+    }
+
     public function generateSyllabusPrompt($mataPelajaran, $tingkatKelas, $addNotes)
     {
         $prompt = '
@@ -36,7 +211,7 @@ class OpenAIService
             e. Tentukan Alokasi Waktu yang disarankan untuk setiap Kompetensi Dasar.
             f. Jelaskan metode Penilaian yang akan digunakan.
 
-            Notes Tambahan: '.$addNotes.'
+            Notes Tambahan: ' . $addNotes . '
 
                 Silakan tuliskan silabus dalam format JSON berikut :
 
@@ -267,37 +442,5 @@ class OpenAIService
             Pastikan untuk mengisi setiap item dengan rincian yang relevan dan sesuai. Terima kasih!';
 
         return $prompt;
-    }
-
-    public function sendMessage(string $message): string
-    {
-        try {
-            $data = [
-                'messages' => [
-                    [
-                        'role' => 'user',
-                        'content' => $message,
-                    ],
-                ],
-                'model' => 'gpt-3.5-turbo-1106',
-                'response_format' => ['type' => 'json_object']
-            ];
-
-            $response = $this->httpClient->post($this->endpoint, [
-                'json' => $data,
-            ]);
-
-            if ($response->getStatusCode() === 200) {
-                $arrResult = json_decode($response->getBody(), true);
-                $resultMessage = $arrResult["choices"][0]["message"]["content"];
-                return $resultMessage;
-            } else {
-                throw new \Exception('Error: Unexpected HTTP status code - ' . $response->getStatusCode());
-            }
-        } catch (RequestException $e) {
-            $message = $e->getResponse() ? $e->getResponse()->getBody()->getContents() : $e->getMessage();
-            $message = json_decode($message, true);
-            throw new \Exception('Error sending the message : ' . $message['error']['message']);
-        }
     }
 }
