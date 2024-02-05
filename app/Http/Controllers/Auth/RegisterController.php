@@ -32,7 +32,7 @@ class RegisterController extends Controller
             ], 403);
         }
 
-        /**Generate kode OTP dengan 6 digit angka. */
+        /**Generate kode OTP dengan 6 digit angka. **/
         $otp = rand(100000, 999999);
 
         /**Membuat akun user dan menampilkan kode OTP. */
@@ -41,6 +41,10 @@ class RegisterController extends Controller
             'password' => Hash::make($request->password),
             'otp' => $otp,
         ]);
+
+        /**Kode OTP hanya berlaku selama 2 menit untuk setiap kode OTP. */
+        $user->otp_expiry = now()->addMinutes(2);
+        $user->save();
 
         /**Mengirim kode OTP ke email user. */
         $user->notify(new OtpNotification($otp));

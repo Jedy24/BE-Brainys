@@ -223,10 +223,15 @@ class AuthenticationController extends Controller
             ], 422);
         }
 
-        /**Cek email dan kode OTP user */
-        $user = User::where('email', $request->email)->where('otp', $request->otp)->first();
+        /**Cek email dan kode OTP user.
+         * Cek apakah kode OTP masih berlaku atau tidak.
+         */
+        $user = User::where('email', $request->email)
+            ->where('otp', $request->otp)
+            ->where('otp_expiry', '>=', now())
+            ->first();
 
-        /**Jika user tidak ditemukan atau kode OTP salah, munculkan pesan error */
+        /**Jika user tidak ditemukan, kode OTP salah atau kode OTP tidak valid, munculkan pesan error */
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
@@ -234,12 +239,13 @@ class AuthenticationController extends Controller
             ], 401);
         }
 
-        /**Jika verifikasi OTP berhasil, maka OTP akan dihapus.
+        /**Jika verifikasi OTP berhasil, maka OTP dan OTP expiry akan dihapus.
          * Setelah verifikasi OTP maka akan ada waktu verifikasinya sebagai bukti telah melakukan verifikasi OTP.
          * Kelengkapan profile secara default bernilai false agar user diharuskan melengkapi profile sebelum melakukan log-in.
          * Menyimpan data user.
          */
         $user->otp = null;
+        $user->otp_expiry = null;
         $user->otp_verified_at = now();
         $user->profile_completed = false;
         $user->save();
@@ -259,6 +265,59 @@ class AuthenticationController extends Controller
 
         /**Mengembalikan nilai dalam bentuk JSON. */
         return response()->json($response, 200);
+    }
+
+    public function resendOtp(Request $request)
+    {
+        /** Validasi data user. */
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ]);
+
+        /** Jika validasi gagal maka muncul pesan error. */
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Validasi gagal',
+                'data' => $validator->errors(),
+            ], 422);
+        }
+
+        /** Mencari user berdasarkan email. */
+        $user = User::where('email', $request->email)->first();
+
+        /** Jika user tidak ditemukan, menampilkan pesan error. */
+        if (!$user) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'User tidak ditemukan.',
+            ], 404);
+        }
+
+        /** Jika user sudah terverifikasi maka muncul pesan bahwa sudah terverifikasi. */
+        if ($user->otp_verified_at) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'User sudah terverifikasi.',
+            ], 422);
+        }
+
+        /** Generate kode OTP baru. */
+        $otp = rand(100000, 999999);
+
+        /** Simpan kode OTP baru dan atur waktu berlaku. */
+        $user->otp = $otp;
+        $user->otp_expiry = now()->addMinutes(2);
+        $user->save();
+
+        /** Mengirim ulang kode OTP ke email user. */
+        $user->notify(new OtpNotification($otp));
+
+        /** Respon sukses. */
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Kode OTP berhasil dikirim ulang.',
+        ], 200);
     }
 
     // Handle profile registration

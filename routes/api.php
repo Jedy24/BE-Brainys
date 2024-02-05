@@ -32,6 +32,7 @@ Route::controller(AuthenticationController::class)->group(function () {
     Route::post('/verify-otp', 'verifyOtp');
     Route::post('/forgot-password', 'forgotPassword');
     Route::post('/reset-password', 'resetPassword');
+    Route::post('/resend-otp', 'resendOtp');
 });
 
 // Protected routes
@@ -45,7 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/history/{id}', [SyllabusController::class, 'historyDetail']); // Menggunakan {id} sebagai parameter
         Route::post('/generate', [SyllabusController::class, 'generate']);
         Route::post('/export-to-word', [SyllabusController::class, 'convertToWord']);
-    });      
+    });
 });
 
 // Route for google log-in
