@@ -122,7 +122,7 @@ class OpenAIService
                             ]
                         },
                         {
-                            "kompetensi_dasar_name": "",
+                            "nama_kompetensi_dasar": "",
                             "materi_pembelajaran": [
                                 {
                                     "materi": "",
@@ -157,7 +157,7 @@ class OpenAIService
                             ]
                         },
                         {
-                            "kompetensi_dasar_name": "",
+                            "nama_kompetensi_dasar": "",
                             "materi_pembelajaran": [
                                 {
                                     "materi": "",
@@ -192,7 +192,7 @@ class OpenAIService
                             ]
                         },
                         {
-                            "kompetensi_dasar_name": "",
+                            "nama_kompetensi_dasar": "",
                             "materi_pembelajaran": [
                                 {
                                     "materi": "",
@@ -227,7 +227,7 @@ class OpenAIService
                             ]
                         },
                         {
-                            "kompetensi_dasar_name": "",
+                            "nama_kompetensi_dasar": "",
                             "materi_pembelajaran": [
                                 {
                                     "materi": "",
