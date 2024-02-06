@@ -72,7 +72,7 @@ class SyllabusController extends Controller
             $templatePath = public_path('word_template/Syllabus_Template.docx');
 
             $docxTemplate = new DocxTemplate($templatePath);
-            $outputPath = public_path('word_output/Syllabus_'.auth()->id().'-' . md5(time() . '' . rand(1000, 9999)) . '.docx');
+            $outputPath = public_path('word_output/Syllabus_' . auth()->id() . '-' . md5(time() . '' . rand(1000, 9999)) . '.docx');
 
             $data = $request->input('data');
             // $customDateTime = new DateTime('2024-01-05 21:20:00');
@@ -139,8 +139,6 @@ class SyllabusController extends Controller
         }
     }
 
-
-
     public function historyDetail(Request $request, $id)
     {
         try {
@@ -171,5 +169,13 @@ class SyllabusController extends Controller
                 'data' => json_decode($e->getMessage(), true),
             ], 500);
         }
+    }
+
+    public function mtHandler(Request $request)
+    {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Coming soon!'
+        ], 500);
     }
 }

@@ -43,14 +43,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile', [AuthenticationController::class, 'profile']);
     Route::post('/change-password', [AuthenticationController::class, 'changePassword']);
     Route::group(['prefix' => 'syllabus'], function () {
-        Route::get('/history', [SyllabusController::class, 'history']);
-        Route::get('/history/{id}', [SyllabusController::class, 'historyDetail']);
-        Route::post('/generate', [SyllabusController::class, 'generate']);
-        Route::post('/export-to-word', [SyllabusController::class, 'convertToWord']);
+        Route::get('/history', [SyllabusController::class, 'mtHandler']);
+        Route::get('/history/{id}', [SyllabusController::class, 'mtHandler']);
+        Route::post('/generate', [SyllabusController::class, 'mtHandler']);
+        Route::post('/export-to-word', [SyllabusController::class, 'mtHandler']);
     });
     Route::group(['prefix' => 'material'], function () {
         Route::post('/generate', [MaterialController::class, 'generate']);
         Route::post('/export-word', [MaterialController::class, 'convertToWord']);
+        Route::get('/history', [MaterialController::class, 'history']);
+        Route::get('/history/{id}', [MaterialController::class, 'historyDetail']);
     });
 });
 

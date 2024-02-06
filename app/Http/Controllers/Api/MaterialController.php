@@ -95,4 +95,80 @@ class MaterialController extends Controller
             ], 500);
         }
     }
+
+    public function history(Request $request)
+    {
+        try {
+            // Retrieve the authenticated user
+            $user = $request->user();
+
+            // Get syllabus histories for the authenticated user
+            $materialHistories = $user->materialHistory()
+                ->select(['id', 'name', 'subject', 'grade', 'notes', 'created_at', 'updated_at', 'user_id'])
+                ->get();
+
+            if ($materialHistories->isEmpty()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Tidak ada riwayat bahan ajar untuk akun anda!',
+                    'data' => [
+                        'generated_num' => 0,
+                        'items' => [],
+                    ],
+                ], 200);
+            }
+
+            // Calculate the total generated syllabuses by the user
+            $generatedNum = $materialHistories->count();
+
+            // Return the response with syllabus histories data
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Riwayat bahan ajar ditampilkan',
+                'data' => [
+                    'generated_num' => $generatedNum,
+                    'items' => $materialHistories,
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage(),
+                'data' => json_decode($e->getMessage(), true),
+            ], 500);
+        }
+    }
+
+    public function historyDetail(Request $request, $id)
+    {
+        try {
+            // Retrieve the authenticated user
+            $user = $request->user();
+
+            // Get a specific syllabus history by ID for the authenticated user
+            $materialHistories = $user->materialHistory()->find($id);
+
+            if (!$materialHistories) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Material history not found',
+                    'data' => null,
+                ], 404);
+            }
+
+            // Return the response with Material history data
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Material history retrieved successfully',
+                'data' => $materialHistories,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage(),
+                'data' => json_decode($e->getMessage(), true),
+            ], 500);
+        }
+    }
+
 }
