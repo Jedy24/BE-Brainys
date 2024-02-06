@@ -50,6 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::group(['prefix' => 'material'], function () {
         Route::post('/generate', [MaterialController::class, 'generate']);
+        Route::post('/export-word', [MaterialController::class, 'convertToWord']);
     });
 });
 
