@@ -75,6 +75,9 @@ class SyllabusController extends Controller
             $outputPath = public_path('word_output/Syllabus_'.auth()->id().'-' . md5(time() . '' . rand(1000, 9999)) . '.docx');
 
             $data = $request->input('data');
+            // $customDateTime = new DateTime('2024-01-05 21:20:00');
+            // $formattedDateTime = $customDateTime->format('d F Y, H:i');
+            // $data['format_date_time'] = $formattedDateTime;
 
             $docxTemplate->merge($data, $outputPath, false, false);
 

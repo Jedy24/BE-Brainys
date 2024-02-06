@@ -68,108 +68,146 @@ class OpenAIService
         
         Berikan saya output dengan format JSON seperti ini:
             
-            {
-                "informasi_umum": {
-                    "penyusun": "",
-                    "instansi": "",
-                    "tahun_penyusunan": "",
-                    "jenjang_sekolah": "",
-                    "mata_pelajaran": "",
-                    "fase_kelas": "",
-                    "topik": "",
-                    "alokasi_waktu": "",
-                    "kompetensi_awal": ""
-                },
-                "sarana_dan_prasarana": {
-                    "sumber_belajar": "",
-                    "lembar_kerja_peserta_didik": ""
-                },
-                "komponen_pembelajaran": {
-                    "perlengkapan_peserta_didik": ["", "", "", ""],
-                    "perlengkapan_guru": ["", "", "", ""
+        {
+            "informasi_umum": {
+                "penyusun": "",
+                "instansi": "",
+                "tahun_penyusunan": "",
+                "jenjang_sekolah": "",
+                "mata_pelajaran": "",
+                "fase_kelas": "",
+                "topik": "(Berbentuk 1 Paragraf/Alinea)",
+                "alokasi_waktu": "",
+                "kompetensi_awal": "(Berbentuk 1 Paragraf/Alinea)",
+                "profil_pelajar_pancasila": "(Berbentuk 1 Paragraf/Alinea)",
+                "target_peserta_didik": "(Berbentuk 1 Paragraf/Alinea)",
+                "model_pembelajaran": "(Berbentuk 1 Paragraf/Alinea)"
+            },
+            "sarana_dan_prasarana": {
+                "sumber_belajar": "(Berbentuk 1 Paragraf/Alinea)",
+                "lembar_kerja_peserta_didik": "(Berbentuk 1 Paragraf/Alinea)"
+            },
+            "komponen_pembelajaran": {
+                "perlengkapan_peserta_didik": ["", "", "", ""],
+                "perlengkapan_guru": ["", "", "", ""
+                ]
+            },
+            "tujuan_kegiatan_pembelajaran": {
+                "tujuan_pembelajaran_bab": "(Berbentuk 1 Paragraf/Alinea)",
+                "tujuan_pembelajaran_topik": ["", "", "", ""]
+            },
+            "pemahaman_bermakna": {
+                "topik": "(Berbentuk 1 Paragraf/Alinea)"
+            },
+            "pertanyaan_pemantik": ["", "", "", ""],
+            "kompetensi_dasar": [
+                {
+                    "nama_kompetensi_dasar": "",
+                    "materi_pembelajaran": [
+                        {
+                            "materi": "",
+                            "indikator": "",
+                            "nilai_karakter": "",
+                            "kegiatan_pembelajaran": "",
+                            "alokasi_waktu": "",
+                            "penilaian": [
+                                {
+                                    "jenis": "",
+                                    "bobot": 0
+                                },
+                                {
+                                    "jenis": "",
+                                    "bobot": 0
+                                }
+                            ]
+                        },
+                        {
+                            "materi": "",
+                            "indikator": "",
+                            "nilai_karakter": "",
+                            "kegiatan_pembelajaran": "",
+                            "alokasi_waktu": "",
+                            "penilaian": [
+                                {
+                                    "jenis": "",
+                                    "bobot": 0
+                                }
+                            ]
+                        }
                     ]
                 },
-                "tujuan_kegiatan_pembelajaran": {
-                    "tujuan_pembelajaran_bab": "",
-                    "tujuan_pembelajaran_topik": ["", "", "", ""]
+                {
+                    "nama_kompetensi_dasar": "",
+                    "materi_pembelajaran": [
+                        {
+                            "materi": "",
+                            "indikator": "",
+                            "nilai_karakter": "",
+                            "kegiatan_pembelajaran": "",
+                            "alokasi_waktu": "",
+                            "penilaian": [
+                                {
+                                    "jenis": "",
+                                    "bobot": 0
+                                },
+                                {
+                                    "jenis": "",
+                                    "bobot": 0
+                                }
+                            ]
+                        },
+                        {
+                            "materi": "",
+                            "indikator": "",
+                            "nilai_karakter": "",
+                            "kegiatan_pembelajaran": "",
+                            "alokasi_waktu": "",
+                            "penilaian": [
+                                {
+                                    "jenis": "",
+                                    "bobot": 0
+                                }
+                            ]
+                        }
+                    ]
                 },
-                "pemahaman_bermakna": {
-                    "topik": ""
-                },
-                "pertanyaan_pemantik": ["", "", "", ""],
-                "kompetensi_dasar": [
-                    {
-                        "nama_kompetensi_dasar": "",
-                        "materi_pembelajaran": [
-                            {
-                                "materi": "",
-                                "indikator": "",
-                                "nilai_karakter": "",
-                                "kegiatan_pembelajaran": "",
-                                "alokasi_waktu": "",
-                                "penilaian": [
-                                    {
-                                        "jenis": "",
-                                        "bobot": 0
-                                    },
-                                    {
-                                        "jenis": "",
-                                        "bobot": 0
-                                    }
-                                ]
-                            },
-                            {
-                                "materi": "",
-                                "indikator": "",
-                                "nilai_karakter": "",
-                                "kegiatan_pembelajaran": "",
-                                "alokasi_waktu": "",
-                                "penilaian": [
-                                    {
-                                        "jenis": "",
-                                        "bobot": 0
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "nama_kompetensi_dasar": "",
-                        "materi_pembelajaran": [
-                            {
-                                "materi": "",
-                                "indikator": "",
-                                "nilai_karakter": "",
-                                "kegiatan_pembelajaran": "",
-                                "alokasi_waktu": "",
-                                "penilaian": [
-                                    {
-                                        "jenis": "",
-                                        "bobot": 0
-                                    },
-                                    {
-                                        "jenis": "",
-                                        "bobot": 0
-                                    }
-                                ]
-                            },
-                            {
-                                "materi": "",
-                                "indikator": "",
-                                "nilai_karakter": "",
-                                "kegiatan_pembelajaran": "",
-                                "alokasi_waktu": "",
-                                "penilaian": [
-                                    {
-                                        "jenis": "",
-                                        "bobot": 0
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
+                {
+                    "nama_kompetensi_dasar": "",
+                    "materi_pembelajaran": [
+                        {
+                            "materi": "",
+                            "indikator": "",
+                            "nilai_karakter": "",
+                            "kegiatan_pembelajaran": "",
+                            "alokasi_waktu": "",
+                            "penilaian": [
+                                {
+                                    "jenis": "",
+                                    "bobot": 0
+                                },
+                                {
+                                    "jenis": "",
+                                    "bobot": 0
+                                }
+                            ]
+                        },
+                        {
+                            "materi": "",
+                            "indikator": "",
+                            "nilai_karakter": "",
+                            "kegiatan_pembelajaran": "",
+                            "alokasi_waktu": "",
+                            "penilaian": [
+                                {
+                                    "jenis": "",
+                                    "bobot": 0
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
             
         ';
 
