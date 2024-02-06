@@ -35,9 +35,10 @@ class AuthenticationController extends Controller
             'message' => 'Data akun berhasil diambil!',
             'data' => [
                 'name' => $user->name,
-                'email' => $user->email,
-                'school_name' => $user->school_name,
                 'profession' => $user->profession,
+                'school_name' => $user->school_name,
+                'email' => $user->email,
+                // 'password' => $user->password,
             ],
         ];
 
