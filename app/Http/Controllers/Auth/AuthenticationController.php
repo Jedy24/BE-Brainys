@@ -318,6 +318,9 @@ class AuthenticationController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Kode OTP berhasil dikirim ulang.',
+            'data' => [
+                'otp' => $otp,
+            ],
         ], 200);
     }
 
