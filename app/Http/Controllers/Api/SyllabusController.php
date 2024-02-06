@@ -174,7 +174,7 @@ class SyllabusController extends Controller
     public function mtHandler(Request $request)
     {
         return response()->json([
-            'status' => 'error',
+            'status' => 'failed',
             'message' => 'Coming soon!'
         ], 500);
     }

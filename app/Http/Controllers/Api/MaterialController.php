@@ -40,6 +40,11 @@ class MaterialController extends Controller
             $resMessage = $this->openAI->sendMessage($prompt);
 
             $parsedResponse = json_decode($resMessage, true);
+            $user = $request->user();
+
+            $parsedResponse['informasi_umum']['penyusun'] = $user->name;
+            $parsedResponse['informasi_umum']['instansi'] = $user->school_name;
+            $parsedResponse['informasi_umum']['tahun_penyusunan'] = Date('Y');
 
             // Construct the response data for success
             $insertData = MaterialHistories::create([
