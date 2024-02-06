@@ -55,8 +55,8 @@ class User extends Authenticatable
         return $this->hasMany(Provider::class, 'user_id', 'id');
     }
 
-    public function syllabusHistory()
+    public function materialHistory()
     {
-        return $this->hasMany(SyllabusHistory::class, 'user_id', 'id');
+        return $this->hasMany(MaterialHistories::class, 'user_id', 'id');
     }
 }

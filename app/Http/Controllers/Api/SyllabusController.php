@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\OpenAIService;
 
-use App\Models\SyllabusHistory;
+use App\Models\MaterialHistories;
 use icircle\Template\Docx\DocxTemplate;
 
 class SyllabusController extends Controller
@@ -42,7 +42,7 @@ class SyllabusController extends Controller
             $parsedResponse = json_decode($resMessage, true);
 
             // Construct the response data for success
-            SyllabusHistory::create([
+            MaterialHistories::create([
                 'name' => $syllabusName,
                 'subject' => $mataPelajaran,
                 'grade' => $tingkatKelas,
