@@ -56,6 +56,126 @@ class OpenAIService
         }
     }
 
+    public function generateMaterialsPromptBeta($subject, $grade, $notes)
+    {
+        $prompt = 'Buatlah bahan ajar untuk mata pelajaran ' . $subject . ' pada tingkat kelas ' . $grade . ' dengan memperhatikan catatan khusus berikut: ' . $notes . '.
+        
+        Jelaskan identitas modul, kompetensi awal, profil pelajar terkait Pancasila (jika ada), serta sarana dan prasarana yang diperlukan. Tentukan juga target peserta didik dan model pembelajaran yang sesuai.
+
+        Selanjutnya, rinci tujuan pembelajaran, pemahaman bermakna, dan pertanyaan pemantik yang relevan untuk mencapai kompetensi yang ditetapkan. Terakhir, susun kegiatan pembelajaran dengan mencantumkan 4 objek kompetensi dasar. Setiap objek kompetensi dasar harus memiliki informasi tentang materi pembelajaran, indikator pencapaian, nilai karakter yang ingin ditanamkan, alokasi waktu, dan jenis penilaian beserta bobotnya.
+        
+        Pastikan setiap bagian memiliki informasi yang cukup dan relevan untuk membantu pendidik atau pembelajar memahami dan melaksanakan materi pembelajaran dengan efektif.
+        
+        Berikan saya output dengan format JSON seperti ini:
+            
+            {
+                "informasi_umum": {
+                    "penyusun": "",
+                    "instansi": "",
+                    "tahun_penyusunan": "",
+                    "jenjang_sekolah": "",
+                    "mata_pelajaran": "",
+                    "fase_kelas": "",
+                    "topik": "",
+                    "alokasi_waktu": "",
+                    "kompetensi_awal": ""
+                },
+                "sarana_dan_prasarana": {
+                    "sumber_belajar": "",
+                    "lembar_kerja_peserta_didik": ""
+                },
+                "komponen_pembelajaran": {
+                    "perlengkapan_peserta_didik": ["", "", "", ""],
+                    "perlengkapan_guru": ["", "", "", ""
+                    ]
+                },
+                "tujuan_kegiatan_pembelajaran": {
+                    "tujuan_pembelajaran_bab": "",
+                    "tujuan_pembelajaran_topik": ["", "", "", ""]
+                },
+                "pemahaman_bermakna": {
+                    "topik": ""
+                },
+                "pertanyaan_pemantik": ["", "", "", ""],
+                "kompetensi_dasar": [
+                    {
+                        "nama_kompetensi_dasar": "",
+                        "materi_pembelajaran": [
+                            {
+                                "materi": "",
+                                "indikator": "",
+                                "nilai_karakter": "",
+                                "kegiatan_pembelajaran": "",
+                                "alokasi_waktu": "",
+                                "penilaian": [
+                                    {
+                                        "jenis": "",
+                                        "bobot": 0
+                                    },
+                                    {
+                                        "jenis": "",
+                                        "bobot": 0
+                                    }
+                                ]
+                            },
+                            {
+                                "materi": "",
+                                "indikator": "",
+                                "nilai_karakter": "",
+                                "kegiatan_pembelajaran": "",
+                                "alokasi_waktu": "",
+                                "penilaian": [
+                                    {
+                                        "jenis": "",
+                                        "bobot": 0
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "kompetensi_dasar_name": "",
+                        "materi_pembelajaran": [
+                            {
+                                "materi": "",
+                                "indikator": "",
+                                "nilai_karakter": "",
+                                "kegiatan_pembelajaran": "",
+                                "alokasi_waktu": "",
+                                "penilaian": [
+                                    {
+                                        "jenis": "",
+                                        "bobot": 0
+                                    },
+                                    {
+                                        "jenis": "",
+                                        "bobot": 0
+                                    }
+                                ]
+                            },
+                            {
+                                "materi": "",
+                                "indikator": "",
+                                "nilai_karakter": "",
+                                "kegiatan_pembelajaran": "",
+                                "alokasi_waktu": "",
+                                "penilaian": [
+                                    {
+                                        "jenis": "",
+                                        "bobot": 0
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+            
+        ';
+
+        return $prompt;
+    }
+
     public function generateMaterialsPrompt($subject, $grade, $notes)
     {
         $prompt = 'Buatlah bahan ajar untuk mata pelajaran ' . $subject . ' pada tingkat kelas ' . $grade . ' dengan memperhatikan catatan khusus berikut: ' . $notes . '.

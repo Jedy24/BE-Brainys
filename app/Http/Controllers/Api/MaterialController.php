@@ -34,7 +34,7 @@ class MaterialController extends Controller
             $mataPelajaran  = $request->input('subject');
             $tingkatKelas   = $request->input('grade');
             $addNotes       = $request->input('notes');
-            $prompt         = $this->openAI->generateMaterialsPrompt($mataPelajaran, $tingkatKelas, $addNotes);
+            $prompt         = $this->openAI->generateMaterialsPromptBeta($mataPelajaran, $tingkatKelas, $addNotes);
 
             // Send the message to OpenAI
             $resMessage = $this->openAI->sendMessage($prompt);

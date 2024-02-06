@@ -15,142 +15,21 @@
         "lembar_kerja_peserta_didik": ""
     },
     "komponen_pembelajaran": {
-        "perlengkapan_peserta_didik": [
-            "",
-            "",
-            "",
-            "",
-            ""
-        ],
-        "perlengkapan_guru": [
-            "",
-            "",
-            "",
-            ""
+        "perlengkapan_peserta_didik": ["", "", "", ""],
+        "perlengkapan_guru": ["", "", "", ""
         ]
     },
     "tujuan_kegiatan_pembelajaran": {
         "tujuan_pembelajaran_bab": "",
-        "tujuan_pembelajaran_topik": [
-            "",
-            ""
-        ]
+        "tujuan_pembelajaran_topik": ["", "", "", ""]
     },
     "pemahaman_bermakna": {
         "topik": ""
     },
-    "pertanyaan_pemantik": [
-        "",
-        ""
-    ],
+    "pertanyaan_pemantik": ["", "", "", ""],
     "kompetensi_dasar": [
         {
             "nama_kompetensi_dasar": "",
-            "materi_pembelajaran": [
-                {
-                    "materi": "",
-                    "indikator": "",
-                    "nilai_karakter": "",
-                    "kegiatan_pembelajaran": "",
-                    "alokasi_waktu": "",
-                    "penilaian": [
-                        {
-                            "jenis": "",
-                            "bobot": 0
-                        },
-                        {
-                            "jenis": "",
-                            "bobot": 0
-                        }
-                    ]
-                },
-                {
-                    "materi": "",
-                    "indikator": "",
-                    "nilai_karakter": "",
-                    "kegiatan_pembelajaran": "",
-                    "alokasi_waktu": "",
-                    "penilaian": [
-                        {
-                            "jenis": "",
-                            "bobot": 0
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "kompetensi_dasar_name": "",
-            "materi_pembelajaran": [
-                {
-                    "materi": "",
-                    "indikator": "",
-                    "nilai_karakter": "",
-                    "kegiatan_pembelajaran": "",
-                    "alokasi_waktu": "",
-                    "penilaian": [
-                        {
-                            "jenis": "",
-                            "bobot": 0
-                        },
-                        {
-                            "jenis": "",
-                            "bobot": 0
-                        }
-                    ]
-                },
-                {
-                    "materi": "",
-                    "indikator": "",
-                    "nilai_karakter": "",
-                    "kegiatan_pembelajaran": "",
-                    "alokasi_waktu": "",
-                    "penilaian": [
-                        {
-                            "jenis": "",
-                            "bobot": 0
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "kompetensi_dasar_name": "",
-            "materi_pembelajaran": [
-                {
-                    "materi": "",
-                    "indikator": "",
-                    "nilai_karakter": "",
-                    "kegiatan_pembelajaran": "",
-                    "alokasi_waktu": "",
-                    "penilaian": [
-                        {
-                            "jenis": "",
-                            "bobot": 0
-                        },
-                        {
-                            "jenis": "",
-                            "bobot": 0
-                        }
-                    ]
-                },
-                {
-                    "materi": "",
-                    "indikator": "",
-                    "nilai_karakter": "",
-                    "kegiatan_pembelajaran": "",
-                    "alokasi_waktu": "",
-                    "penilaian": [
-                        {
-                            "jenis": "",
-                            "bobot": 0
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "kompetensi_dasar_name": "",
             "materi_pembelajaran": [
                 {
                     "materi": "",
