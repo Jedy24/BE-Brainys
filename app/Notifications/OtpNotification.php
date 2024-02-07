@@ -40,7 +40,8 @@ class OtpNotification extends Notification
                 ->subject('Kode OTP untuk Verifikasi')
                 ->line('Kode OTP untuk verifikasi adalah: ' .  $this->otp )
                 ->line('Jika anda tidak meminta kode OTP, abaikan pesan ini.')
-                ->salutation('Regards, \nOasys Syllabus');
+                ->salutation('Regards, ')
+                ->salutation('Oasys Syllabus');
     }
 
     /**
