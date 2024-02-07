@@ -207,6 +207,9 @@ class OpenAIService
                     ]
                 }
             ]
+            "lampiran": {
+                "glorasium_materi": ["", "", "", "", "", "", "", "", "", ""]
+            }
         }
             
         ';
