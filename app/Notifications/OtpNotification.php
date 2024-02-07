@@ -39,9 +39,9 @@ class OtpNotification extends Notification
     {
         return (new MailMessage)
                 ->subject('Kode OTP untuk Verifikasi')
-                ->line('Kode OTP untuk verifikasi adalah: <strong>' .  $this->otp . '</strong>')
+                ->line(new HtmlString('Kode OTP untuk verifikasi adalah: <strong>' . $this->otp . '</strong>'))
                 ->line('Jika anda tidak meminta kode OTP, abaikan pesan ini.')
-                ->salutation('Regards, \nOasys Syllabus');
+                ->salutation(new HtmlString('Regards,<br>Oasys Syllabus'));
     }
 
     /**
