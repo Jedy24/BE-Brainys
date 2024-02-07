@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\HtmlString;
 
 class OtpNotification extends Notification
 {
@@ -38,9 +39,9 @@ class OtpNotification extends Notification
     {
         return (new MailMessage)
                 ->subject('Kode OTP untuk Verifikasi')
-                ->line('Kode OTP untuk verifikasi adalah: ' .  $this->otp )
+                ->line('Kode OTP untuk verifikasi adalah: <strong>' .  $this->otp . '</strong>')
                 ->line('Jika anda tidak meminta kode OTP, abaikan pesan ini.')
-                ->salutation('Regards, Oasys Syllabus');
+                ->salutation('Regards, \nOasys Syllabus');
     }
 
     /**

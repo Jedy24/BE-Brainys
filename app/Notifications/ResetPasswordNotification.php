@@ -43,7 +43,7 @@ class ResetPasswordNotification extends Notification
             ->action('Reset Password', $url)
             ->line('Jika Anda tidak merasa meminta reset password, ubah password akun Anda sekarang juga untuk menghindari
             tindakan yang tidak sah.')
-            ->salutation('Regards, Oasys Syllabus');
+            ->salutation('Regards, \nOasys Syllabus');
     }
 
     /**
