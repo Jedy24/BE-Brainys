@@ -156,7 +156,7 @@ class MaterialController extends Controller
             if (!$materialHistories) {
                 return response()->json([
                     'status' => 'failed',
-                    'message' => 'Material history not found',
+                    'message' => 'Riwayat hasil bahan ajar tidak tersedia di akun ini!',
                     'data' => null,
                 ], 404);
             }
