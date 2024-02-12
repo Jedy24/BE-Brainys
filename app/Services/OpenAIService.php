@@ -208,7 +208,7 @@ class OpenAIService
                 }
             ]
             "lampiran": {
-                "glorasium_materi": ["", "", "", "", "", "", "", "", "", ""]
+                "glorasium_materi": ["", "", "", "", "", "", "", "", "", ""] //Berikan glorasium masing masing 1 item 1 kalimat penjelasan aftar alfabetis istilah dalam suatu ranah pengetahuan tertentu yang dilengkapi dengan definisi untuk istilah-istilah tersebut
             }
         }
             
