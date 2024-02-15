@@ -209,6 +209,7 @@ class OpenAIService
             ]
             "lampiran": {
                 "glorasium_materi": ["", "", "", "", "", "", "", "", "", ""] //Berikan 10 item glorasium masing masing 1 item 1 kalimat penjelasan aftar alfabetis istilah dalam suatu ranah pengetahuan tertentu yang dilengkapi dengan definisi untuk istilah-istilah tersebut
+                "daftar_pustaka": ["", "", "", "", "", "", "", "", "", ""] //Berikan 10 item daftar pustaka masing masing 1 Daftar pustaka adalah daftar sumber yang digunakan untuk mengutip publikasi ilmiah.
             }
         }
             
