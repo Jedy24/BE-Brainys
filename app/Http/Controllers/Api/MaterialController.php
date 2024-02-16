@@ -29,6 +29,18 @@ class MaterialController extends Controller
                 'notes' => 'required',
             ]);
 
+            // Retrieve the authenticated user
+            $user = $request->user();
+
+            // Check if the user has less than 20 material histories
+            if ($user->materialHistory()->count() >= 20) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Anda telah mencapai batas maksimal untuk riwayat bahan ajar. Saat ini anda telah menghasilkan '.$user->materialHistory()->count().' bahan ajar.',
+                    'data' => null,
+                ], 400);
+            }
+
             // Parameters
             $syllabusName   = $request->input('name');
             $mataPelajaran  = $request->input('subject');
@@ -175,5 +187,4 @@ class MaterialController extends Controller
             ], 500);
         }
     }
-
 }
