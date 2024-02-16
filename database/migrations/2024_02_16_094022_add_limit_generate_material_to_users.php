@@ -14,7 +14,7 @@ class AddLimitGenerateMaterialToUsers extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->integer('limit_generate_material')->default(20)->after('school_name');
+            $table->integer('limit_generate_material')->default(20)->after('profession');
         });
     }
 
