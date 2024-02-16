@@ -33,11 +33,14 @@ class MaterialController extends Controller
             $user = $request->user();
 
             // Check if the user has less than 20 material histories
-            if ($user->materialHistory()->count() >= 20) {
+            if ($user->materialHistory()->count() >= $user->limit_generate_material) {
                 return response()->json([
                     'status' => 'failed',
-                    'message' => 'Anda telah mencapai batas maksimal untuk riwayat bahan ajar. Saat ini anda telah menghasilkan '.$user->materialHistory()->count().' bahan ajar.',
-                    'data' => null,
+                    'message' => 'Anda telah mencapai batas maksimal untuk riwayat bahan ajar.',
+                    'data' => [
+                        'generated_num' => $user->materialHistory()->count(),
+                        'limit_num' => $user->limit_generate_material
+                    ],
                 ], 400);
             }
 
