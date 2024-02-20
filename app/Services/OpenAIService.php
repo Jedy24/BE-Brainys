@@ -79,7 +79,7 @@ class OpenAIService
                 "topik": "(Berbentuk 1 Paragraf/Alinea)",
                 "alokasi_waktu": "",
                 "kompetensi_awal": "(Berbentuk 1 Paragraf/Alinea)",
-                "profil_pelajar_pancasila": "(Berbentuk 1 Paragraf/Alinea)",
+                "profil_pelajar_pancasila": "(Berbentuk 1 Paragraf/Alinea)", Perhatian: Pastikan profil pelajar sesuai dengan mata pelajaran yang dipilih, jangan ada unsur PPKN, dan harus ada profil pelajar yang mencerminkan pancasila.
                 "target_peserta_didik": "(Berbentuk 1 Paragraf/Alinea)",
                 "model_pembelajaran": "(Berbentuk 1 Paragraf/Alinea)"
             },
