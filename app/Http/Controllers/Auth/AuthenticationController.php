@@ -379,4 +379,49 @@ class AuthenticationController extends Controller
         /**Mengembalikan nilai dalam bentuk JSON. */
         return response()->json($response, 200);
     }
+
+    // Handle update profile user
+    public function updateProfile(Request $request)
+    {
+        // Verifikasi token dari log-in
+        $user = $request->user();
+
+        // Pesan error jika token dari login tidak valid
+        if (!$user) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Akun tidak terotentifikasi.',
+            ], 401);
+        }
+
+        // Validasi data yang diterima dari request
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'profession' => 'required|string|max:255',
+            'school_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+        ]);
+
+        // Mengupdate data profil pengguna
+        $user->update([
+            'name' => $request->input('name'),
+            'profession' => $request->input('profession'),
+            'school_name' => $request->input('school_name'),
+            'email' => $request->input('email'),
+        ]);
+
+        // Mengembalikan respons sukses
+        $response = [
+            'status' => 'success',
+            'message' => 'Profil berhasil diperbarui!',
+            'data' => [
+                'name' => $user->name,
+                'profession' => $user->profession,
+                'school_name' => $user->school_name,
+                'email' => $user->email,
+            ],
+        ];
+
+        return response()->json($response, 200);
+    }
 }
