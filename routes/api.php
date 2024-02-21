@@ -42,6 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user-profile', [AuthenticationController::class, 'userProfile']);
     Route::post('/profile', [AuthenticationController::class, 'profile']);
     Route::post('/change-password', [AuthenticationController::class, 'changePassword']);
+    Route::post('/update-profile', [AuthenticationController::class, 'updateProfile']);
     Route::group(['prefix' => 'syllabus'], function () {
         Route::get('/history', [SyllabusController::class, 'mtHandler']);
         Route::get('/history/{id}', [SyllabusController::class, 'mtHandler']);
