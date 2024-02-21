@@ -383,10 +383,10 @@ class AuthenticationController extends Controller
     // Handle update profile user
     public function updateProfile(Request $request)
     {
-        // Verifikasi token dari log-in
+        /* Verifikasi token dari log-in **/
         $user = $request->user();
 
-        // Pesan error jika token dari login tidak valid
+        /* Pesan error jika token dari login tidak valid **/
         if (!$user) {
             return response()->json([
                 'status' => 'failed',
@@ -394,21 +394,21 @@ class AuthenticationController extends Controller
             ], 401);
         }
 
-        // Validasi data yang diterima dari request
+        /* Validasi data yang diterima dari request **/
         $request->validate([
             'name' => 'required|string|max:255',
             'profession' => 'required|string|max:255',
             'school_name' => 'required|string|max:255',
         ]);
 
-        // Mengupdate data profil pengguna
+        /* Mengupdate data profil pengguna **/
         $user->update([
             'name' => $request->input('name'),
             'profession' => $request->input('profession'),
             'school_name' => $request->input('school_name'),
         ]);
 
-        // Mengembalikan respons sukses
+        /* Mengembalikan respons sukses **/
         $response = [
             'status' => 'success',
             'message' => 'Profil berhasil diperbarui!',
