@@ -399,7 +399,6 @@ class AuthenticationController extends Controller
             'name' => 'required|string|max:255',
             'profession' => 'required|string|max:255',
             'school_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
         ]);
 
         // Mengupdate data profil pengguna
@@ -407,7 +406,6 @@ class AuthenticationController extends Controller
             'name' => $request->input('name'),
             'profession' => $request->input('profession'),
             'school_name' => $request->input('school_name'),
-            'email' => $request->input('email'),
         ]);
 
         // Mengembalikan respons sukses
@@ -418,7 +416,6 @@ class AuthenticationController extends Controller
                 'name' => $user->name,
                 'profession' => $user->profession,
                 'school_name' => $user->school_name,
-                'email' => $user->email,
             ],
         ];
 
