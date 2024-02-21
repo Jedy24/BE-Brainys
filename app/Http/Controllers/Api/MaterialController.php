@@ -45,7 +45,7 @@ class MaterialController extends Controller
             }
 
             // Parameters
-            $syllabusName   = $request->input('name');
+            $materialName   = $request->input('name');
             $mataPelajaran  = $request->input('subject');
             $tingkatKelas   = $request->input('grade');
             $addNotes       = $request->input('notes');
@@ -57,13 +57,14 @@ class MaterialController extends Controller
             $parsedResponse = json_decode($resMessage, true);
             $user = $request->user();
 
+            $parsedResponse['informasi_umum']['nama_bahan_ajar'] = $materialName;
             $parsedResponse['informasi_umum']['penyusun'] = $user->name;
             $parsedResponse['informasi_umum']['instansi'] = $user->school_name;
             $parsedResponse['informasi_umum']['tahun_penyusunan'] = Date('Y');
 
             // Construct the response data for success
             $insertData = MaterialHistories::create([
-                'name' => $syllabusName,
+                'name' => $materialName,
                 'subject' => $mataPelajaran,
                 'grade' => $tingkatKelas,
                 'notes' => $addNotes,
