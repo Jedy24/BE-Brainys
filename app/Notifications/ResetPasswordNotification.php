@@ -37,7 +37,7 @@ class ResetPasswordNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $url = url("/reset-password?token={$this->resetToken}");
+        $url = url("https://brainys.oasys.id/reset-password?token={$this->resetToken}");
 
         return (new MailMessage)
             ->line('Anda menerima pesan reset password karena kami menerima pesan reset password untuk akun Anda.')
