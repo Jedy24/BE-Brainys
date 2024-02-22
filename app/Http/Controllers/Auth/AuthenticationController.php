@@ -160,9 +160,8 @@ class AuthenticationController extends Controller
     {
         /**Validasi data user. */
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'new_password' => 'required|string|min:8|confirmed',
             'reset_token' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
         ]);
 
         /**Jika validasi gagal maka muncul pesan error. */
@@ -174,9 +173,8 @@ class AuthenticationController extends Controller
             ], 422);
         }
 
-        /**Mencari data user dari email berupa token reset dan masa berlaku token reset. */
-        $user = User::where('email', $request->email)
-            ->where('reset_token', $request->reset_token)
+        /** Mencari data user berdasarkan reset token dan masa berlakunya */
+        $user = User::where('reset_token', $request->reset_token)
             ->where('reset_token_expired', '>', now())
             ->first();
 
