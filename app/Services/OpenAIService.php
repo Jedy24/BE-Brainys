@@ -77,7 +77,7 @@ class OpenAIService
                 "mata_pelajaran": "",
                 "fase_kelas": "",
                 "topik": "(Berbentuk 1 Paragraf/Alinea)",
-                "alokasi_waktu": "",
+                "alokasi_waktu": "", Perhatian: Untuk satu kali pertemuan alokasi waktunya 2 jam, silahkan pikirkan berapa pertemuan, maksimal 4 pertemuan untuk 1 bahan ajar
                 "kompetensi_awal": "(Berbentuk 1 Paragraf/Alinea)",
                 "profil_pelajar_pancasila": "(Berbentuk 1 Paragraf/Alinea)", Perhatian: Pastikan profil pelajar sesuai dengan mata pelajaran yang dipilih, jangan ada unsur PPKN, dan harus ada profil pelajar yang mencerminkan pancasila.
                 "target_peserta_didik": "(Berbentuk 1 Paragraf/Alinea)",
@@ -106,6 +106,7 @@ class OpenAIService
                     "materi_pembelajaran": [
                         {
                             "materi": "",
+                            "tujuan_pembelajaran_materi": "(Berbentuk 1 Paragraf/Alinea)",
                             "indikator": "",
                             "nilai_karakter": "",
                             "kegiatan_pembelajaran": "",
@@ -123,6 +124,7 @@ class OpenAIService
                         },
                         {
                             "materi": "",
+                            "tujuan_pembelajaran_materi": "(Berbentuk 1 Paragraf/Alinea)",
                             "indikator": "",
                             "nilai_karakter": "",
                             "kegiatan_pembelajaran": "",
@@ -141,6 +143,7 @@ class OpenAIService
                     "materi_pembelajaran": [
                         {
                             "materi": "",
+                            "tujuan_pembelajaran_materi": "(Berbentuk 1 Paragraf/Alinea)",
                             "indikator": "",
                             "nilai_karakter": "",
                             "kegiatan_pembelajaran": "",
@@ -158,6 +161,7 @@ class OpenAIService
                         },
                         {
                             "materi": "",
+                            "tujuan_pembelajaran_materi": "(Berbentuk 1 Paragraf/Alinea)",
                             "indikator": "",
                             "nilai_karakter": "",
                             "kegiatan_pembelajaran": "",
@@ -176,6 +180,7 @@ class OpenAIService
                     "materi_pembelajaran": [
                         {
                             "materi": "",
+                            "tujuan_pembelajaran_materi": "(Berbentuk 1 Paragraf/Alinea)",
                             "indikator": "",
                             "nilai_karakter": "",
                             "kegiatan_pembelajaran": "",
@@ -193,6 +198,7 @@ class OpenAIService
                         },
                         {
                             "materi": "",
+                            "tujuan_pembelajaran_materi": "(Berbentuk 1 Paragraf/Alinea)",
                             "indikator": "",
                             "nilai_karakter": "",
                             "kegiatan_pembelajaran": "",
