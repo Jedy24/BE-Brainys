@@ -139,7 +139,6 @@ class AuthenticationController extends Controller
          */
         $token = Str::random(60);
         $user->reset_token = $token;
-        $user->reset_token_expired = now()->addHours(1);
         $user->save();
 
         /**Mengirim pesan reset password ke email. */
