@@ -12,12 +12,12 @@ class ResetPasswordNotification extends Notification
 {
     use Queueable;
 
-    public $resetToken;
+    public $user;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(User $user)
+    public function __construct($user)
     {
         $this->user = $user;
     }
