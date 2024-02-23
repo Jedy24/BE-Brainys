@@ -160,6 +160,7 @@ class AuthenticationController extends Controller
     {
         /**Validasi data user. */
         $validator = Validator::make($request->all(), [
+            'reset_token' => 'required|string',
             'new_password' => 'required|string|min:8|confirmed',
         ]);
 
