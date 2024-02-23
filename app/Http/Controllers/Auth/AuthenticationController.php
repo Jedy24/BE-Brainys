@@ -158,8 +158,6 @@ class AuthenticationController extends Controller
     // Handle reset password function
     public function resetPassword(Request $request)
     {
-        $resetToken = session('reset_token');
-
         /**Validasi data user. */
         $validator = Validator::make($request->all(), [
             'new_password' => 'required|string|min:8|confirmed',
@@ -195,8 +193,6 @@ class AuthenticationController extends Controller
         $user->reset_token = null;
         $user->reset_token_expired = null;
         $user->save();
-
-        session()->forget('reset_token');
 
         /**Mengembalikan nilai dalam bentuk JSON.
          * Menampilkan pesan sukses.
