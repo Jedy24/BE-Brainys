@@ -142,8 +142,6 @@ class AuthenticationController extends Controller
         $user->reset_token_expired = now()->addHours(1);
         $user->save();
 
-        session(['reset_token' => $token]);
-
         /**Mengirim pesan reset password ke email. */
         $user->notify(new ResetPasswordNotification($token));
 
