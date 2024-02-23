@@ -158,6 +158,8 @@ class AuthenticationController extends Controller
     // Handle reset password function
     public function resetPassword(Request $request)
     {
+        $resetToken = $request->query('token');
+
         /**Validasi data user. */
         $validator = Validator::make($request->all(), [
             'reset_token' => 'required|string',
