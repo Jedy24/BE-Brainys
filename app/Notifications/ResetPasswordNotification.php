@@ -37,8 +37,6 @@ class ResetPasswordNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $token = session('reset_token');
-
         $url = url("https://brainys.oasys.id/forget-password?token={$resetToken}");
 
         return (new MailMessage)
