@@ -143,7 +143,7 @@ class AuthenticationController extends Controller
         $user->save();
 
         /**Mengirim pesan reset password ke email. */
-        $user->notify(new ResetPasswordNotification($token));
+        $user->notify(new ResetPasswordNotification());
 
         /**Mengembalikan nilai dalam bentuk JSON.
          * Menampilkan pesan sukses.
@@ -158,13 +158,13 @@ class AuthenticationController extends Controller
     // Handle reset password function
     public function resetPassword(Request $request)
     {
-        $resetToken = $request->query('token');
-
         /**Validasi data user. */
         $validator = Validator::make($request->all(), [
             'reset_token' => 'required|string',
             'new_password' => 'required|string|min:8|confirmed',
         ]);
+
+        $resetToken = $user->reset_token;
 
         /**Jika validasi gagal maka muncul pesan error. */
         if ($validator->fails()) {
