@@ -177,7 +177,7 @@ class AuthenticationController extends Controller
         }
 
         /** Mencari data user berdasarkan reset token dan masa berlakunya */
-        $user = User::where('reset_token', $token)
+        $user = User::where('reset_token', $resetToken)
             ->where('reset_token_expired', '>', now())
             ->first();
 
