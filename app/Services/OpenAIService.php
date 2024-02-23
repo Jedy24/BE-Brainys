@@ -95,6 +95,7 @@ class OpenAIService
             "tujuan_kegiatan_pembelajaran": {
                 "tujuan_pembelajaran_bab": "(Berbentuk 1 Paragraf/Alinea)",
                 "tujuan_pembelajaran_topik": ["", "", "", ""]
+                "tujuan_pembelajaran_pertemuan": ["", "", "", "", "", "", "", ""], "(Berbentuk 1 Paragraf/Alinea untuk setiap pertemuan tanpa menuliskan pertemuan ke berapa, ambil data "alokasi_waktu" di atas untuk menentukan berapa kali pertemuan)",
             },
             "pemahaman_bermakna": {
                 "topik": "(Berbentuk 1 Paragraf/Alinea)"
