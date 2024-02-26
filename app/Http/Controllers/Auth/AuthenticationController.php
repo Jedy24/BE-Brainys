@@ -143,7 +143,7 @@ class AuthenticationController extends Controller
         $user->save();
 
         /**Mengirim pesan reset password ke email. */
-        $user->notify(new ResetPasswordNotification($token));
+        $user->notify(new ResetPasswordNotification($token, $user->email));
 
         /**Mengembalikan nilai dalam bentuk JSON.
          * Menampilkan pesan sukses.

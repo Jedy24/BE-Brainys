@@ -13,13 +13,15 @@ class ResetPasswordNotification extends Notification
     use Queueable;
 
     public $resetToken;
+    public $userEmail;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct($resetToken)
+    public function __construct($resetToken, $userEmail)
     {
         $this->resetToken = $resetToken;
+        $this->userEmail = $userEmail;
     }
 
     /**
@@ -37,7 +39,7 @@ class ResetPasswordNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $url = url("https://brainys.oasys.id/forget-password", ['token' => $this->resetToken]);
+        $url = url("https://brainys.oasys.id/forget-password?email={$this->userEmail}&token={$this->resetToken}");
 
         return (new MailMessage)
             ->line('Anda menerima pesan reset password karena kami menerima pesan reset password untuk akun Anda.')
