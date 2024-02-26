@@ -103,7 +103,7 @@ class OpenAIService
             "pertanyaan_pemantik": ["", "", "", ""],
             "kompetensi_dasar": [
                 {
-                    "nama_kompetensi_dasar": "",
+                    "nama_kompetensi_dasar": "", //nama
                     "materi_pembelajaran": [
                         {
                             "materi": "",
