@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ExerciseController;
 use App\Http\Controllers\Api\MaterialController;
 use App\Http\Controllers\Api\SyllabusController;
 use Illuminate\Http\Request;
@@ -54,6 +55,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/export-word', [MaterialController::class, 'convertToWord']);
         Route::get('/history', [MaterialController::class, 'history']);
         Route::get('/history/{id}', [MaterialController::class, 'historyDetail']);
+    });
+    Route::group(['prefix' => 'exercise'], function () {
+        Route::post('/generate-essay', [ExerciseController::class, 'generateEssay']);
     });
 });
 
