@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\ExerciseController;
 use App\Http\Controllers\Api\MaterialController;
 use App\Http\Controllers\Api\SyllabusController;
+use App\Http\Controllers\Api\UserStatusController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
@@ -41,6 +42,7 @@ Route::controller(AuthenticationController::class)->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthenticationController::class, 'logout']);
     Route::get('/user-profile', [AuthenticationController::class, 'userProfile']);
+    Route::get('/user-status', [UserStatusController::class, 'getStatus']);
     Route::post('/profile', [AuthenticationController::class, 'profile']);
     Route::post('/change-password', [AuthenticationController::class, 'changePassword']);
     Route::post('/update-profile', [AuthenticationController::class, 'updateProfile']);
