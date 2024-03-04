@@ -372,7 +372,7 @@ class OpenAIService
     {
         $prompt = 'Buatkan silabus untuk mata pelajaran ' . $subject . ' pada tingkat ' . $grade . ' dengan NIP/NIK ' . $nip . ' dengan memperhatikan catatan khusus berikut: ' . $notes . '.
 
-        Jelaskan alokasi waktu, kompetensi inti (KI), kompetensi dasar, materi pembelajaran, dan kegiatan pembelajaran yang relevan.
+        Jelaskan jenjang sekolah, alokasi waktu, kompetensi inti (KI), kompetensi dasar, materi pembelajaran, dan kegiatan pembelajaran yang relevan.
 
         Selanjutnya rinci kompetensi inti (KI) menjadi empat bagian yaitu KI-1 yang menyangkut spiritual, KI-2 yang menyangkut sosial, KI-3 yang menyangkut pengetahuan, dan KI-4 yang menyangkut keterampilan.
 
@@ -384,6 +384,7 @@ class OpenAIService
             "informasi_umum": {
                 "mata_pelajaran" : "",
                 "nama_sekolah" : "",
+                "jenjang_sekolah" : "",
                 "tingkat_kelas": "",
                 "nip" : ""
             },
@@ -429,7 +430,7 @@ class OpenAIService
                         "materi_pembelajaran" : ["", "", "", ""],
                         "kegiatan_pembelajaran" : ["", "", "", ""]
                     },
-                ] Perhatikan: Pastikan setiap bagian pada item "inti_silabus" memiliki informasi yang lengkap dan relevan
+                ], Perhatikan: Pastikan setiap bagian pada item "inti_silabus" memiliki informasi yang lengkap dan relevan
             }
         }';
 
