@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ExerciseHistory;
 use App\Services\OpenAIService;
 use Illuminate\Http\Request;
 
@@ -20,6 +21,7 @@ class ExerciseController extends Controller
         try {
             // Validasi input
             $request->validate([
+                'name' => 'required|string',
                 'subject' => 'required|string',
                 'grade' => 'required|string',
                 'number_of_questions' => 'required|integer|min:1',
@@ -27,6 +29,7 @@ class ExerciseController extends Controller
             ]);
 
             // Ambil data dari permintaan
+            $exerciseName = $request->input('name');
             $mataPelajaran = $request->input('subject');
             $tingkatKelas = $request->input('grade');
             $jumlahSoal = $request->input('number_of_questions');
@@ -41,24 +44,19 @@ class ExerciseController extends Controller
             // Parse respon dari OpenAI jika diperlukan
             $parsedResponse = json_decode($resMessage, true);
 
-            // Simpan hasil latihan ke database jika perlu
-            // Exercise::create([
-            //     'type' => 'essay',
-            //     'subject' => $mataPelajaran,
-            //     'grade' => $tingkatKelas,
-            //     'number_of_questions' => $jumlahSoal,
-            //     'prompt' => $prompt,
-            //     'response' => $parsedResponse,
-            // ]);
+            // Simpan hasil latihan ke database menggunakan metode create
+            $exerciseHistory = ExerciseHistory::create([
+                'name' => $exerciseName,
+                'subject' => $mataPelajaran,
+                'grade' => $tingkatKelas,
+                'number_of_question' => $jumlahSoal,
+                'notes' => $notes,
+                'type' => 'essay',
+                'output_data' => json_encode($parsedResponse),
+                'user_id' => auth()->id(), // Menggunakan ID pengguna yang sedang diotentikasi
+            ]);
 
-            // Konstruksi data respon untuk sukses
-            // $responseData = [
-            //     'subject' => $mataPelajaran,
-            //     'grade' => $tingkatKelas,
-            //     'number_of_questions' => $jumlahSoal,
-            //     'prompt' => $prompt,
-            //     'response' => $parsedResponse,
-            // ];
+            $parsedResponse['id'] = $exerciseHistory->id;
 
             // Return respon JSON sukses
             return response()->json([
