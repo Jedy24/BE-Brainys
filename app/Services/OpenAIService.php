@@ -385,51 +385,51 @@ class OpenAIService
                 "mata_pelajaran" : "",
                 "nama_sekolah" : "",
                 "tingkat_kelas": "",
-                "nip" : "",
+                "nip" : ""
             },
             "silabus_pembelajaran": {
                 "mata_pelajaran" : "",
                 "tingkat_kelas" : "",
                 "alokasi_waktu" : "", Perhatian: Alokasi waktu berupa berapa jam pelajaran perminggunya
                 "kompetensi_inti": [
-                    "KI-1 (Spiritual) : "" ",
-                    "KI-2 (Sosial) : "" ",
-                    "KI-3 (Pengetahuan) : "" ",
-                    "KI-4 (Keterampilan) : "" ",
+                    "KI-1 (Spiritual) : ",
+                    "KI-2 (Sosial) : ",
+                    "KI-3 (Pengetahuan) : ",
+                    "KI-4 (Keterampilan) : "
                 ],
                 "definisi_kompetensi_inti" : "", Perhatian: Definisi kompetensi inti adalah pencapaian atau tujuan dari keempat kompetensi inti tersebut (Berbentuk 1 Paragraf/Alinea)
                 "inti_silabus" : [
                     {
                         "kompetensi_dasar" : ["", ""],
                         "materi_pembelajaran" : ["", "", "", ""],
-                        "kegiatan_pembelajaran" : ["", "", "", ""],
+                        "kegiatan_pembelajaran" : ["", "", "", ""]
                     },
                     {
                         "kompetensi_dasar" : ["", ""],
                         "materi_pembelajaran" : ["", "", "", ""],
-                        "kegiatan_pembelajaran" : ["", "", "", ""],
+                        "kegiatan_pembelajaran" : ["", "", "", ""]
                     },
                     {
                         "kompetensi_dasar" : ["", ""],
                         "materi_pembelajaran" : ["", "", "", ""],
-                        "kegiatan_pembelajaran" : ["", "", "", ""],
+                        "kegiatan_pembelajaran" : ["", "", "", ""]
                     },
                     {
                         "kompetensi_dasar" : ["", ""],
                         "materi_pembelajaran" : ["", "", "", ""],
-                        "kegiatan_pembelajaran" : ["", "", "", ""],
+                        "kegiatan_pembelajaran" : ["", "", "", ""]
                     },
                     {
                         "kompetensi_dasar" : ["", ""],
                         "materi_pembelajaran" : ["", "", "", ""],
-                        "kegiatan_pembelajaran" : ["", "", "", ""],
+                        "kegiatan_pembelajaran" : ["", "", "", ""]
                     },
                     {
                         "kompetensi_dasar" : ["", ""],
                         "materi_pembelajaran" : ["", "", "", ""],
-                        "kegiatan_pembelajaran" : ["", "", "", ""],
+                        "kegiatan_pembelajaran" : ["", "", "", ""]
                     },
-                ], Perhatikan: Pastikan setiap bagian pada item "inti_silabus" memiliki informasi yang lengkap dan relevan
+                ] Perhatikan: Pastikan setiap bagian pada item "inti_silabus" memiliki informasi yang lengkap dan relevan
             }
         }';
 
