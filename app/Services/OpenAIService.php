@@ -429,7 +429,7 @@ class OpenAIService
                         "materi_pembelajaran" : ["", "", "", ""],
                         "kegiatan_pembelajaran" : ["", "", "", ""],
                     },
-                ], Perhatikan: Pastikan setiap bagian pada item "inti_silabus" memiliki informasi yang lengkap dan relevan
+                ], Perhatikan: Pastikan setiap bagian pada item "inti_silabus" beserta isinya memiliki informasi yang lengkap dan relevan
             }
         }';
 
