@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\OpenAIService;
 
-use App\Models\MaterialHistories;
+use App\Models\Syllabuses;
 use icircle\Template\Docx\DocxTemplate;
 
 class SyllabusController extends Controller
@@ -23,38 +23,46 @@ class SyllabusController extends Controller
         try {
             // Input validation
             $request->validate([
-                'name' => 'required',
                 'subject' => 'required',
                 'grade' => 'required',
+                'nip' => 'required',
                 'notes' => 'required',
             ]);
 
+            // Retrieve the authenticated user
+            $user = $request->user();
+
             // Parameters
-            $syllabusName   = $request->input('name');
-            $mataPelajaran  = $request->input('subject');
-            $tingkatKelas   = $request->input('grade');
-            $addNotes       = $request->input('notes');
-            $prompt         = $this->openAI->generateSyllabusPrompt($mataPelajaran, $tingkatKelas, $addNotes);
+            $mataPelajaran   = $request->input('subject');
+            $tingkatKelas    = $request->input('grade');
+            $NIP             = $request->input('nip');
+            $addNotes        = $request->input('notes');
+            $prompt          = $this->openAI->generateSyllabusPromptBeta($mataPelajaran, $tingkatKelas, $NIP, $addNotes);
 
             // Send the message to OpenAI
             $resMessage = $this->openAI->sendMessage($prompt);
 
             $parsedResponse = json_decode($resMessage, true);
+            $user = $request->user();
+
+            $parsedResponse['informasi_umum']['nama_sekolah'] = $user->school_name;
 
             // Construct the response data for success
-            MaterialHistories::create([
-                'name' => $syllabusName,
+            $insertData = Syllabuses::create([
                 'subject' => $mataPelajaran,
                 'grade' => $tingkatKelas,
+                'nip' => $NIP,
                 'notes' => $addNotes,
-                'output_data' => $parsedResponse,
+                'generate_output' => $parsedResponse,
                 'user_id' => auth()->id(),
             ]);
+
+            $parsedResponse['id'] = $insertData->id;
 
             // return new APIResponse($responseData);
             return response()->json([
                 'status' => 'success',
-                'message' => 'Silabus berhasil dihasilkan',
+                'message' => 'Silabus berhasil dibuat!',
                 'data' => $parsedResponse,
             ], 200);
         } catch (\Exception $e) {
