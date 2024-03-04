@@ -402,7 +402,7 @@ class OpenAIService
                     {
                         "kompetensi_dasar" : ["", ""],
                         "materi_pembelajaran" : ["", "", "", ""],
-                        "kegiatan_pembelajaran" : ["", "", "", "", ""],
+                        "kegiatan_pembelajaran" : ["", "", "", ""],
                     },
                     {
                         "kompetensi_dasar" : ["", ""],
