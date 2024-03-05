@@ -60,6 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::group(['prefix' => 'exercise'], function () {
         Route::post('/generate-essay', [ExerciseController::class, 'generateEssay']);
+        Route::post('/generate-choice', [ExerciseController::class, 'generateChoice']);
     });
 });
 
