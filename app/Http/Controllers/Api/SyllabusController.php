@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\OpenAIService;
 
-use App\Models\Syllabuses;
+use App\Models\SyllabusHistories;
 use icircle\Template\Docx\DocxTemplate;
 
 class SyllabusController extends Controller
@@ -48,7 +48,7 @@ class SyllabusController extends Controller
             $parsedResponse['informasi_umum']['nama_sekolah'] = $user->school_name;
 
             // Construct the response data for success
-            $insertData = Syllabuses::create([
+            $insertData = SyllabusHistories::create([
                 'subject' => $mataPelajaran,
                 'grade' => $tingkatKelas,
                 'nip' => $NIP,
@@ -112,7 +112,7 @@ class SyllabusController extends Controller
 
             // Get syllabus histories for the authenticated user
             $syllabusHistories = $user->syllabusHistory()
-                ->select(['id', 'name', 'subject', 'grade', 'notes', 'created_at', 'updated_at', 'user_id'])
+                ->select(['id', 'subject', 'grade', 'nip', 'notes', 'user_id', 'created_at', 'updated_at'])
                 ->get();
 
             if ($syllabusHistories->isEmpty()) {
@@ -159,7 +159,7 @@ class SyllabusController extends Controller
             if (!$syllabusHistory) {
                 return response()->json([
                     'status' => 'failed',
-                    'message' => 'Syllabus history not found',
+                    'message' => 'Riwayat hasil silabus tidak tersedia pada akun ini!',
                     'data' => null,
                 ], 404);
             }

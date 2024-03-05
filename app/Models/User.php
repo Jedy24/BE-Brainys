@@ -59,4 +59,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(MaterialHistories::class, 'user_id', 'id');
     }
+
+    public function syllabusHistory()
+    {
+        return $this->hasMany(SyllabusHistories::class, 'user_id', 'id');
+    }
 }

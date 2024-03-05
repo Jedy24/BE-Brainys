@@ -48,8 +48,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/update-profile', [AuthenticationController::class, 'updateProfile']);
     Route::group(['prefix' => 'syllabus'], function () {
         Route::post('/generate', [SyllabusController::class, 'generate']);
-        Route::get('/history', [SyllabusController::class, 'mtHandler']);
-        Route::get('/history/{id}', [SyllabusController::class, 'mtHandler']);
+        Route::get('/history', [SyllabusController::class, 'history']);
+        Route::get('/history/{id}', [SyllabusController::class, 'historyDetail']);
         Route::post('/export-to-word', [SyllabusController::class, 'mtHandler']);
     });
     Route::group(['prefix' => 'material'], function () {
