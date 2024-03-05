@@ -717,34 +717,36 @@ class OpenAIService
     public function generateExercisesChoicePrompt($subject, $grade, $number_of_question, $notes)
     {
         // Construct the prompt
-        $prompt = "Generate latihan untuk mata pelajaran: {$subject}, tingkat kelas: {$grade} dengan memperhatikan catatan khusus berikut: {$notes}" . PHP_EOL .
+        $prompt = "Generate latihan untuk mata pelajaran: {$subject}, tingkat kelas: {$grade} dengan memperhatikan catatan khusus berikut: {$notes}. Saya butuh dihasilkan {$number_of_question} soal . " . PHP_EOL .
             "Perhatian: Mohon jawab dengan format JSON berikut:" . PHP_EOL .
             '{
-            "informasi_umum": {
-                "penyusun": "",
-                "instansi": "",
-                "tahun_penyusunan": "",
-                "jenjang_sekolah": "",
-                "mata_pelajaran": "",
-                "fase_kelas": "",
-                "topik": "(Berbentuk 1 Paragraf/Alinea)",
-                "alokasi_waktu": "",
-                "kompetensi_awal": "(Berbentuk 1 Paragraf/Alinea)"
-            },
-            "soal_pilihan_ganda": [
-                {
-                    "question": "",
-                    "options": {
-                        "a": "",
-                        "b": "",
-                        "c": "",
-                        "d": ""
-                    },
-                    "correct_option": "a"
-                }
-            ]
-        }' . PHP_EOL .
-            "Jumlah soal yang diminta: {$number_of_question}";
+                "informasi_umum": {
+                    "penyusun": "",
+                    "instansi": "",
+                    "tahun_penyusunan": "",
+                    "jenjang_sekolah": "",
+                    "mata_pelajaran": "",
+                    "fase_kelas": "",
+                    "topik": "(Berbentuk 1 Paragraf/Alinea)",
+                    "alokasi_waktu": "",
+                    "kompetensi_awal": "(Berbentuk 1 Paragraf/Alinea)"
+                },
+                "soal_pilihan_ganda": [
+                    {
+                        "question": "",
+                        "options": {
+                            "a": "",
+                            "b": "",
+                            "c": "",
+                            "d": ""
+                        },
+                        "correct_option": ""
+                    }
+                ]
+            }' . PHP_EOL .
+            "Mohon berikan jawaban yang jelas dan sesuai dengan pertanyaan. Silakan isi semua pertanyaan dan pilihan jawaban yang tersedia." . PHP_EOL .
+            "Pastikan jumlah soal yang diminta sesuai dengan kebutuhan saya yaitu {$number_of_question} soal dan dapat diselesaikan dengan baik dalam waktu yang telah dialokasikan." . PHP_EOL .
+            "Terima kasih atas kerja sama Anda.";
 
         // Return the generated prompt
         return $prompt;

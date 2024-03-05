@@ -94,13 +94,19 @@ class ExerciseController extends Controller
             $notes = $request->input('notes') ? $request->input('notes') : '';
 
             // Generate prompt untuk essay exercise
-            $prompt = $this->openAI->generateExercisesEssayPrompt($mataPelajaran, $tingkatKelas, $jumlahSoal, $notes);
+            $prompt = $this->openAI->generateExercisesChoicePrompt($mataPelajaran, $tingkatKelas, $jumlahSoal, $notes);
 
             // Kirim permintaan ke OpenAI
             $resMessage = $this->openAI->sendMessage($prompt);
 
             // Parse respon dari OpenAI jika diperlukan
             $parsedResponse = json_decode($resMessage, true);
+
+            $user = $request->user();
+            $parsedResponse['informasi_umum']['nama_latihan'] = $exerciseName;
+            $parsedResponse['informasi_umum']['penyusun'] = $user->name;
+            $parsedResponse['informasi_umum']['instansi'] = $user->school_name;
+            $parsedResponse['informasi_umum']['tahun_penyusunan'] = Date('Y');
 
             // Simpan hasil latihan ke database menggunakan metode create
             $exerciseHistory = ExerciseHistory::create([
@@ -109,17 +115,18 @@ class ExerciseController extends Controller
                 'grade' => $tingkatKelas,
                 'number_of_question' => $jumlahSoal,
                 'notes' => $notes,
-                'type' => 'essay',
+                'type' => 'multiple_choice',
                 'output_data' => json_encode($parsedResponse),
                 'user_id' => auth()->id(), // Menggunakan ID pengguna yang sedang diotentikasi
             ]);
 
+            $parsedResponse['generated_num'] = count($parsedResponse['soal_pilihan_ganda']);
             $parsedResponse['id'] = $exerciseHistory->id;
 
             // Return respon JSON sukses
             return response()->json([
                 'status' => 'success',
-                'message' => 'Latihan esai berhasil dihasilkan',
+                'message' => 'Latihan pilihan berhasil dihasilkan',
                 'data' => $parsedResponse,
             ], 200);
         } catch (\Exception $e) {
