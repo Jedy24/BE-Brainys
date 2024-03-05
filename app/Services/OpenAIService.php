@@ -720,24 +720,30 @@ class OpenAIService
         $prompt = "Generate latihan untuk mata pelajaran: {$subject}, tingkat kelas: {$grade} dengan memperhatikan catatan khusus berikut: {$notes}" . PHP_EOL .
             "Perhatian: Mohon jawab dengan format JSON berikut:" . PHP_EOL .
             '{
-                "informasi_umum": {
-                    "penyusun": "",
-                    "instansi": "",
-                    "tahun_penyusunan": "",
-                    "jenjang_sekolah": "",
-                    "mata_pelajaran": "",
-                    "fase_kelas": "",
-                    "topik": "(Berbentuk 1 Paragraf/Alinea)",
-                    "alokasi_waktu": "",
-                    "kompetensi_awal": "(Berbentuk 1 Paragraf/Alinea)"
-                },
-                "soal_essay": [
-                    {
-                        "question": "",
-                        "instructions": ""
-                    }
-                ]
-            }' . PHP_EOL .
+            "informasi_umum": {
+                "penyusun": "",
+                "instansi": "",
+                "tahun_penyusunan": "",
+                "jenjang_sekolah": "",
+                "mata_pelajaran": "",
+                "fase_kelas": "",
+                "topik": "(Berbentuk 1 Paragraf/Alinea)",
+                "alokasi_waktu": "",
+                "kompetensi_awal": "(Berbentuk 1 Paragraf/Alinea)"
+            },
+            "soal_pilihan_ganda": [
+                {
+                    "question": "",
+                    "options": {
+                        "a": "",
+                        "b": "",
+                        "c": "",
+                        "d": ""
+                    },
+                    "correct_option": "a"
+                }
+            ]
+        }' . PHP_EOL .
             "Jumlah soal yang diminta: {$number_of_question}";
 
         // Return the generated prompt
