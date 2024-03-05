@@ -374,7 +374,9 @@ class OpenAIService
 
         Jelaskan jenjang sekolah, alokasi waktu, kompetensi inti (KI), kompetensi dasar, materi pembelajaran, dan kegiatan pembelajaran yang relevan.
 
-        Selanjutnya rinci kompetensi inti (KI) menjadi empat bagian yaitu KI-1 yang menyangkut spiritual, KI-2 yang menyangkut sosial, KI-3 yang menyangkut pengetahuan, dan KI-4 yang menyangkut keterampilan.
+        Rincikan kompetensi inti (KI) menjadi empat bagian yaitu KI-1 yang menyangkut spiritual, KI-2 yang menyangkut sosial, KI-3 yang menyangkut pengetahuan, dan KI-4 yang menyangkut keterampilan. Pastikan kompetensi inti (KI) memiliki informasi yang lengkap dan relevan.
+
+        Selanjutnya susun 6 inti silabus yang berisikan kompetensi dasar, materi pembelajaran, dan kegiatan pembelajaran. Setiap kompetensi dasar memiliki 2 item, materi pembelajaran memiliki 4 item, dan kegiatan pembelajaran memiliki 4 item. Pastikan inti silabus beserta isinya memiliki informasi yang lengkap dan relevan.
 
         Pastikan setiap bagian memiliki informasi yang cukup dan relevan untuk membantu pendidik atau pembelajar memahami dan melaksanakan materi pembelajaran dengan efektif.
 
