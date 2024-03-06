@@ -83,7 +83,7 @@ class SyllabusController extends Controller
             $outputPath = public_path('word_output/Syllabus_' . auth()->id() . '-' . md5(time() . '' . rand(1000, 9999)) . '.docx');
 
             $syllabusHistoryId  = $request->input('id');
-            $syllabuslHistory   = SyllabusHistories::find($syllabusHistoryId);
+            $syllabusHistory   = SyllabusHistories::find($syllabusHistoryId);
 
             $data = $syllabusHistory->output_data;
             $docxTemplate->merge($data, $outputPath, false, false);
