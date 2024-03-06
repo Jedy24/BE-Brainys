@@ -85,7 +85,7 @@ class SyllabusController extends Controller
             $syllabusHistoryId  = $request->input('id');
             $syllabusHistory   = SyllabusHistories::find($syllabusHistoryId);
 
-            $data = $syllabusHistory->output_data;
+            $data = $syllabusHistory->generate_output;
             $docxTemplate->merge($data, $outputPath, false, false);
 
             // Assuming the merge operation is successful
