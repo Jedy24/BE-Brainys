@@ -45,6 +45,7 @@ class SyllabusController extends Controller
             $parsedResponse = json_decode($resMessage, true);
             $user = $request->user();
 
+            $parsedResponse['informasi_umum']['nama_guru'] = $user->name;
             $parsedResponse['informasi_umum']['nama_sekolah'] = $user->school_name;
 
             // Construct the response data for success
@@ -78,15 +79,13 @@ class SyllabusController extends Controller
     {
         try {
             $templatePath = public_path('word_template/Syllabus_Template.docx');
-
             $docxTemplate = new DocxTemplate($templatePath);
             $outputPath = public_path('word_output/Syllabus_' . auth()->id() . '-' . md5(time() . '' . rand(1000, 9999)) . '.docx');
 
-            $data = $request->input('data');
-            // $customDateTime = new DateTime('2024-01-05 21:20:00');
-            // $formattedDateTime = $customDateTime->format('d F Y, H:i');
-            // $data['format_date_time'] = $formattedDateTime;
+            $syllabusHistoryId  = $request->input('id');
+            $syllabuslHistory   = SyllabusHistories::find($syllabusHistoryId);
 
+            $data = $syllabusHistory->output_data;
             $docxTemplate->merge($data, $outputPath, false, false);
 
             // Assuming the merge operation is successful

@@ -388,6 +388,7 @@ class OpenAIService
                 "nama_sekolah" : "",
                 "jenjang_sekolah" : "",
                 "tingkat_kelas": "",
+                "nama_guru": "",
                 "nip" : ""
             },
             "silabus_pembelajaran": {
