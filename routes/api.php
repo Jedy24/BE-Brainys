@@ -50,7 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/generate', [SyllabusController::class, 'generate']);
         Route::get('/history', [SyllabusController::class, 'history']);
         Route::get('/history/{id}', [SyllabusController::class, 'historyDetail']);
-        Route::post('/export-to-word', [SyllabusController::class, 'mtHandler']);
+        Route::post('/export-word', [SyllabusController::class, 'convertToWord']);
     });
     Route::group(['prefix' => 'material'], function () {
         Route::post('/generate', [MaterialController::class, 'generate']);
