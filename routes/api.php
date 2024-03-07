@@ -61,6 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group(['prefix' => 'exercise'], function () {
         Route::post('/generate-essay', [ExerciseController::class, 'generateEssay']);
         Route::post('/generate-choice', [ExerciseController::class, 'generateChoice']);
+        Route::post('/export-word', [ExerciseController::class, 'convertToWord']);
         Route::get('/history', [ExerciseController::class, 'history']);
         Route::get('/history/{id}', [ExerciseController::class, 'historyDetail']);
     });

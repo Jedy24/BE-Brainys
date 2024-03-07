@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ExerciseHistories;
 use App\Services\OpenAIService;
+use icircle\Template\Docx\DocxTemplate;
 use Illuminate\Http\Request;
 
 class ExerciseController extends Controller
@@ -59,6 +60,12 @@ class ExerciseController extends Controller
             // Parse respon dari OpenAI jika diperlukan
             $parsedResponse = json_decode($resMessage, true);
 
+            $user = $request->user();
+            $parsedResponse['informasi_umum']['nama_latihan'] = $exerciseName;
+            $parsedResponse['informasi_umum']['penyusun'] = $user->name;
+            $parsedResponse['informasi_umum']['instansi'] = $user->school_name;
+            $parsedResponse['informasi_umum']['tahun_penyusunan'] = Date('Y');
+
             // Simpan hasil latihan ke database menggunakan metode create
             $exerciseHistory = ExerciseHistories::create([
                 'name' => $exerciseName,
@@ -67,7 +74,7 @@ class ExerciseController extends Controller
                 'number_of_question' => $jumlahSoal,
                 'notes' => $notes,
                 'type' => 'essay',
-                'output_data' => json_encode($parsedResponse),
+                'output_data' => $parsedResponse,
                 'user_id' => auth()->id(), // Menggunakan ID pengguna yang sedang diotentikasi
             ]);
 
@@ -146,7 +153,7 @@ class ExerciseController extends Controller
                 'number_of_question' => $jumlahSoal,
                 'notes' => $notes,
                 'type' => 'multiple_choice',
-                'output_data' => json_encode($parsedResponse),
+                'output_data' => $parsedResponse,
                 'user_id' => auth()->id(), // Menggunakan ID pengguna yang sedang diotentikasi
             ]);
 
@@ -161,6 +168,45 @@ class ExerciseController extends Controller
             ], 200);
         } catch (\Exception $e) {
             // Tangani jika terjadi kesalahan
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage(),
+                'data' => json_decode($e->getMessage(), true),
+            ], 500);
+        }
+    }
+
+    public function convertToWord(Request $request)
+    {
+        try {
+            $exerciseHistoriesId    = $request->input('id');
+            $exerciseHistories      = ExerciseHistories::find($exerciseHistoriesId);
+
+            if($exerciseHistories->type == 'multiple_choice'){
+                $templatePath   = public_path('word_template/Soal_Pilihan_Template.docx');
+                $docxTemplate   = new DocxTemplate($templatePath);
+                $outputPath     = public_path('word_output/Soal_Pilihan_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.docx');
+            } else if($exerciseHistories->type == 'essay'){
+                $templatePath   = public_path('word_template/Soal_Essay_Template.docx');
+                $docxTemplate   = new DocxTemplate($templatePath);
+                $outputPath     = public_path('word_output/Soal_Essay_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.docx');
+            } else {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Data tidak ditemukan!',
+                ], 500);
+            }
+
+            $data = $exerciseHistories->output_data;
+            $docxTemplate->merge($data, $outputPath, false, false);
+
+            // Assuming the merge operation is successful
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Dokumen word berhasil dibuat',
+                'data' => ['output_path' => $outputPath, 'download_url' => url('word_output/' . basename($outputPath))],
+            ], 200);
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => 'failed',
                 'message' => $e->getMessage(),
