@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\ExerciseHistories;
-use App\Models\ExerciseHistory;
 use App\Services\OpenAIService;
 use Illuminate\Http\Request;
 
@@ -162,6 +161,81 @@ class ExerciseController extends Controller
             ], 200);
         } catch (\Exception $e) {
             // Tangani jika terjadi kesalahan
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage(),
+                'data' => json_decode($e->getMessage(), true),
+            ], 500);
+        }
+    }
+
+    public function history(Request $request)
+    {
+        try {
+            // Retrieve the authenticated user
+            $user = $request->user();
+
+            // Get syllabus histories for the authenticated user
+            $exerciseHistories = $user->exerciseHistory()
+                ->select(['id', 'name', 'subject', 'grade', 'notes', 'created_at', 'updated_at', 'user_id'])
+                ->get();
+
+            if ($exerciseHistories->isEmpty()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Tidak ada riwayat soal latihan untuk akun anda!',
+                    'data' => [
+                        'generated_num' => 0,
+                        'items' => [],
+                    ],
+                ], 200);
+            }
+
+            // Calculate the total generated syllabuses by the user
+            $generatedNum = $exerciseHistories->count();
+
+            // Return the response with syllabus histories data
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Riwayat soal latihan ditampilkan',
+                'data' => [
+                    'generated_num' => $generatedNum,
+                    'items' => $exerciseHistories,
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage(),
+                'data' => json_decode($e->getMessage(), true),
+            ], 500);
+        }
+    }
+
+    public function historyDetail(Request $request, $id)
+    {
+        try {
+            // Retrieve the authenticated user
+            $user = $request->user();
+
+            // Get a specific syllabus history by ID for the authenticated user
+            $exerciseHistories = $user->exerciseHistory()->find($id);
+
+            if (!$exerciseHistories) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Riwayat hasil latihan soal tidak tersedia di akun ini!',
+                    'data' => null,
+                ], 404);
+            }
+
+            // Return the response with Material history data
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Exercise history retrieved successfully',
+                'data' => $exerciseHistories,
+            ], 200);
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => 'failed',
                 'message' => $e->getMessage(),

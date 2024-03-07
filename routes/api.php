@@ -46,24 +46,25 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile', [AuthenticationController::class, 'profile']);
     Route::post('/change-password', [AuthenticationController::class, 'changePassword']);
     Route::post('/update-profile', [AuthenticationController::class, 'updateProfile']);
-    Route::group(['prefix' => 'syllabus'], function () {
-        Route::post('/generate', [SyllabusController::class, 'generate']);
-        Route::get('/history', [SyllabusController::class, 'history']);
-        Route::get('/history/{id}', [SyllabusController::class, 'historyDetail']);
-        Route::post('/export-word', [SyllabusController::class, 'convertToWord']);
-    });
     Route::group(['prefix' => 'material'], function () {
         Route::post('/generate', [MaterialController::class, 'generate']);
         Route::post('/export-word', [MaterialController::class, 'convertToWord']);
         Route::get('/history', [MaterialController::class, 'history']);
         Route::get('/history/{id}', [MaterialController::class, 'historyDetail']);
     });
+    Route::group(['prefix' => 'syllabus'], function () {
+        Route::post('/generate', [SyllabusController::class, 'generate']);
+        Route::get('/history', [SyllabusController::class, 'history']);
+        Route::get('/history/{id}', [SyllabusController::class, 'historyDetail']);
+        Route::post('/export-word', [SyllabusController::class, 'convertToWord']);
+    });
     Route::group(['prefix' => 'exercise'], function () {
         Route::post('/generate-essay', [ExerciseController::class, 'generateEssay']);
         Route::post('/generate-choice', [ExerciseController::class, 'generateChoice']);
+        Route::get('/history', [ExerciseController::class, 'history']);
+        Route::get('/history/{id}', [ExerciseController::class, 'historyDetail']);
     });
 });
-
 
 // Route for google log-in
 Route::get('login/{provider}', [SocialiteController::class, 'redirect']);
