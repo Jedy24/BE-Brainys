@@ -64,4 +64,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(SyllabusHistories::class, 'user_id', 'id');
     }
+
+    public function exerciseHistory()
+    {
+        return $this->hasMany(ExerciseHistories::class, 'user_id', 'id');
+    }
 }

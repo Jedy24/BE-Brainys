@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ExerciseHistories;
 use App\Models\ExerciseHistory;
 use App\Services\OpenAIService;
 use Illuminate\Http\Request;
@@ -28,6 +29,21 @@ class ExerciseController extends Controller
                 // 'notes' => 'optional|string',
             ]);
 
+            // Retrieve the authenticated user
+            $user = $request->user();
+
+            // Check if the user has less than 20 material histories
+            if ($user->exerciseHistory()->count() >= $user->limit_generate_exercise) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Anda telah mencapai batas maksimal untuk riwayat bahan ajar.',
+                    'data' => [
+                        'generated_num' => $user->exerciseHistory()->count(),
+                        'limit_num' => $user->limit_generate_exercise,
+                    ],
+                ], 400);
+            }
+
             // Ambil data dari permintaan
             $exerciseName = $request->input('name');
             $mataPelajaran = $request->input('subject');
@@ -45,7 +61,7 @@ class ExerciseController extends Controller
             $parsedResponse = json_decode($resMessage, true);
 
             // Simpan hasil latihan ke database menggunakan metode create
-            $exerciseHistory = ExerciseHistory::create([
+            $exerciseHistory = ExerciseHistories::create([
                 'name' => $exerciseName,
                 'subject' => $mataPelajaran,
                 'grade' => $tingkatKelas,
@@ -86,6 +102,21 @@ class ExerciseController extends Controller
                 // 'notes' => 'optional|string',
             ]);
 
+            // Retrieve the authenticated user
+            $user = $request->user();
+
+            // Check if the user has less than 20 exercise
+            if ($user->exerciseHistory()->count() >= $user->limit_generate_exercise) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Anda telah mencapai batas maksimal untuk riwayat bahan ajar.',
+                    'data' => [
+                        'generated_num' => $user->exerciseHistory()->count(),
+                        'limit_num' => $user->limit_generate_exercise,
+                    ],
+                ], 400);
+            }
+
             // Ambil data dari permintaan
             $exerciseName = $request->input('name');
             $mataPelajaran = $request->input('subject');
@@ -109,7 +140,7 @@ class ExerciseController extends Controller
             $parsedResponse['informasi_umum']['tahun_penyusunan'] = Date('Y');
 
             // Simpan hasil latihan ke database menggunakan metode create
-            $exerciseHistory = ExerciseHistory::create([
+            $exerciseHistory = ExerciseHistories::create([
                 'name' => $exerciseName,
                 'subject' => $mataPelajaran,
                 'grade' => $tingkatKelas,

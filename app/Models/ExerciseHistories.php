@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ExerciseHistory extends Model
+class ExerciseHistories extends Model
 {
     protected $table = 'exercise_histories';
 
