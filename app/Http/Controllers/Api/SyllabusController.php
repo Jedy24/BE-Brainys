@@ -32,6 +32,18 @@ class SyllabusController extends Controller
             // Retrieve the authenticated user
             $user = $request->user();
 
+            // Check if the user has less than 20 syllabus histories
+            if ($user->syllabusHistory()->count() >= $user->limit_generate_syllabus) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Anda telah mencapai batas maksimal untuk riwayat silabus.',
+                    'data' => [
+                        'generated_num' => $user->syllabusHistory()->count(),
+                        'limit_num' => $user->limit_generate_syllabus
+                    ],
+                ], 400);
+            }
+
             // Parameters
             $mataPelajaran   = $request->input('subject');
             $tingkatKelas    = $request->input('grade');
