@@ -7,6 +7,7 @@ use App\Models\ExerciseHistories;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\MaterialHistories;
+use App\Models\SyllabusHistories;
 
 class UserStatusController extends Controller
 {
