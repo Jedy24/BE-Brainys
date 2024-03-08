@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ExerciseHistories;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\MaterialHistories;
@@ -15,23 +16,19 @@ class UserStatusController extends Controller
             // Retrieve the authenticated user
             $user = $request->user();
 
-            // Get the user's material usage status
-            $materialLimit = $user->limit_generate_material;
-            $usedMaterials = MaterialHistories::where('user_id', $user->id)->count();
-
             // Construct the status data
             $status = [
                 'materials' => [
-                    'limit' => $materialLimit,
-                    'used' => $usedMaterials,
+                    'limit' => $user->limit_generate_material,
+                    'used' => MaterialHistories::where('user_id', $user->id)->count(),
                 ],
                 'syllabus' => [
                     'limit' => 0,
                     'used' => 0,
                 ],
                 'exercise' => [
-                    'limit' => 0,
-                    'used' => 0,
+                    'limit' => $user->limit_generate_exercise,
+                    'used' => ExerciseHistories::where('user_id', $user->id)->count(),
                 ]
             ];
 
