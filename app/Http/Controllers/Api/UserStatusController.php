@@ -23,8 +23,8 @@ class UserStatusController extends Controller
                     'used' => MaterialHistories::where('user_id', $user->id)->count(),
                 ],
                 'syllabus' => [
-                    'limit' => 0,
-                    'used' => 0,
+                    'limit' => $user->limit_generate_syllabus,
+                    'used' => SyllabusHistories::where('user_id', $user->id)->count(),
                 ],
                 'exercise' => [
                     'limit' => $user->limit_generate_exercise,
