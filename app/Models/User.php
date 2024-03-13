@@ -69,4 +69,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(ExerciseHistories::class, 'user_id', 'id');
     }
+
+    public function generateAllSum(){
+        return ($this->materialHistory()->count() + $this->syllabusHistory()->count() + $this->exerciseHistory()->count());
+    }
 }

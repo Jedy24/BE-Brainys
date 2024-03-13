@@ -30,6 +30,10 @@ class UserStatusController extends Controller
                 'exercise' => [
                     'limit' => $user->limit_generate_exercise,
                     'used' => ExerciseHistories::where('user_id', $user->id)->count(),
+                ],
+                'all' => [
+                    'limit' => $user->limit_generate,
+                    'used' => $user->generateAllSum(),
                 ]
             ];
 
