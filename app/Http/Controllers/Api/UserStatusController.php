@@ -20,15 +20,15 @@ class UserStatusController extends Controller
             // Construct the status data
             $status = [
                 'materials' => [
-                    'limit' => $user->limit_generate_material,
+                    // 'limit' => $user->limit_generate_material,
                     'used' => MaterialHistories::where('user_id', $user->id)->count(),
                 ],
                 'syllabus' => [
-                    'limit' => $user->limit_generate_syllabus,
+                    // 'limit' => $user->limit_generate_syllabus,
                     'used' => SyllabusHistories::where('user_id', $user->id)->count(),
                 ],
                 'exercise' => [
-                    'limit' => $user->limit_generate_exercise,
+                    // 'limit' => $user->limit_generate_exercise,
                     'used' => ExerciseHistories::where('user_id', $user->id)->count(),
                 ],
                 'all' => [
