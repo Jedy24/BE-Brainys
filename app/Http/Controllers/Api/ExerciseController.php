@@ -153,6 +153,18 @@ class ExerciseController extends Controller
             $parsedResponse['informasi_umum']['instansi'] = $user->school_name;
             $parsedResponse['informasi_umum']['tahun_penyusunan'] = Date('Y');
 
+            $correct_options = [];
+            
+            // Loop through each question
+            foreach ($parsedResponse['soal_pilihan_ganda'] as $question) {
+                // Extract the correct option for the current question and add it to the $correct_options array
+                $correct_options[] = $question['correct_option'];
+            }
+
+            // Populate the 'kunci_jawaban' array with the array of correct options
+            $parsedResponse['kunci_jawaban'] = $correct_options;
+            $parsedResponse['generated_num'] = count($parsedResponse['soal_pilihan_ganda']);
+            
             // Simpan hasil latihan ke database menggunakan metode create
             $exerciseHistory = ExerciseHistories::create([
                 'name' => $exerciseName,
@@ -165,7 +177,6 @@ class ExerciseController extends Controller
                 'user_id' => auth()->id(), // Menggunakan ID pengguna yang sedang diotentikasi
             ]);
 
-            $parsedResponse['generated_num'] = count($parsedResponse['soal_pilihan_ganda']);
             $parsedResponse['id'] = $exerciseHistory->id;
 
             // Return respon JSON sukses
@@ -190,11 +201,11 @@ class ExerciseController extends Controller
             $exerciseHistoriesId    = $request->input('id');
             $exerciseHistories      = ExerciseHistories::find($exerciseHistoriesId);
 
-            if($exerciseHistories->type == 'multiple_choice'){
+            if ($exerciseHistories->type == 'multiple_choice') {
                 $templatePath   = public_path('word_template/Soal_Pilihan_Template.docx');
                 $docxTemplate   = new DocxTemplate($templatePath);
                 $outputPath     = public_path('word_output/Soal_Pilihan_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.docx');
-            } else if($exerciseHistories->type == 'essay'){
+            } else if ($exerciseHistories->type == 'essay') {
                 $templatePath   = public_path('word_template/Soal_Essay_Template.docx');
                 $docxTemplate   = new DocxTemplate($templatePath);
                 $outputPath     = public_path('word_output/Soal_Essay_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.docx');
