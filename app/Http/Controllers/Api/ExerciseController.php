@@ -154,7 +154,7 @@ class ExerciseController extends Controller
             $parsedResponse['informasi_umum']['tahun_penyusunan'] = Date('Y');
 
             $correct_options = [];
-            
+
             // Loop through each question
             foreach ($parsedResponse['soal_pilihan_ganda'] as $question) {
                 // Extract the correct option for the current question and add it to the $correct_options array
@@ -242,7 +242,7 @@ class ExerciseController extends Controller
 
             // Get syllabus histories for the authenticated user
             $exerciseHistories = $user->exerciseHistory()
-                ->select(['id', 'name', 'subject', 'grade', 'notes', 'created_at', 'updated_at', 'user_id'])
+                ->select(['id', 'name', 'subject', 'grade', 'type', 'notes', 'created_at', 'updated_at', 'user_id'])
                 ->get();
 
             if ($exerciseHistories->isEmpty()) {
