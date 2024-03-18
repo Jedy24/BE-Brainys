@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\ExerciseController;
+use App\Http\Controllers\Api\HistoryController;
 use App\Http\Controllers\Api\MaterialController;
 use App\Http\Controllers\Api\SyllabusController;
 use App\Http\Controllers\Api\UserStatusController;
@@ -46,6 +47,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile', [AuthenticationController::class, 'profile']);
     Route::post('/change-password', [AuthenticationController::class, 'changePassword']);
     Route::post('/update-profile', [AuthenticationController::class, 'updateProfile']);
+    Route::group(['prefix' => 'history'], function () {
+        Route::get('/', [HistoryController::class, 'showHistory']);
+        Route::post('/', [HistoryController::class, 'showHistoryFilter']);
+    });
     Route::group(['prefix' => 'material'], function () {
         Route::post('/generate', [MaterialController::class, 'generate']);
         Route::post('/export-word', [MaterialController::class, 'convertToWord']);
