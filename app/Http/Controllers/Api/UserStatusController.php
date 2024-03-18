@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\MaterialHistories;
 use App\Models\SyllabusHistories;
+use App\Models\UserNotification;
 
 class UserStatusController extends Controller
 {
@@ -37,6 +38,20 @@ class UserStatusController extends Controller
                 ]
             ];
 
+            // Initialize notification message
+            $notificationMessage = null;
+
+            // Check if user is approaching the generate limit
+            if ($status['all']['used'] >= 15 && $status['all']['used'] < 20) {
+                // Send notification directly
+                $this->sendNotification($user, 'Anda hampir mencapai limit untuk melakukan generasi.');
+                // Set notification message
+                $notificationMessage = 'Anda hampir mencapai limit untuk melakukan generasi.';
+            }
+
+            // Add notification message to status data
+            $status['notification'] = $notificationMessage;
+
             // Return the response with user status data
             return response()->json([
                 'status' => 'success',
@@ -50,5 +65,14 @@ class UserStatusController extends Controller
                 'data' => null,
             ], 500);
         }
+    }
+
+    private function sendNotification(User $user, string $message)
+    {
+        $notification = new UserNotification([
+            'user_id' => $user->id,
+            'message' => $message,
+        ]);
+        $notification->save();
     }
 }
