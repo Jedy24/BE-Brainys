@@ -8,42 +8,48 @@ use App\Models\MaterialHistories;
 use App\Models\SyllabusHistories;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class HistoryController extends Controller
 {
     public function showHistory()
     {
+        $user_id = Auth::id();
+
         try {
-            // Retrieve syllabus history records
-            $syllabusHistories = SyllabusHistories::select([
-                'id',
-                'subject AS name',
-                'notes AS description',
-                DB::raw("'syllabus' AS type"),
-                'created_at',
-                DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
-            ])->get();
+            // Retrieve syllabus history records for the specific user
+            $syllabusHistories = SyllabusHistories::where('user_id', $user_id)
+                ->select([
+                    'id',
+                    'subject AS name',
+                    'notes AS description',
+                    DB::raw("'syllabus' AS type"),
+                    'created_at',
+                    DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
+                ])->get();
 
-            // Retrieve material history records
-            $materialHistories = MaterialHistories::select([
-                'id',
-                'name',
-                'notes AS description',
-                DB::raw("'material' AS type"),
-                'created_at',
-                DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
-            ])->get();
+            // Retrieve material history records for the specific user
+            $materialHistories = MaterialHistories::where('user_id', $user_id)
+                ->select([
+                    'id',
+                    'name',
+                    'notes AS description',
+                    DB::raw("'material' AS type"),
+                    'created_at',
+                    DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
+                ])->get();
 
-            // Retrieve exercise history records
-            $exerciseHistories = ExerciseHistories::select([
-                'id',
-                'name',
-                'notes AS description',
-                DB::raw("'exercise' AS type"),
-                'created_at',
-                DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
-            ])->get();
+            // Retrieve exercise history records for the specific user
+            $exerciseHistories = ExerciseHistories::where('user_id', $user_id)
+                ->select([
+                    'id',
+                    'name',
+                    'notes AS description',
+                    DB::raw("'exercise' AS type"),
+                    'created_at',
+                    DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
+                ])->get();
 
             // Menggabungkan semua riwayat ke dalam satu koleksi
             $history = $syllabusHistories->merge($materialHistories)->merge($exerciseHistories);
@@ -91,16 +97,21 @@ class HistoryController extends Controller
             // Initialize variable to hold history data
             $histories = [];
 
-            // Retrieve history records based on the type
+            $user_id = Auth::id(); // Ambil ID pengguna yang terautentikasi, Anda mungkin perlu menggantinya dengan metode autentikasi yang sesuai dengan aplikasi Anda
+
+            // Retrieve history records based on the type and user_id
             switch ($type) {
                 case 'syllabus':
-                    $histories = SyllabusHistories::orderByDesc('created_at')->get();
+                    $histories = SyllabusHistories::where('user_id', $user_id)
+                        ->orderByDesc('created_at')->get();
                     break;
                 case 'material':
-                    $histories = MaterialHistories::orderByDesc('created_at')->get();
+                    $histories = MaterialHistories::where('user_id', $user_id)
+                        ->orderByDesc('created_at')->get();
                     break;
                 case 'exercise':
-                    $histories = ExerciseHistories::orderByDesc('created_at')->get();
+                    $histories = ExerciseHistories::where('user_id', $user_id)
+                        ->orderByDesc('created_at')->get();
                     break;
                 default:
                     throw new \Exception('Invalid history type provided.');
