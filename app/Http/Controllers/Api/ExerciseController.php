@@ -25,7 +25,7 @@ class ExerciseController extends Controller
                 'name' => 'required|string',
                 'subject' => 'required|string',
                 'grade' => 'required|string',
-                'number_of_questions' => 'required|integer|min:1',
+                'number_of_questions' => 'required|integer|min:1|max:15',
                 // 'notes' => 'optional|string',
             ]);
 
@@ -108,7 +108,7 @@ class ExerciseController extends Controller
                 'name' => 'required|string',
                 'subject' => 'required|string',
                 'grade' => 'required|string',
-                'number_of_questions' => 'required|integer|min:1',
+                'number_of_questions' => 'required|integer|min:1|max:15',
                 // 'notes' => 'optional|string',
             ]);
 
