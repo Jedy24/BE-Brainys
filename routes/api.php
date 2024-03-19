@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\HistoryController;
 use App\Http\Controllers\Api\MaterialController;
 use App\Http\Controllers\Api\SyllabusController;
 use App\Http\Controllers\Api\UserStatusController;
+use App\Http\Controllers\Api\UpdateMessageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
@@ -47,6 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile', [AuthenticationController::class, 'profile']);
     Route::post('/change-password', [AuthenticationController::class, 'changePassword']);
     Route::post('/update-profile', [AuthenticationController::class, 'updateProfile']);
+    Route::post('/check-updates', [UpdateMessageController::class, 'checkUpdates']);
     Route::group(['prefix' => 'history'], function () {
         Route::get('/', [HistoryController::class, 'showHistory']);
         Route::post('/', [HistoryController::class, 'showHistoryFilter']);
