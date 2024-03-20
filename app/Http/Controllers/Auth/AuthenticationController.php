@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
@@ -13,6 +12,8 @@ use App\Notifications\OtpNotification;
 use App\Notifications\ResetPasswordNotification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Models\UserNotification;
 
 class AuthenticationController extends Controller
 {
@@ -418,5 +419,32 @@ class AuthenticationController extends Controller
         ];
 
         return response()->json($response, 200);
+    }
+
+    //Get message for new user
+    public function newUser(Request $request){
+        $user = $request->user();
+
+        /**Message error jika token dari log-in salah. */
+        if (!$user) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Akun tidak terotentifikasi.',
+            ], 401);
+        }
+
+        $welcomeMessage = "Hello " . $user->name . "! Welcome to Brainys.";
+
+        /**Menyimpan data ke dalam database */
+        UserNotification::create([
+            'user_id' => $user->id,
+            'message' => $welcomeMessage,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Pesan selamat datang berhasil disimpan.',
+            'welcome_message' => $welcomeMessage,
+        ], 200);
     }
 }
