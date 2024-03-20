@@ -720,7 +720,8 @@ class OpenAIService
                 "soal_essay": [
                     {
                         "question": "",
-                        "instructions": ""
+                        "instructions": "",
+                        "kriteria_penilaian": ["", "", ""], //Paragraf membentuk kriteria penialaian jawaban
                     }
                 ]
             }' . PHP_EOL .
