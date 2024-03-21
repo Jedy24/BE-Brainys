@@ -84,3 +84,6 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('login/{provider}', [SocialiteController::class, 'redirect']);
 Route::get('login/{provider}/callback', [SocialiteController::class, 'callback']);
 Route::post('login/{provider}/callback', [SocialiteController::class, 'callback']);
+
+// Clear cache for system update message
+Route::get('/clear-cache', [UpdateMessageController::class, 'clearCache']);

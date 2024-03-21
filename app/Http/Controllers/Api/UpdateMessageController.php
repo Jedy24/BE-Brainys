@@ -62,4 +62,16 @@ class UpdateMessageController extends Controller
             'updates' => $updates,
         ]);
     }
+
+
+    public function clearCache()
+    {
+        // Hapus cache untuk kunci 'latest_version'
+        Cache::forget('latest_version');
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Cache cleared successfully',
+        ]);
+    }
 }
