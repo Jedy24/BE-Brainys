@@ -47,10 +47,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user-profile', [AuthenticationController::class, 'userProfile']);
     Route::get('/new-user', [AuthenticationController::class, 'newUser']);
     Route::get('/user-status', [UserStatusController::class, 'getStatus']);
+    Route::get('/check-updates', [UpdateMessageController::class, 'checkUpdates']);
     Route::post('/profile', [AuthenticationController::class, 'profile']);
     Route::post('/change-password', [AuthenticationController::class, 'changePassword']);
     Route::post('/update-profile', [AuthenticationController::class, 'updateProfile']);
-    Route::get('/check-updates', [UpdateMessageController::class, 'checkUpdates']);
     Route::group(['prefix' => 'history'], function () {
         Route::get('/', [HistoryController::class, 'showHistory']);
         Route::post('/', [HistoryController::class, 'showHistoryFilter']);
@@ -84,6 +84,3 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('login/{provider}', [SocialiteController::class, 'redirect']);
 Route::get('login/{provider}/callback', [SocialiteController::class, 'callback']);
 Route::post('login/{provider}/callback', [SocialiteController::class, 'callback']);
-
-// Clear cache for system update message
-Route::get('/clear-cache', [UpdateMessageController::class, 'clearCache']);
