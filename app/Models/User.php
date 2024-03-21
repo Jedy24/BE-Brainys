@@ -73,4 +73,9 @@ class User extends Authenticatable
     public function generateAllSum(){
         return ($this->materialHistory()->count() + $this->syllabusHistory()->count() + $this->exerciseHistory()->count());
     }
+
+    public function feedbackReviews()
+    {
+        return $this->hasMany(FeedbackReview::class, 'user_id', 'id');
+    }
 }

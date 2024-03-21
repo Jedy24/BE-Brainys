@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\Api\FeedbackReviewController;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,6 +73,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/export-word', [ExerciseController::class, 'convertToWord']);
         Route::get('/history', [ExerciseController::class, 'history']);
         Route::get('/history/{id}', [ExerciseController::class, 'historyDetail']);
+    });
+    Route::group(['prefix' => 'feedback'], function () {
+        Route::get('/', [FeedbackReviewController::class, 'index']);
+        Route::post('/create', [FeedbackReviewController::class, 'store']);
     });
 });
 
