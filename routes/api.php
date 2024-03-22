@@ -47,7 +47,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user-profile', [AuthenticationController::class, 'userProfile']);
     Route::get('/new-user', [AuthenticationController::class, 'newUser']);
     Route::get('/user-status', [UserStatusController::class, 'getStatus']);
-    Route::get('/check-updates', [UpdateMessageController::class, 'checkUpdates']);
     Route::post('/profile', [AuthenticationController::class, 'profile']);
     Route::post('/change-password', [AuthenticationController::class, 'changePassword']);
     Route::post('/update-profile', [AuthenticationController::class, 'updateProfile']);
@@ -84,3 +83,6 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('login/{provider}', [SocialiteController::class, 'redirect']);
 Route::get('login/{provider}/callback', [SocialiteController::class, 'callback']);
 Route::post('login/{provider}/callback', [SocialiteController::class, 'callback']);
+
+// Route for get system update message
+Route::get('/check-updates', [UpdateMessageController::class, 'checkUpdates']);
