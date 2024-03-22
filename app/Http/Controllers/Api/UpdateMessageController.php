@@ -43,30 +43,24 @@ class UpdateMessageController extends Controller
         ]);
     }
 
-    public function showUpdates(Request $request)
+    public function showUpdates(Request $request, $id)
     {
-        // Ambil semua data dari tabel update_messages
-        $updateMessages = UpdateMessage::all();
+        // Ambil data berdasarkan id
+        $updateMessages = UpdateMessage::find($id);
 
         // Jika tidak ada data, kirim respons JSON dengan pesan "Tidak ada data"
-        if ($updateMessages->isEmpty()) {
+        if (!$updateMessages) {
             return response()->json([
-                'status' => 'success',
-                'message' => 'Tidak ada data',
-                'updates' => [],
-            ]);
+                'status' => 'error',
+                'message' => 'Data tidak ditemukan',
+            ], 404);
         }
 
-        // Siapkan array untuk menyimpan informasi pembaharuan
-        $updates = [];
-
-        // Loop melalui setiap pesan pembaharuan dan tambahkan ke dalam array
-        foreach ($updateMessages as $updateMessage) {
-            $updates[] = [
-                'version' => $updateMessage->version,
-                'update_message' => $updateMessage->message,
-            ];
-        }
+        // Respons JSON dengan informasi pesan pembaharuan
+        $updates = [
+            'version' => $updateMessages->version,
+            'update_message' => $updateMessages->message,
+        ];
 
         // Return respons JSON dengan informasi pembaharuan
         return response()->json([

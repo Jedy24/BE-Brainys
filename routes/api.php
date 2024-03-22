@@ -86,4 +86,4 @@ Route::post('login/{provider}/callback', [SocialiteController::class, 'callback'
 
 // Route for get system update message
 Route::get('/check-updates', [UpdateMessageController::class, 'checkUpdates']);
-Route::get('/show-updates', [UpdateMessageController::class, 'showUpdates']);
+Route::get('/show-updates/{id}', [UpdateMessageController::class, 'showUpdates']);
