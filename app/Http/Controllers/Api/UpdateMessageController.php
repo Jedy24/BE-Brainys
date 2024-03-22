@@ -12,6 +12,9 @@ class UpdateMessageController extends Controller
 {
     public function checkUpdates(Request $request)
     {
+        // Menghapus seluruh data pada tabel update_messages
+        DB::table('update_messages')->truncate();
+
         // Ambil pesan pembaharuan dari database admin_brainys
         $updateMessages = DB::connection('admin_brainys')->table('update_messages')->get();
 
