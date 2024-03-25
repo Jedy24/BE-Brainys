@@ -30,6 +30,7 @@ class UpdateMessageController extends Controller
 
             // Tambahkan informasi pembaharuan ke array updates
             $updates[] = [
+                'id' => $newUpdateMessage->id,
                 'version' => $updateMessage->version,
                 'update_message' => $updateMessage->message,
             ];
