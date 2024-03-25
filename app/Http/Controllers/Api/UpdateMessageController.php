@@ -59,6 +59,7 @@ class UpdateMessageController extends Controller
 
         // Respons JSON dengan informasi pesan pembaharuan
         $updates = [
+            'id' => $updateMessages->id,
             'version' => $updateMessages->version,
             'update_message' => $updateMessages->message,
         ];
