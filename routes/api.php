@@ -13,6 +13,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Api\FeedbackReviewController;
+use App\Http\Controllers\Api\OpenAIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -87,3 +88,8 @@ Route::post('login/{provider}/callback', [SocialiteController::class, 'callback'
 // Route for get system update message
 Route::get('/check-updates', [UpdateMessageController::class, 'checkUpdates']);
 Route::get('/show-updates/{id}', [UpdateMessageController::class, 'showUpdates']);
+
+// Open AI API
+Route::group(['prefix' => 'open-ai'], function () {
+    Route::get('/credit', [OpenAIController::class, 'checkCredit']);
+});

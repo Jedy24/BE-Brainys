@@ -10,10 +10,13 @@ class OpenAIService
     private $authorization;
     private $endpoint;
     private $httpClient;
+    private $webToken;
+    private $webClient;
 
     public function __construct()
     {
         $this->authorization = env('OPEN_AI_KEY');
+        $this->webToken = 'sess-pnheSDFN58DMZxyHuQbGHoTJOZXZ4Wl1ZWhQvDPX';
         $this->endpoint = 'https://api.openai.com/v1/chat/completions';
 
         $this->httpClient = new Client([
@@ -22,6 +25,31 @@ class OpenAIService
                 'Authorization' => 'Bearer ' . $this->authorization,
             ],
         ]);
+
+        $this->webClient = new Client([
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer ' . $this->webToken,
+            ],
+        ]);
+    }
+
+    public function checkCredit()
+    {
+        try {
+            $response = $this->webClient->get('https://api.openai.com/dashboard/billing/credit_grants');
+
+            if ($response->getStatusCode() === 200) {
+                $creditData = json_decode($response->getBody(), true);
+                return $creditData;
+            } else {
+                throw new \Exception('Error: Unexpected HTTP status code - ' . $response->getStatusCode());
+            }
+        } catch (RequestException $e) {
+            $message = $e->getResponse() ? $e->getResponse()->getBody()->getContents() : $e->getMessage();
+            $message = json_decode($message, true);
+            throw new \Exception('Error checking the credit: ' . $message['error']['message']);
+        }
     }
 
     public function sendMessage($message)
