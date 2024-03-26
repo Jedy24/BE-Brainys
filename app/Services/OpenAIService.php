@@ -16,7 +16,8 @@ class OpenAIService
     public function __construct()
     {
         $this->authorization = env('OPEN_AI_KEY');
-        $this->webToken = 'sess-pnheSDFN58DMZxyHuQbGHoTJOZXZ4Wl1ZWhQvDPX';
+        $this->webToken = env('OPEN_AI_SESSION');
+        
         $this->endpoint = 'https://api.openai.com/v1/chat/completions';
 
         $this->httpClient = new Client([
