@@ -13,7 +13,9 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Actions\ExportBulkAction;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Hash;
@@ -23,7 +25,14 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
+    protected static ?string $navigationGroup = 'Master';
+
     protected static ?string $navigationIcon = 'heroicon-o-users';
+
+    protected function paginateTableQuery(Builder $query): Paginator
+    {
+        return $query->fastPaginate(($this->getTableRecordsPerPage() === 'all') ? $query->count() : $this->getTableRecordsPerPage());
+    }
 
     public static function getLabel(): string
     {
@@ -62,6 +71,10 @@ class UserResource extends Resource
                 Forms\Components\TextInput::make('profession')
                     ->placeholder('Profession')
                     ->label('Profession'),
+                Forms\Components\TextInput::make('limit_generate')
+                    ->label('Limit Generate')
+                    ->placeholder('Limit Generate')
+                    ->columnSpanFull(),
                 Forms\Components\Hidden::make('otp_verified_at')
                     ->default(now()->toDateTimeString()),
             ]);
@@ -70,6 +83,9 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->heading('Users')
+            ->description('Manage Brainys users')
+            ->defaultSort('profile_completed', 'DESC')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Full Name')
@@ -87,14 +103,34 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('profession')
                     ->label('Profession')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('limit_generate')
+                    ->label('Limit Generate')
+                    ->alignCenter()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('generate_count')
-                    ->label('Generate Count')
+                    ->label('Generate All Count')
                     ->getStateUsing(fn (User $record) => $record->generateAllSum())
                     ->alignCenter()
                     ->sortable(),
             ])
             ->filters([
-                // Tambahkan filter yang relevan di sini jika diperlukan
+                Filter::make('profile_completed')
+                    ->label('Profile Completed')
+                    ->query(fn (Builder $query): Builder => $query->where('profile_completed', true)),
+                Filter::make('name')
+                    ->label('Full Name')
+                    ->form([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Full Name'),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        $query->where(function ($query) use ($data) {
+                            if (isset($data['name'])) {
+                                $query->where('name', 'like', '%' . $data['name'] . '%');
+                            }
+                        });
+                    }),
+
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
