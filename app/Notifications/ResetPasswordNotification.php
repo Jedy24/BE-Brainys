@@ -42,10 +42,9 @@ class ResetPasswordNotification extends Notification
         $url = url("https://brainys.oasys.id/forget-password?email={$this->userEmail}&token={$this->resetToken}");
 
         return (new MailMessage)
-            ->line('Anda menerima pesan reset password karena kami menerima pesan reset password untuk akun Anda.')
+            ->line('Anda menerima pesan reset password karena kami menerima permintaan reset password untuk akun Anda.')
             ->action('Reset Password', $url)
-            ->line('Jika Anda tidak merasa meminta reset password, ubah password akun Anda sekarang juga untuk menghindari
-            tindakan yang tidak sah.')
+            ->line('Jika Anda merasa tidak melakukannya, ubah password akun Anda sekarang juga untuk menghindari tindakan yang tidak sah.')
             ->salutation(new HtmlString('Regards,<br>Oasys Syllabus'));
     }
 
