@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'otp',
         'otp_expiry',
+        'otp_verified_at',
         'profile_completed',
         'school_name',
         'profession',
