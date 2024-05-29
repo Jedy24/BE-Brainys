@@ -32,6 +32,14 @@ class ExerciseController extends Controller
             // Retrieve the authenticated user
             $user = $request->user();
 
+            // Check if the user is active
+            if ($user->is_active === 0) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'User tidak aktif. Anda tidak dapat membuat latihan soal.',
+                ], 400);
+            }
+
             // Check if the user has less than 20 material histories
             if ($user->generateAllSum() >= $user->limit_generate) {
                 return response()->json([
@@ -164,7 +172,7 @@ class ExerciseController extends Controller
             // Populate the 'kunci_jawaban' array with the array of correct options
             $parsedResponse['kunci_jawaban'] = $correct_options;
             $parsedResponse['generated_num'] = count($parsedResponse['soal_pilihan_ganda']);
-            
+
             // Simpan hasil latihan ke database menggunakan metode create
             $exerciseHistory = ExerciseHistories::create([
                 'name' => $exerciseName,
