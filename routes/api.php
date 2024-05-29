@@ -14,6 +14,7 @@ use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Api\FeedbackReviewController;
 use App\Http\Controllers\Api\OpenAIController;
+use App\Http\Controllers\Api\SendInvitationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -93,3 +94,5 @@ Route::get('/show-updates/{id}', [UpdateMessageController::class, 'showUpdates']
 Route::group(['prefix' => 'open-ai'], function () {
     Route::get('/credit', [OpenAIController::class, 'checkCredit']);
 });
+
+Route::post('/send-invitation', [SendInvitationController::class, 'sendInvitation']);
