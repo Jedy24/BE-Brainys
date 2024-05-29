@@ -5,15 +5,20 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserInvitationResource\Pages;
 use App\Filament\Resources\UserInvitationResource\RelationManagers;
 use App\Forms\Components\InviteCodeInput;
+use App\Http\Controllers\Api\SendInvitationController;
+use App\Models\User;
 use App\Models\UserInvitation;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Http;
 
 class UserInvitationResource extends Resource
 {
@@ -101,6 +106,13 @@ class UserInvitationResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Action::make('sendInvitation')
+                    ->label('Send Invitation')
+                    ->action(function (UserInvitation $record) {
+                        static::sendInvitation($record);
+                    })
+                    ->requiresConfirmation()
+                    ->color('primary'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -123,5 +135,54 @@ class UserInvitationResource extends Resource
             'create' => Pages\CreateUserInvitation::route('/create'),
             'edit' => Pages\EditUserInvitation::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * Get the base URL for the API.
+     *
+     * @return string
+     */
+    protected static function getApiBaseUrl(): string
+    {
+        // You can get this from the configuration or environment variable
+        return env('APP_URL', 'https://be.brainys.oasys.id');
+    }
+
+    /**
+     * Send an invitation.
+     */
+    public static function sendInvitation(UserInvitation $user)
+    {
+        try {
+            // Create a new request instance
+            $request = new \Illuminate\Http\Request();
+            $request->replace(['email' => $user->email]);
+
+            // Create an instance of the SendInvitationController
+            $controller = new SendInvitationController();
+
+            // Call the sendInvitation method
+            $response = $controller->sendInvitation($request);
+
+            // Handle response from the controller
+            $responseData = $response->getData();
+
+            if ($response->status() === 200 && $responseData->status === 'success') {
+                Notification::make()
+                    ->title('Kode undangan berhasil dikirim ke ' . $user->email)
+                    ->success()
+                    ->send();
+            } else {
+                Notification::make()
+                    ->title('Gagal mengirim kode undangan.')
+                    ->danger()
+                    ->send();
+            }
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title('Error: ' . $e->getMessage())
+                ->danger()
+                ->send();
+        }
     }
 }

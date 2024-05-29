@@ -15,6 +15,7 @@ use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Api\FeedbackReviewController;
 use App\Http\Controllers\Api\OpenAIController;
 use App\Http\Controllers\Api\SendInvitationController;
+use App\Http\Controllers\Api\UserInvitationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,22 +53,31 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile', [AuthenticationController::class, 'profile']);
     Route::post('/change-password', [AuthenticationController::class, 'changePassword']);
     Route::post('/update-profile', [AuthenticationController::class, 'updateProfile']);
+    Route::post('/user-invitations/redeem', [UserInvitationController::class, 'redeem']);
+
+    // History
     Route::group(['prefix' => 'history'], function () {
         Route::get('/', [HistoryController::class, 'showHistory']);
         Route::post('/', [HistoryController::class, 'showHistoryFilter']);
     });
+
+    // Material
     Route::group(['prefix' => 'material'], function () {
         Route::post('/generate', [MaterialController::class, 'generate']);
         Route::post('/export-word', [MaterialController::class, 'convertToWord']);
         Route::get('/history', [MaterialController::class, 'history']);
         Route::get('/history/{id}', [MaterialController::class, 'historyDetail']);
     });
+
+    // Syllabus
     Route::group(['prefix' => 'syllabus'], function () {
         Route::post('/generate', [SyllabusController::class, 'generate']);
         Route::get('/history', [SyllabusController::class, 'history']);
         Route::get('/history/{id}', [SyllabusController::class, 'historyDetail']);
         Route::post('/export-word', [SyllabusController::class, 'convertToWord']);
     });
+
+    // Exercise
     Route::group(['prefix' => 'exercise'], function () {
         Route::post('/generate-essay', [ExerciseController::class, 'generateEssay']);
         Route::post('/generate-choice', [ExerciseController::class, 'generateChoice']);
@@ -75,6 +85,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/history', [ExerciseController::class, 'history']);
         Route::get('/history/{id}', [ExerciseController::class, 'historyDetail']);
     });
+
+    // Feedback
     Route::group(['prefix' => 'feedback'], function () {
         Route::get('/', [FeedbackReviewController::class, 'index']);
         Route::post('/create', [FeedbackReviewController::class, 'store']);
@@ -95,4 +107,4 @@ Route::group(['prefix' => 'open-ai'], function () {
     Route::get('/credit', [OpenAIController::class, 'checkCredit']);
 });
 
-Route::post('/send-invitation', [SendInvitationController::class, 'sendInvitation']);
+Route::post('/send-invitation', [SendInvitationController::class, 'sendInvitation'])->name('api.send-invitation');;

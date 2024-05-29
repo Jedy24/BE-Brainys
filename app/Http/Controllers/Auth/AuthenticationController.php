@@ -39,6 +39,7 @@ class AuthenticationController extends Controller
                 'profession' => $user->profession,
                 'school_name' => $user->school_name,
                 'email' => $user->email,
+                'is_active' => $user->is_active,
                 // 'password' => $user->password,
             ],
         ];
