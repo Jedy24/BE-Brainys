@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -81,5 +82,18 @@ class User extends Authenticatable
     public function feedbackReviews()
     {
         return $this->hasMany(FeedbackReview::class, 'user_id', 'id');
+    }
+
+    public static function getGenerateAllSumGroupedByDate($startDate, $endDate)
+    {
+        return DB::table('users')
+            ->select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('SUM((SELECT COUNT(*) FROM material_histories WHERE material_histories.user_id = users.id) + (SELECT COUNT(*) FROM syllabus_histories WHERE syllabus_histories.user_id = users.id) + (SELECT COUNT(*) FROM exercise_histories WHERE exercise_histories.user_id = users.id)) as total')
+            )
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('date')
+            ->get();
     }
 }

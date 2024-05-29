@@ -32,6 +32,14 @@ class MaterialController extends Controller
             // Retrieve the authenticated user
             $user = $request->user();
 
+            // Check if the user is active
+            if ($user->is_active === 0) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'User tidak aktif. Anda tidak dapat membuat bahan ajar.',
+                ], 400);
+            }
+
             // Check if the user has less than 20 material histories
             if ($user->generateAllSum() >= $user->limit_generate) {
                 return response()->json([
