@@ -16,16 +16,18 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class UserExercisesResource extends Resource
 {
     protected static ?string $model = User::class;
+    
+    protected static ?int $navigationSort = 5;
 
-    protected static ?string $navigationGroup = 'User Modules';
+    protected static ?string $navigationGroup = 'Users Modules';
 
-    protected static ?string $navigationLabel = 'User Exercise';
+    protected static ?string $navigationLabel = 'Users Exercise';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function getLabel(): string
     {
-        return 'User Exercise';
+        return 'Users Exercise';
     }
 
     public static function getPluralLabel(): string

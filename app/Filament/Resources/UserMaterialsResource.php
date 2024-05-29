@@ -16,16 +16,18 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class UserMaterialsResource extends Resource
 {
     protected static ?string $model = User::class;
+    
+    protected static ?int $navigationSort = 4;
 
-    protected static ?string $navigationGroup = 'User Modules';
+    protected static ?string $navigationGroup = 'Users Modules';
 
-    protected static ?string $navigationLabel = 'User Materials';
+    protected static ?string $navigationLabel = 'Users Materials';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function getLabel(): string
     {
-        return 'User Material';
+        return 'Users Material';
     }
 
     public static function getPluralLabel(): string

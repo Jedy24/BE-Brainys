@@ -16,12 +16,14 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class UpdateMessageResource extends Resource
 {
     protected static ?string $model = UpdateMessage::class;
+    
+    protected static ?int $navigationSort = 6;
 
     protected static ?string $navigationGroup = 'System';
 
     protected static ?string $navigationLabel = 'Update Message';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-c-megaphone';
 
     public static function getLabel(): string
     {

@@ -25,6 +25,8 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
+    protected static ?int $navigationSort = 1;
+
     protected static ?string $navigationGroup = 'Master';
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
@@ -73,10 +75,24 @@ class UserResource extends Resource
                     ->label('Profession'),
                 Forms\Components\TextInput::make('limit_generate')
                     ->label('Limit Generate')
-                    ->placeholder('Limit Generate')
+                    ->placeholder('Limit Generate'),
+                Forms\Components\Select::make('roles')
+                    ->label('Roles')
+                    ->options([
+                        'admin' => 'Admin',
+                        'member' => 'Member',
+                    ])
+                    ->default('member')
+                    ->required(),
+                Forms\Components\Toggle::make('is_active')
+                    ->label('Active')
+                    ->default(true)
+                    ->required()
                     ->columnSpanFull(),
                 Forms\Components\Hidden::make('otp_verified_at')
                     ->default(now()->toDateTimeString()),
+                Forms\Components\Hidden::make('profile_completed')
+                    ->default(true),
             ]);
     }
 
@@ -96,6 +112,10 @@ class UserResource extends Resource
                 Tables\Columns\IconColumn::make('profile_completed')
                     ->boolean()
                     ->label('Profile Complete')
+                    ->alignCenter(),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->boolean()
+                    ->label('Active')
                     ->alignCenter(),
                 Tables\Columns\TextColumn::make('school_name')
                     ->label('School Name')
