@@ -101,13 +101,20 @@ class UserResource extends Resource
         return $table
             ->heading('Users')
             ->description('Manage Brainys users')
-            ->defaultSort('profile_completed', 'DESC')
+            ->defaultSort('created_at', 'DESC')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Full Name')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->label('Email Address')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('school_name')
+                    ->label('School Name')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('profession')
+                    ->label('Profession')
                     ->sortable(),
                 Tables\Columns\IconColumn::make('profile_completed')
                     ->boolean()
@@ -117,12 +124,6 @@ class UserResource extends Resource
                     ->boolean()
                     ->label('Active')
                     ->alignCenter(),
-                Tables\Columns\TextColumn::make('school_name')
-                    ->label('School Name')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('profession')
-                    ->label('Profession')
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('limit_generate')
                     ->label('Limit Generate')
                     ->alignCenter()
@@ -132,6 +133,11 @@ class UserResource extends Resource
                     ->getStateUsing(fn (User $record) => $record->generateAllSum())
                     ->alignCenter()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Register At')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
                 Filter::make('profile_completed')
@@ -157,6 +163,7 @@ class UserResource extends Resource
                 Tables\Actions\DeleteAction::make(),
                 Action::make('resetPassword')
                     ->label('Reset Password')
+                    ->icon('heroicon-o-lock-closed')
                     ->action(function (User $record) {
                         static::forgotPassword($record);
                     })

@@ -82,24 +82,34 @@ class UserInvitationResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->heading('Users Invitation')
+            ->description('Manage Brainys Invitation')
+            ->defaultSort('created_at', 'DESC')
             ->columns([
                 Tables\Columns\TextColumn::make('email')
+                    ->label('Email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('invite_code')
+                    ->label('Invite Code')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('is_used')
+                    ->label('Used')
+                    ->alignCenter()
                     ->boolean(),
                 Tables\Columns\TextColumn::make('expired_at')
+                    ->label('Expiration Date')
                     ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Created At')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Updated At')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
             ])
             ->filters([
                 //
@@ -108,16 +118,27 @@ class UserInvitationResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Action::make('sendInvitation')
                     ->label('Send Invitation')
+                    ->icon('heroicon-o-envelope')
                     ->action(function (UserInvitation $record) {
                         static::sendInvitation($record);
                     })
                     ->requiresConfirmation()
-                    ->color('primary'),
+                    ->color('success'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+                Tables\Actions\BulkAction::make('sendBulkInvitations')
+                    ->label('Send Invitations')
+                    ->icon('heroicon-o-envelope')
+                    ->action(function (array $records) {
+                        foreach ($records as $record) {
+                            static::sendInvitation($record);
+                        }
+                    })
+                    ->requiresConfirmation()
+                    ->color('success'),
             ]);
     }
 

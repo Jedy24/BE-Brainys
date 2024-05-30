@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class UserExercisesResource extends Resource
 {
     protected static ?string $model = User::class;
-    
+
     protected static ?int $navigationSort = 5;
 
     protected static ?string $navigationGroup = 'Users Modules';
@@ -46,8 +46,9 @@ class UserExercisesResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-        ->heading('Users Exercise')
-        ->description('Show user generated for exercise module')
+            ->heading('Users Exercise')
+            ->description('Show user generated for exercise module')
+            ->defaultSort('created_at', 'DESC')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Full Name')
@@ -60,7 +61,12 @@ class UserExercisesResource extends Resource
                 Tables\Columns\TextColumn::make('generate_count')
                     ->label('Generate Exercise Count')
                     ->getStateUsing(fn (User $record) => $record->exerciseHistory()->count())
-                    ->alignCenter()
+                    ->alignCenter(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('User Register')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
                 //

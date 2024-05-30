@@ -48,6 +48,7 @@ class UserMaterialsResource extends Resource
         return $table
             ->heading('Users Material')
             ->description('Show user generated for material module')
+            ->defaultSort('created_at', 'DESC')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Full Name')
@@ -60,7 +61,12 @@ class UserMaterialsResource extends Resource
                 Tables\Columns\TextColumn::make('generate_count')
                     ->label('Generate Material Count')
                     ->getStateUsing(fn (User $record) => $record->materialHistory()->count())
-                    ->alignCenter()
+                    ->alignCenter(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('User Register')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
                 //

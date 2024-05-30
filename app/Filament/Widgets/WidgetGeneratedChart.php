@@ -2,46 +2,107 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\ExerciseHistories;
+use App\Models\MaterialHistories;
+use App\Models\SyllabusHistories;
 use App\Models\User;
 use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
 
 class WidgetGeneratedChart extends ChartWidget
 {
-    protected static ?string $heading = 'Generated Module Chart';
-
+    protected static ?string $heading = 'User Generated Activity Over the Last 7 Days';
     protected int | string | array $columnSpan = 'full';
-
     protected static ?string $maxHeight = '300px';
 
     protected function getData(): array
     {
-        // Define the date range (last 25 days for example)
-        $startDate = Carbon::now()->subDays(7);
+        $startDate = Carbon::now()->subDays(6);
         $endDate = Carbon::now();
 
-        // Fetch the data
-        $data = User::getGenerateAllSumGroupedByDate($startDate, $endDate);
+        // Helper function to aggregate data
+        $aggregateData = function ($model) use ($startDate, $endDate) {
+            return $model::whereBetween('created_at', [$startDate, $endDate])
+                ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+                ->groupBy('date')
+                ->orderBy('date')
+                ->get()
+                ->pluck('count', 'date');
+        };
 
-        // Prepare the data for the chart
-        $labels = $data->pluck('date')->toArray();
-        $generatedData = $data->pluck('total')->toArray();
+        $materialData = $aggregateData(MaterialHistories::class);
+        $syllabusData = $aggregateData(SyllabusHistories::class);
+        $exerciseData = $aggregateData(ExerciseHistories::class);
+
+        // Generate all dates in the range
+        $dates = [];
+        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+            $dates[$date->format('Y-m-d')] = 0;
+        }
+
+        // Merge and fill missing dates with zeros
+        $mergeData = function ($data) use ($dates) {
+            return array_values(array_replace($dates, $data->toArray()));
+        };
 
         return [
             'datasets' => [
                 [
-                    'label' => 'Modules Generated',
-                    'data' => $generatedData,
-                    'backgroundColor' => '#36A2EB',
-                    'borderColor' => '#9BD0F5',
+                    'label' => 'Material Histories',
+                    'data' => $mergeData($materialData),
+                    'backgroundColor' => 'rgba(255, 99, 132, 0.5)',
+                    'borderColor' => 'rgb(255, 99, 132)',
+                    'fill' => false,
                 ],
+                [
+                    'label' => 'Syllabus Histories',
+                    'data' => $mergeData($syllabusData),
+                    'backgroundColor' => 'rgba(54, 162, 235, 0.5)',
+                    'borderColor' => 'rgb(54, 162, 235)',
+                    'fill' => false,
+                ],
+                [
+                    'label' => 'Exercise Histories',
+                    'data' => $mergeData($exerciseData),
+                    'backgroundColor' => 'rgba(75, 192, 192, 0.5)',
+                    'borderColor' => 'rgb(75, 192, 192)',
+                    'fill' => false,
+                ]
             ],
-            'labels' => $labels,
+            'labels' => array_keys($dates),
         ];
     }
+
 
     protected function getType(): string
     {
         return 'line';
+    }
+
+    protected function getOptions(): array
+    {
+        return [
+            'scales' => [
+                'yAxes' => [
+                    [
+                        'ticks' => [
+                            'beginAtZero' => true,
+                            'stepSize' => 1,  // Memaksa interval antar ticks menjadi bilangan bulat.
+                            // 'precision' => 0, // Menentukan bahwa tidak ada desimal pada ticks.
+                            // 'suggestedMax' => 10, // Sesuaikan berdasarkan maksimal data yang Anda perkirakan.
+                        ]
+                    ]
+                ]
+            ],
+            'plugins' => [
+                'legend' => [
+                    'display' => true,
+                    'position' => 'top',
+                ],
+            ],
+            'responsive' => true,
+            'maintainAspectRatio' => false,
+        ];
+    
     }
 }

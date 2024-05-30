@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class UserSyllabusResource extends Resource
 {
     protected static ?string $model = User::class;
-    
+
     protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationGroup = 'Users Modules';
@@ -48,6 +48,7 @@ class UserSyllabusResource extends Resource
         return $table
             ->heading('Users Syllabus')
             ->description('Show user generated for syllabus module')
+            ->defaultSort('created_at', 'DESC')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Full Name')
@@ -60,7 +61,12 @@ class UserSyllabusResource extends Resource
                 Tables\Columns\TextColumn::make('generate_count')
                     ->label('Generate Syllabus Count')
                     ->getStateUsing(fn (User $record) => $record->syllabusHistory()->count())
-                    ->alignCenter()
+                    ->alignCenter(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('User Register')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
                 //
