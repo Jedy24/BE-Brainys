@@ -195,7 +195,7 @@ class UserInvitationResource extends Resource
                     ->send();
             } else {
                 Notification::make()
-                    ->title('Gagal mengirim kode undangan.')
+                    ->title('Gagal mengirim kode undangan: '.$responseData->message)
                     ->danger()
                     ->send();
             }

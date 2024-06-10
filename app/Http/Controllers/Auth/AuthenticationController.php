@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Api\SendInvitationController;
 use App\Http\Controllers\Controller;
+use App\Models\AutoInviteEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Response;
@@ -13,6 +15,7 @@ use App\Notifications\ResetPasswordNotification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\UserInvitation;
 use App\Models\UserNotification;
 
 class AuthenticationController extends Controller
@@ -59,7 +62,7 @@ class AuthenticationController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Berhasil keluar.'
-            ], 200);
+        ], 200);
     }
 
     // Handle change password function
@@ -257,6 +260,28 @@ class AuthenticationController extends Controller
         $data['token'] = $token;
         $data['user'] = $user;
 
+        /**Ekstrak domain email */
+        $emailDomain = substr(strrchr($user->email, "@"), 1);
+
+        /**Cek apakah email_domain ada dan is_active bernilai 1 */
+        $autoInviteEmail = AutoInviteEmail::where('email_domain', $emailDomain)
+            ->where('is_active', 1)
+            ->first();
+
+        if ($autoInviteEmail) {
+            /**Membuat invite code */
+            $inviteCode = $this->generateRandomCode(8);
+            $invitation = UserInvitation::create([
+                'email' => $user->email,
+                'invite_code' => $inviteCode,
+                'is_used' => false,
+                'expired_at' => now()->addDays(30),
+            ]);
+
+            /**Mengirim email undangan */
+            self::sendInvitation($invitation);
+        }
+
         /**Memunculkan pesan sukses setelah selesai verifikasi. */
         $response = [
             'status' => 'success',
@@ -423,7 +448,8 @@ class AuthenticationController extends Controller
     }
 
     //Get message for new user
-    public function newUser(Request $request){
+    public function newUser(Request $request)
+    {
         $user = $request->user();
 
         /**Message error jika token dari log-in salah. */
@@ -447,5 +473,42 @@ class AuthenticationController extends Controller
             'message' => 'Pesan selamat datang berhasil disimpan.',
             'welcome_message' => $welcomeMessage,
         ], 200);
+    }
+
+    // Send Invite
+    public static function sendInvitation(UserInvitation $user)
+    {
+        try {
+            // Create a new request instance
+            $request = new \Illuminate\Http\Request();
+            $request->replace(['email' => $user->email]);
+
+            // Create an instance of the SendInvitationController
+            $controller = new SendInvitationController();
+
+            // Call the sendInvitation method
+            $response = $controller->sendInvitation($request);
+
+            // Handle response from the controller
+            $responseData = $response->getData();
+        } catch (\Exception $e) {
+        }
+    }
+
+    /**
+     * Generate a random alphanumeric string.
+     *
+     * @param int $length
+     * @return string
+     */
+    protected static function generateRandomCode($length = 8): string
+    {
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
     }
 }
