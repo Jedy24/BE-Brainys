@@ -40,14 +40,10 @@ class LoginController extends Controller
             /**Pesan error jika email user tidak ada. */
             if (!$user) {
                 $errorMessage = 'Email tidak ditemukan, periksa lagi Email Anda.';
-            }
-            /**Pesan error jika user belum melakukan verifikasi OTP. */
-            elseif (!$user->otp_verified_at) {
-                $errorMessage = 'Akun belum melakukan verifikasi OTP, silakan melakukan verifikasi OTP.';
-            }
-            /**Pesan error jika password tidak sesuai. */
-            elseif (!Hash::check($request->password, $user->password)) {
+            } else if (!Hash::check($request->password, $user->password)) {
                 $errorMessage = 'Password salah, periksa lagi password Anda.';
+            } else if (!$user->otp_verified_at) {
+                $errorMessage = 'Akun belum melakukan verifikasi OTP, silakan melakukan verifikasi OTP.';
             }
 
             /**Menampilkan pesan error. */
