@@ -17,7 +17,7 @@ class OpenAIService
     {
         $this->authorization = env('OPEN_AI_KEY');
         $this->webToken = env('OPEN_AI_SESSION');
-        
+
         $this->endpoint = 'https://api.openai.com/v1/chat/completions';
 
         $this->httpClient = new Client([
@@ -110,7 +110,8 @@ class OpenAIService
                 "kompetensi_awal": "(Berbentuk 1 Paragraf/Alinea)",
                 "profil_pelajar_pancasila": "(Berbentuk 1 Paragraf/Alinea)", Perhatian: Pastikan profil pelajar sesuai dengan mata pelajaran yang dipilih, jangan ada unsur PPKN, dan harus ada profil pelajar yang mencerminkan pancasila.
                 "target_peserta_didik": "(Berbentuk 1 Paragraf/Alinea)",
-                "model_pembelajaran": "(Berbentuk 1 Paragraf/Alinea)"
+                "model_pembelajaran": "(Berbentuk 1 Paragraf/Alinea)",
+                "capaian_pembelajaran": "(Berbentuk 2 sampai 4 Paragraf/Alinea)"
             },
             "sarana_dan_prasarana": {
                 "sumber_belajar": "(Berbentuk 1 Paragraf/Alinea)",
@@ -250,6 +251,39 @@ class OpenAIService
         }
 
         ';
+
+        return $prompt;
+    }
+
+    public function generateMaterialsPromptBetaContinue($existingData)
+    {
+        $prompt = 'Ini data hasil generate bahan ajar saya dalam bentuk JSON sebelumnya:';
+        $prompt .= $existingData . ' ';
+        $prompt .= 'Tolong cermati ya!';
+        $prompt .= 'Analisis data dan berikan saya dalam bentuk JSON output dengan format :';
+        $prompt .= '
+        {
+            "lembar_kerja_peserta_didik": {
+                "type": "Ayo Analisis",
+                "question": "" // Tipe  yang pertanyaana kritis dan panjang teks pertayannya untuk siswa analisis
+            },
+            "bahan_bacaan_guru_peserta_didik": [
+                {
+                    "title": "", // Judul terkait Materi
+                    "content": "" // Isi Bahan terkait Materi dalam beberapa alinea
+                },
+                {
+                    "title": "", // Judul terkait Materi
+                    "content": "" // Isi Bahan terkait Materi dalam beberapa alinea
+                },
+                {
+                    "title": "", // Judul terkait Materi
+                    "content": "" // Isi Bahan terkait Materi dalam beberapa alinea
+                }
+            ]
+        }
+        ';
+        $prompt .= '';
 
         return $prompt;
     }

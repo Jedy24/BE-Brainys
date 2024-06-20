@@ -65,8 +65,13 @@ class MaterialController extends Controller
 
             // Send the message to OpenAI
             $resMessage = $this->openAI->sendMessage($prompt);
-
             $parsedResponse = json_decode($resMessage, true);
+
+            $continueGenerateData = $resMessage;
+            $upPrompt = $this->openAI->generateMaterialsPromptBetaContinue($continueGenerateData);
+            $upMessage = $this->openAI->sendMessage($upPrompt);
+            $part2Response = json_decode($upMessage, true);
+
             $user = $request->user();
 
             $parsedResponse['informasi_umum']['nama_bahan_ajar'] = $materialName;
@@ -90,7 +95,7 @@ class MaterialController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Bahan Ajar berhasil dihasilkan',
-                'data' => $parsedResponse,
+                'data' => $part2Response,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
