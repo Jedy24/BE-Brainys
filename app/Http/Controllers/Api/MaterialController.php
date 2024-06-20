@@ -95,7 +95,7 @@ class MaterialController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Bahan Ajar berhasil dihasilkan',
-                'data' => $part2Response,
+                'data' => $parsedResponse,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

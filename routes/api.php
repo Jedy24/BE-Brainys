@@ -13,6 +13,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Api\FeedbackReviewController;
+use App\Http\Controllers\Api\GamificationController;
 use App\Http\Controllers\Api\OpenAIController;
 use App\Http\Controllers\Api\SendInvitationController;
 use App\Http\Controllers\Api\UserInvitationController;
@@ -84,6 +85,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/export-word', [ExerciseController::class, 'convertToWord']);
         Route::get('/history', [ExerciseController::class, 'history']);
         Route::get('/history/{id}', [ExerciseController::class, 'historyDetail']);
+    });
+
+    // Gamification
+    Route::group(['prefix' => 'gamification'], function () {
+        Route::post('/generate', [GamificationController::class, 'generate']);
+        Route::post('/export-word', [GamificationController::class, 'convertToWord']);
     });
 
     // Feedback
