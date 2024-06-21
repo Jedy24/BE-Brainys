@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\ExerciseController;
 use App\Http\Controllers\Api\HistoryController;
 use App\Http\Controllers\Api\MaterialController;
 use App\Http\Controllers\Api\SyllabusController;
+use App\Http\Controllers\Api\HintController;
 use App\Http\Controllers\Api\UserStatusController;
 use App\Http\Controllers\Api\UpdateMessageController;
 use Illuminate\Http\Request;
@@ -84,6 +85,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/export-word', [ExerciseController::class, 'convertToWord']);
         Route::get('/history', [ExerciseController::class, 'history']);
         Route::get('/history/{id}', [ExerciseController::class, 'historyDetail']);
+    });
+
+    // Hint
+    Route::group(['prefix' => 'hint'], function () {
+        Route::post('/generate', [HintController::class, 'generate']);
+        Route::post('/export-word', [HintController::class, 'convertToWord']);
+        Route::get('/history', [HintController::class, 'history']);
+        Route::get('/history/{id}', [HintController::class, 'historyDetail']);
     });
 
     // Feedback
