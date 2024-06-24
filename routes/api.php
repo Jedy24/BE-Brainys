@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\HistoryController;
 use App\Http\Controllers\Api\MaterialController;
 use App\Http\Controllers\Api\SyllabusController;
 use App\Http\Controllers\Api\HintController;
+use App\Http\Controllers\Api\BahanAjarController;
 use App\Http\Controllers\Api\UserStatusController;
 use App\Http\Controllers\Api\UpdateMessageController;
 use Illuminate\Http\Request;
@@ -93,6 +94,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/export-word', [HintController::class, 'convertToWord']);
         Route::get('/history', [HintController::class, 'history']);
         Route::get('/history/{id}', [HintController::class, 'historyDetail']);
+    });
+
+    Route::group(['prefix' => 'bahan-ajar'], function () {
+        Route::post('/generate', [BahanAjarController::class, 'generate']);
+        Route::post('/export-word', [BahanAjarController::class, 'convertToWord']);
+        Route::get('/history', [BahanAjarController::class, 'history']);
+        Route::get('/history/{id}', [BahanAjarController::class, 'historyDetail']);
     });
 
     // Feedback
