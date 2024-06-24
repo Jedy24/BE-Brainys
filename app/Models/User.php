@@ -30,6 +30,7 @@ class User extends Authenticatable
         'profile_completed',
         'limit_generate',
         'school_name',
+        'school_level',
         'profession',
     ];
 
