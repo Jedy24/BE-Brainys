@@ -837,7 +837,41 @@ class OpenAIService
 
     public function generateBahanAjarPrompt($subject, $grade, $addNotes)
     {
-        $prompt =
+        $prompt = "Generate kisi-kisi untuk mata pelajaran: {$subject}, tingkat kelas: {$grade}, dengan memerhatikan catatan khusus berikut: {$addNotes}. " . PHP_EOL .
+            "Perhatian: Mohon jawab dengan format JSON berikut:" . PHP_EOL .
+            '{
+                "informasi_umum": {
+                    "penyusun": "",
+                    "instansi": "",
+                    "tingkat_kelas": "",
+                    "mata_pelajaran": "",
+                },
+                "materi":[
+                    {
+                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus: {$addNotes}.
+                        "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
+                    },
+                                        {
+                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus: {$addNotes}.
+                        "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
+                    },
+                                        {
+                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus: {$addNotes}.
+                        "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
+                    },
+                                        {
+                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus: {$addNotes}.
+                        "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
+                    },
+                                        {
+                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus: {$addNotes}.
+                        "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
+                    },
+                ]
+                "lampiran":{
+                    "sumber_referensi": ["", "", "", "", ""] //Perhatian: Mohon berikan sumber referensi yang relevan dengan materi seperti mengutip dari jurnal ilmiah, artikel ilmiah, buku pelajaran, jangan berupa data fiktif!.
+                }
+            }' . PHP_EOL .
             "Terima kasih atas kerja sama Anda.";
 
         return $prompt;
