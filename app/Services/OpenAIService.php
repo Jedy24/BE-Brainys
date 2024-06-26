@@ -831,4 +831,83 @@ class OpenAIService
         // Return the generated prompt
         return $prompt;
     }
+
+    public function generateHintsPrompt($subject, $grade, $addNotes)
+    {
+        $prompt = "Generate kisi-kisi untuk mata pelajaran: {$subject}, tingkat kelas: {$grade}, dengan memerhatikan catatan khusus berikut: {$addNotes}. " . PHP_EOL .
+            "Perhatian: Mohon jawab dengan format JSON berikut:" . PHP_EOL .
+            '{
+                "informasi_umum": {
+                    "penyusun": "",
+                    "instansi": "",
+                    "mata_pelajaran": "",
+                    "tingkat_kelas": "",
+                },
+                "kisi_kisi": [
+                    {
+                        "capaian_pembelajaran": "", //Perhatian: Mohon berikan capaian pembelajaran sesuai dengan catatan khusus: {$addNotes}.
+                        "domain/elemen": "", //Perhatian: Mohon berikan nama domain/elemen yang relevan dengan capaian pembelajaran.
+                        "pokok_materi": "", //Perhatian: Mohon berikan pokok materi yang merupakan rangkuman dari domain/elemen berupa satu sampai dua kata.
+                        "indikator_soal": ["", "", ""],
+                    },
+                                        {
+                        "capaian_pembelajaran": "", //Perhatian: Mohon berikan capaian pembelajaran sesuai dengan catatan khusus: {$addNotes}.
+                        "domain/elemen": "", //Perhatian: Mohon berikan nama domain/elemen yang relevan dengan capaian pembelajaran.
+                        "pokok_materi": "", //Perhatian: Mohon berikan pokok materi yang merupakan rangkuman dari domain/elemen berupa satu sampai dua kata.
+                        "indikator_soal": ["", "", ""],
+                    },
+                                        {
+                        "capaian_pembelajaran": "", //Perhatian: Mohon berikan capaian pembelajaran sesuai dengan catatan khusus: {$addNotes}.
+                        "domain/elemen": "", //Perhatian: Mohon berikan nama domain/elemen yang relevan dengan capaian pembelajaran.
+                        "pokok_materi": "", //Perhatian: Mohon berikan pokok materi yang merupakan rangkuman dari domain/elemen berupa satu sampai dua kata.
+                        "indikator_soal": ["", "", ""],
+                    }
+                ]
+            }' . PHP_EOL .
+            "Terima kasih atas kerja sama Anda.";
+
+        return $prompt;
+    }
+
+    public function generateBahanAjarPrompt($subject, $grade, $addNotes)
+    {
+        $prompt = "Generate kisi-kisi untuk mata pelajaran: {$subject}, tingkat kelas: {$grade}, dengan memerhatikan catatan khusus berikut: {$addNotes}. " . PHP_EOL .
+            "Perhatian: Mohon jawab dengan format JSON berikut:" . PHP_EOL .
+            '{
+                "informasi_umum": {
+                    "penyusun": "",
+                    "instansi": "",
+                    "tingkat_kelas": "",
+                    "mata_pelajaran": "",
+                },
+                "materi":[
+                    {
+                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus: {$addNotes}.
+                        "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
+                    },
+                                        {
+                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus: {$addNotes}.
+                        "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
+                    },
+                                        {
+                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus: {$addNotes}.
+                        "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
+                    },
+                                        {
+                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus: {$addNotes}.
+                        "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
+                    },
+                                        {
+                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus: {$addNotes}.
+                        "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
+                    },
+                ]
+                "lampiran":{
+                    "sumber_referensi": ["", "", "", "", ""] //Perhatian: Mohon berikan sumber referensi yang relevan dengan materi seperti mengutip dari jurnal ilmiah, artikel ilmiah, buku pelajaran, jangan berupa data fiktif!.
+                }
+            }' . PHP_EOL .
+            "Terima kasih atas kerja sama Anda.";
+
+        return $prompt;
+    }
 }

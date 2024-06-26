@@ -30,6 +30,7 @@ class User extends Authenticatable
         'profile_completed',
         'limit_generate',
         'school_name',
+        'school_level',
         'profession',
     ];
 
@@ -73,6 +74,16 @@ class User extends Authenticatable
     public function exerciseHistory()
     {
         return $this->hasMany(ExerciseHistories::class, 'user_id', 'id');
+    }
+
+    public function hintHistory()
+    {
+        return $this->hasMany(HintHistories::class, 'user_id', 'id');
+    }
+
+    public function bahanAjarHistory()
+    {
+        return $this->hasMany(BahanAjarHistories::class, 'user_id', 'id');
     }
 
     public function generateAllSum(){

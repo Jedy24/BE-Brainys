@@ -355,6 +355,7 @@ class AuthenticationController extends Controller
         /**Validasi data user. */
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
+            'school_level' => 'required|string|max:255',
             'school_name' => 'required|string|max:255',
             'profession' => 'required|string|max:255',
         ]);
@@ -382,6 +383,7 @@ class AuthenticationController extends Controller
         /**Jika ditemukan maka akan memperbaharui data user. */
         $user->update([
             'name' => $request->name,
+            'school_level' => $request->school_level,
             'school_name' => $request->school_name,
             'profession' => $request->profession,
         ]);
