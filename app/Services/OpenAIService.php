@@ -845,19 +845,19 @@ class OpenAIService
                 },
                 "kisi_kisi": [
                     {
-                        "capaian_pembelajaran": "", //Perhatian: Mohon berikan capaian pembelajaran sesuai dengan catatan khusus: {$addNotes}.
+                        "capaian_pembelajaran": "", //Perhatian: Mohon berikan capaian pembelajaran sesuai dengan catatan khusus.
                         "domain/elemen": "", //Perhatian: Mohon berikan nama domain/elemen yang relevan dengan capaian pembelajaran.
                         "pokok_materi": "", //Perhatian: Mohon berikan pokok materi yang merupakan rangkuman dari domain/elemen berupa satu sampai dua kata.
                         "indikator_soal": ["", "", ""],
                     },
                                         {
-                        "capaian_pembelajaran": "", //Perhatian: Mohon berikan capaian pembelajaran sesuai dengan catatan khusus: {$addNotes}.
+                        "capaian_pembelajaran": "", //Perhatian: Mohon berikan capaian pembelajaran sesuai dengan catatan khusus.
                         "domain/elemen": "", //Perhatian: Mohon berikan nama domain/elemen yang relevan dengan capaian pembelajaran.
                         "pokok_materi": "", //Perhatian: Mohon berikan pokok materi yang merupakan rangkuman dari domain/elemen berupa satu sampai dua kata.
                         "indikator_soal": ["", "", ""],
                     },
                                         {
-                        "capaian_pembelajaran": "", //Perhatian: Mohon berikan capaian pembelajaran sesuai dengan catatan khusus: {$addNotes}.
+                        "capaian_pembelajaran": "", //Perhatian: Mohon berikan capaian pembelajaran sesuai dengan catatan khusus.
                         "domain/elemen": "", //Perhatian: Mohon berikan nama domain/elemen yang relevan dengan capaian pembelajaran.
                         "pokok_materi": "", //Perhatian: Mohon berikan pokok materi yang merupakan rangkuman dari domain/elemen berupa satu sampai dua kata.
                         "indikator_soal": ["", "", ""],
@@ -882,28 +882,33 @@ class OpenAIService
                 },
                 "materi":[
                     {
-                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus: {$addNotes}.
+                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus.
                         "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
+                        "sub_materi": "(Berupa paragraf yang menjelaskan rinci dari isi_materi, seperti rumus dan atau penjelasan lainnya)",
                     },
                                         {
-                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus: {$addNotes}.
+                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus.
                         "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
+                        "sub_materi": "(Berupa paragraf yang menjelaskan rinci dari isi_materi, seperti rumus dan atau penjelasan lainnya)",
                     },
                                         {
-                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus: {$addNotes}.
+                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus.
                         "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
+                        "sub_materi": "(Berupa paragraf yang menjelaskan rinci dari isi_materi, seperti rumus dan atau penjelasan lainnya)",
                     },
                                         {
-                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus: {$addNotes}.
+                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus.
                         "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
+                        "sub_materi": "(Berupa paragraf yang menjelaskan rinci dari isi_materi, seperti rumus dan atau penjelasan lainnya)",
                     },
                                         {
-                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus: {$addNotes}.
+                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus.
                         "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
+                        "sub_materi": "(Berupa paragraf yang menjelaskan rinci dari isi_materi, seperti rumus dan atau penjelasan lainnya)",
                     },
                 ]
                 "lampiran":{
-                    "sumber_referensi": ["", "", "", "", ""] //Perhatian: Mohon berikan sumber referensi yang relevan dengan materi seperti mengutip dari jurnal ilmiah, artikel ilmiah, buku pelajaran, jangan berupa data fiktif!.
+                    "sumber_referensi": ["", "", "", "", ""] //Perhatian: Mohon berikan sumber referensi yang relevan dengan materi seperti mengutip dari jurnal ilmiah, artikel ilmiah, buku pelajaran, jangan berupa data fiktif! Pastikan sumber referensi menggunakan format referensi yang sesuai.
                 }
             }' . PHP_EOL .
             "Terima kasih atas kerja sama Anda.";
