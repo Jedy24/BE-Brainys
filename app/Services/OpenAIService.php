@@ -879,36 +879,51 @@ class OpenAIService
                     "instansi": "",
                     "tingkat_kelas": "",
                     "mata_pelajaran": "",
+                    "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus.
                 },
-                "materi":[
+                "pendahuluan": {
+                    "definisi": "(Berupa paragraf yang menjelaskan definisi dari judul materi)",
+                },
+                "konten":[
                     {
-                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus.
-                        "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
-                        "sub_materi": "(Berupa paragraf yang menjelaskan rinci dari isi_materi, seperti rumus dan atau penjelasan lainnya)",
+                        "nama_konten": "", //Perhatian: Nama konten adalah sub bab materi dari judul materi.
+                        "isi_konten": "(Berupa paragraf yang menjelaskan materi)",
                     },
-                                        {
-                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus.
-                        "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
-                        "sub_materi": "(Berupa paragraf yang menjelaskan rinci dari isi_materi, seperti rumus dan atau penjelasan lainnya)",
+                    {
+                        "nama_konten": "", //Perhatian: Nama konten adalah sub bab materi dari judul materi.
+                        "isi_konten": "(Berupa paragraf yang menjelaskan materi)",
                     },
-                                        {
-                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus.
-                        "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
-                        "sub_materi": "(Berupa paragraf yang menjelaskan rinci dari isi_materi, seperti rumus dan atau penjelasan lainnya)",
+                    {
+                        "nama_konten": "", //Perhatian: Nama konten adalah sub bab materi dari judul materi.
+                        "isi_konten": "(Berupa paragraf yang menjelaskan materi)",
                     },
-                                        {
-                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus.
-                        "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
-                        "sub_materi": "(Berupa paragraf yang menjelaskan rinci dari isi_materi, seperti rumus dan atau penjelasan lainnya)",
+                    {
+                        "nama_konten": "", //Perhatian: Nama konten adalah sub bab materi dari judul materi.
+                        "isi_konten": "(Berupa paragraf yang menjelaskan materi)",
                     },
-                                        {
-                        "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus.
-                        "isi_materi": "(Berupa paragraf yang menjelaskan materi pembelajaran sesuai judul_materi",
-                        "sub_materi": "(Berupa paragraf yang menjelaskan rinci dari isi_materi, seperti rumus dan atau penjelasan lainnya)",
+                    {
+                        "nama_konten": "", //Perhatian: Nama konten adalah sub bab materi dari judul materi.
+                        "isi_konten": "(Berupa paragraf yang menjelaskan materi)",
                     },
-                ]
+                ],
+                "studi_kasus": [
+                    {
+                        "nama_studi_kasus": "", //Perhatian: Mohon berikan nama studi kasus yang relevan dengan catatan khusus.
+                        "isi_studi_kasus": "(Berupa paragraf yang merupakan isi dari studi kasus)",
+                    },
+                    {
+                        "nama_studi_kasus": "", //Perhatian: Mohon berikan nama studi kasus yang relevan dengan catatan khusus.
+                        "isi_studi_kasus": "(Berupa paragraf yang merupakan isi dari studi kasus)",
+                    },
+                ],
+                "quiz": {
+                    "soal_quiz": "", //Perhatian: Mohon berikan soal quiz yang berkaitan dengan judul materi dan catatan khusus.
+                },
+                "evaluasi": {
+                    "isi_evaluasi": "(Berupa paragraf yang merupakan evaluasi atau rangkuman dari materi)",
+                }
                 "lampiran":{
-                    "sumber_referensi": ["", "", "", "", ""] //Perhatian: Mohon berikan sumber referensi yang relevan dengan materi seperti mengutip dari jurnal ilmiah, artikel ilmiah, buku pelajaran, jangan berupa data fiktif! Pastikan sumber referensi menggunakan format referensi yang sesuai.
+                    "sumber_referensi": ["", "", "", "", ""] //Perhatian: Mohon berikan 5 sumber referensi yang relevan dengan materi seperti mengutip dari jurnal ilmiah, artikel ilmiah, buku pelajaran, jangan berupa data fiktif! Pastikan sumber referensi menggunakan format referensi yang sesuai.
                 }
             }' . PHP_EOL .
             "Terima kasih atas kerja sama Anda.";
