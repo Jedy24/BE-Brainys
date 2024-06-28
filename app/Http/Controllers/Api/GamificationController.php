@@ -25,6 +25,7 @@ class GamificationController extends Controller
                 'name' => 'required',
                 'subject' => 'required',
                 'grade' => 'required',
+                'game_scheme' => 'required',
                 'notes' => 'nullable',
             ]);
 
@@ -55,8 +56,9 @@ class GamificationController extends Controller
             $gameName       = $request->input('name');
             $mataPelajaran  = $request->input('subject');
             $tingkatKelas   = $request->input('grade');
+            $skema          = $request->input('game_scheme');
             $addNotes       = $request->input('notes');
-            $prompt         = $this->prompt($mataPelajaran, $tingkatKelas, $addNotes);
+            $prompt         = $this->prompt($mataPelajaran, $tingkatKelas, $skema, $addNotes);
 
             // Send the message to OpenAI
             $resMessage = $this->openAI->sendMessage($prompt);
@@ -75,6 +77,7 @@ class GamificationController extends Controller
                 'subject' => $mataPelajaran,
                 'grade' => $tingkatKelas,
                 'notes' => $addNotes,
+                'game_scheme' => $request->input('game_scheme'),
                 'output_data' => $parsedResponse,
                 'user_id' => auth()->id(),
             ]);
@@ -124,26 +127,33 @@ class GamificationController extends Controller
         }
     }
 
-    public function prompt($subject, $grade, $notes){
+    public function prompt($subject, $grade, $game_scheme, $notes)
+    {
         $prompt = '';
         $prompt .= '
         You are an expert education doctor tasked with designing a gamified learning format. Use the following parameters:
-
-        Subject: '.$subject.'
-        Grade: '.$grade.'
-        Notes: '.$notes.'
-
+    
+        Subject: ' . $subject . '
+        Grade: ' . $grade . '
+        Game Scheme: ' . $game_scheme . '
+        Notes: ' . $notes . '
+    
         Create a JSON format for gamified learning in Indonesian, including:
-
+    
         tema: A theme related to the subject.
         konsep_utama: The main concept focusing on practical activities and competition.
+        skema_game: '.$game_scheme.'
         elemen_gamifikasi: Gamification elements consisting of titles and descriptions.
         misi_dan_tantangan: Missions and challenges with types, descriptions, and points.
         langkah_implementasi: Create the `langkah_implementasi` section which will be displayed as instructions for students, including:
             step: Numbered steps for implementation.
             title: Brief titles for each step.
-            description: Detailed instructions for each step presented as an array. Minimum 2 point.
+            description: Detailed instructions for each step presented as an array. Minimum 2 points.
         
+        Game Scheme Explanation:
+        - For individual game scheme: Each student competes individually, earning points and achievements based on their own efforts.
+        - For group game scheme: Students collaborate in teams to complete missions and challenges, fostering teamwork and collective achievement.
+    
         Example format:
         {
             "tema": "",
@@ -231,7 +241,7 @@ class GamificationController extends Controller
                 }
             ]
         }
-
+    
         ';
         $prompt .= '';
 
