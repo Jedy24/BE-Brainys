@@ -39,8 +39,9 @@ class AuthenticationController extends Controller
             'message' => 'Data akun berhasil diambil!',
             'data' => [
                 'name' => $user->name,
-                'profession' => $user->profession,
+                'school_level' => $user->school_level,
                 'school_name' => $user->school_name,
+                'profession' => $user->profession,
                 'email' => $user->email,
                 'is_active' => $user->is_active,
                 // 'password' => $user->password,
@@ -424,15 +425,17 @@ class AuthenticationController extends Controller
         /* Validasi data yang diterima dari request **/
         $request->validate([
             'name' => 'required|string|max:255',
-            'profession' => 'required|string|max:255',
+            'school_level' => 'required|string|max:255',
             'school_name' => 'required|string|max:255',
+            'profession' => 'required|string|max:255',
         ]);
 
         /* Mengupdate data profil pengguna **/
         $user->update([
             'name' => $request->input('name'),
-            'profession' => $request->input('profession'),
+            'school_level' => $request->input('school_level'),
             'school_name' => $request->input('school_name'),
+            'profession' => $request->input('profession'),
         ]);
 
         /* Mengembalikan respons sukses **/
@@ -441,8 +444,9 @@ class AuthenticationController extends Controller
             'message' => 'Profil berhasil diperbarui!',
             'data' => [
                 'name' => $user->name,
-                'profession' => $user->profession,
+                'school_level' => $user->school_level,
                 'school_name' => $user->school_name,
+                'profession' => $user->profession,
             ],
         ];
 
