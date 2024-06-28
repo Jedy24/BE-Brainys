@@ -16,6 +16,7 @@ class GamificationHistories extends Model
         'subject',
         'grade',
         'notes',
+        'game_scheme',
         'output_data',
         'user_id',
     ];
