@@ -65,7 +65,8 @@ class HistoryController extends Controller
                 ])->get();
 
             // Menggabungkan semua riwayat ke dalam satu koleksi
-            $history = $syllabusHistories->merge($materialHistories)->merge($exerciseHistories)->merge($bahanAjarHistories);
+            // $history = $syllabusHistories->merge($materialHistories)->merge($exerciseHistories)->merge($bahanAjarHistories);
+            $history = $syllabusHistories->concat($materialHistories)->concat($exerciseHistories)->concat($bahanAjarHistories);
 
             // Sort the merged collection by created_at in descending order
             $sortedHistory = $history->sortByDesc('created_at');
