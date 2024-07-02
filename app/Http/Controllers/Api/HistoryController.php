@@ -59,7 +59,7 @@ class HistoryController extends Controller
                     'id',
                     'name',
                     'notes AS description',
-                    DB::raw("'bahan_ajar' AS type"),
+                    DB::raw("'bahan-ajar' AS type"),
                     'created_at',
                     DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
                 ])->get();
