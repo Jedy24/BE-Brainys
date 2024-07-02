@@ -8,6 +8,7 @@ use App\Models\MaterialHistories;
 use App\Models\SyllabusHistories;
 use App\Models\HintHistories;
 use App\Models\BahanAjarHistories;
+use App\Models\GamificationHistories;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -64,9 +65,23 @@ class HistoryController extends Controller
                     DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
                 ])->get();
 
+            // Retrieve gamification history records for the specific user
+            $gamificationHistories = GamificationHistories::where('user_id', $user_id)
+                ->select([
+                    'id',
+                    'name',
+                    'notes AS description',
+                    DB::raw("'gamification' AS type"),
+                    'created_at',
+                    DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
+                ])->get();
+
             // Menggabungkan semua riwayat ke dalam satu koleksi
-            // $history = $syllabusHistories->merge($materialHistories)->merge($exerciseHistories)->merge($bahanAjarHistories);
-            $history = $syllabusHistories->concat($materialHistories)->concat($exerciseHistories)->concat($bahanAjarHistories);
+            $history = $syllabusHistories
+                ->concat($materialHistories)
+                ->concat($exerciseHistories)
+                ->concat($bahanAjarHistories)
+                ->concat($gamificationHistories);
 
             // Sort the merged collection by created_at in descending order
             $sortedHistory = $history->sortByDesc('created_at');

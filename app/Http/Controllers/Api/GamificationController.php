@@ -23,9 +23,10 @@ class GamificationController extends Controller
             // Input validation
             $request->validate([
                 'name' => 'required',
-                'subject' => 'required',
-                'grade' => 'required',
                 'game_scheme' => 'required',
+                'grade' => 'required',
+                'subject' => 'required',
+                'material' => 'required',
                 'notes' => 'nullable',
             ]);
 
@@ -54,11 +55,12 @@ class GamificationController extends Controller
 
             // Parameters
             $gameName       = $request->input('name');
-            $mataPelajaran  = $request->input('subject');
-            $tingkatKelas   = $request->input('grade');
             $skema          = $request->input('game_scheme');
+            $tingkatKelas   = $request->input('grade');
+            $mataPelajaran  = $request->input('subject');
+            $material       = $request->input('material');
             $addNotes       = $request->input('notes');
-            $prompt         = $this->prompt($mataPelajaran, $tingkatKelas, $skema, $addNotes);
+            $prompt         = $this->prompt($mataPelajaran, $tingkatKelas, $skema, $material, $addNotes);
 
             // Send the message to OpenAI
             $resMessage = $this->openAI->sendMessage($prompt);
@@ -66,9 +68,12 @@ class GamificationController extends Controller
 
             $user = $request->user();
 
-            $parsedResponse['informasi_umum']['nama_gamifikasi'] = $gameName;
             $parsedResponse['informasi_umum']['penyusun'] = $user->name;
             $parsedResponse['informasi_umum']['instansi'] = $user->school_name;
+            $parsedResponse['informasi_umum']['kelas'] = $tingkatKelas;
+            $parsedResponse['informasi_umum']['mata_pelajaran'] = $mataPelajaran;
+            $parsedResponse['informasi_umum']['materi_pelajaran'] = 'TBC';
+            $parsedResponse['informasi_umum']['nama_gamifikasi'] = $gameName;
             $parsedResponse['informasi_umum']['tahun_penyusunan'] = Date('Y');
 
             // Construct the response data for success
@@ -127,7 +132,7 @@ class GamificationController extends Controller
         }
     }
 
-    public function prompt($subject, $grade, $game_scheme, $notes)
+    public function prompt($subject, $grade, $game_scheme, $material, $notes)
     {
         $prompt = '';
         $prompt .= '
@@ -136,13 +141,14 @@ class GamificationController extends Controller
         Subject: ' . $subject . '
         Grade: ' . $grade . '
         Game Scheme: ' . $game_scheme . '
+        Material: ' . $material . '
         Notes: ' . $notes . '
     
         Create a JSON format for gamified learning in Indonesian, including:
     
         tema: A theme related to the subject.
         konsep_utama: The main concept focusing on practical activities and competition.
-        skema_game: '.$game_scheme.'
+        skema_game: ' . $game_scheme . '
         elemen_gamifikasi: Gamification elements consisting of titles and descriptions.
         misi_dan_tantangan: Missions and challenges with types, descriptions, and points.
         langkah_implementasi: Create the `langkah_implementasi` section which will be displayed as instructions for students, including:
@@ -158,6 +164,7 @@ class GamificationController extends Controller
         {
             "tema": "",
             "konsep_utama": "",
+            "skema_game": "",
             "elemen_gamifikasi": [
                 {
                     "judul": "",
@@ -242,6 +249,12 @@ class GamificationController extends Controller
             ]
         }
     
+        Subject: This refers to the specific subject or topic that the gamified learning format will be based on.
+        Grade: This indicates the educational level or grade of the students for whom the format is being designed.
+        Game Scheme: This describes whether the gamification will be conducted individually or in groups. Individual schemes focus on personal achievement, while group schemes emphasize collaboration and teamwork.
+        Material: The educational content or material that will be covered in the gamified learning activities.
+        Notes: Any additional notes or special instructions that might be relevant to the design of the gamified learning format.
+        
         ';
         $prompt .= '';
 
