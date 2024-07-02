@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\ExerciseHistories;
 use App\Models\MaterialHistories;
 use App\Models\SyllabusHistories;
+use App\Models\HintHistories;
+use App\Models\BahanAjarHistories;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,8 +53,19 @@ class HistoryController extends Controller
                     DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
                 ])->get();
 
+            // Retrieve bahan ajar history records for the specific user
+            $bahanAjarHistories = BahanAjarHistories::where('user_id', $user_id)
+                ->select([
+                    'id',
+                    'name',
+                    'notes AS description',
+                    DB::raw("'bahan_ajar' AS type"),
+                    'created_at',
+                    DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
+                ])->get();
+
             // Menggabungkan semua riwayat ke dalam satu koleksi
-            $history = $syllabusHistories->merge($materialHistories)->merge($exerciseHistories);
+            $history = $syllabusHistories->merge($materialHistories)->merge($exerciseHistories)->merge($bahanAjarHistories);
 
             // Sort the merged collection by created_at in descending order
             $sortedHistory = $history->sortByDesc('created_at');
