@@ -5,16 +5,19 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\GamificationHistories;
 use App\Services\OpenAIService;
+use App\Services\PPTGamification;
 use icircle\Template\Docx\DocxTemplate;
 use Illuminate\Http\Request;
 
 class GamificationController extends Controller
 {
     private $openAI;
+    protected $pptGamification;
 
-    public function __construct(OpenAIService $openAI)
+    public function __construct(OpenAIService $openAI, PPTGamification $pptGamification)
     {
         $this->openAI = $openAI;
+        $this->pptGamification = $pptGamification;
     }
 
     public function generate(Request $request)
@@ -122,6 +125,33 @@ class GamificationController extends Controller
                 'status' => 'success',
                 'message' => 'Dokumen word berhasil dibuat',
                 'data' => ['output_path' => $outputPath, 'download_url' => url('word_output/' . basename($outputPath))],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage(),
+                'data' => json_decode($e->getMessage(), true),
+            ], 500);
+        }
+    }
+
+    public function convertToPPT(Request $request)
+    {
+        try {
+            $outputPath     = public_path('ppt_output/Gamifikasi_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.pptx');
+
+            $gamificationId     = $request->input('id');
+            $gamificationData   = GamificationHistories::find($gamificationId);
+            $gamificationOut    = $gamificationData->output_data;
+            $gamificationOut    = json_decode(json_encode($gamificationData->output_data), true);
+
+            $this->pptGamification->createPresentation($gamificationOut, $outputPath);
+
+            // Assuming the merge operation is successful
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Dokumen word berhasil dibuat',
+                'data' => ['output_path' => $outputPath, 'download_url' => url('ppt_output/' . basename($outputPath))],
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

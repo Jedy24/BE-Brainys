@@ -4,6 +4,7 @@
 /public/hot
 /public/storage
 /public/word_output
+/public/ppt_output
 /public/json_example
 /storage/*.key
 /vendor

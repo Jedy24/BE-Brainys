@@ -93,6 +93,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group(['prefix' => 'gamification'], function () {
         Route::post('/generate', [GamificationController::class, 'generate']);
         Route::post('/export-word', [GamificationController::class, 'convertToWord']);
+        Route::post('/export-ppt', [GamificationController::class, 'convertToPPT']);
     });
 
     // Hint
