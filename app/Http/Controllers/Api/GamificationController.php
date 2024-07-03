@@ -150,7 +150,7 @@ class GamificationController extends Controller
             // Assuming the merge operation is successful
             return response()->json([
                 'status' => 'success',
-                'message' => 'Dokumen word berhasil dibuat',
+                'message' => 'Dokumen PPT berhasil dibuat',
                 'data' => ['output_path' => $outputPath, 'download_url' => url('ppt_output/' . basename($outputPath))],
             ], 200);
         } catch (\Exception $e) {
