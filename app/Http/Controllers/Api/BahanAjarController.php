@@ -5,16 +5,19 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\BahanAjarHistories;
 use App\Services\OpenAIService;
+use App\Services\PPTBahanAjar;
 use icircle\Template\Docx\DocxTemplate;
 use Illuminate\Http\Request;
 
 class BahanAjarController extends Controller
 {
     private $openAI;
+    private $pptBahanAjar;
 
-    public function __construct(OpenAIService $openAI)
+    public function __construct(OpenAIService $openAI, PPTBahanAjar $pptBahanAjar)
     {
         $this->openAI = $openAI;
+        $this->pptBahanAjar = $pptBahanAjar;
     }
 
     public function generate(Request $request)
@@ -117,6 +120,35 @@ class BahanAjarController extends Controller
                 'status' => 'success',
                 'message' => 'Dokumen word berhasil dibuat',
                 'data' => ['output_path' => $outputPath, 'download_url' => url('word_output/' . basename($outputPath))],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage(),
+                'data' => json_decode($e->getMessage(), true),
+            ], 500);
+        }
+    }
+
+    public function convertToPPT(Request $request)
+    {
+        try {
+            $outputPath     = public_path('ppt_output/Bahan_Ajar_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.pptx');
+
+            $BahanAjarId    = $request->input('id');
+            $BahanAjarData  = BahanAjarHistories::find($BahanAjarId);
+            $BahanAjarOut   = $BahanAjarData->generate_output;
+            $BahanAjarOut   = json_decode(json_encode($BahanAjarData->generate_output), true);
+
+            // dd($BahanAjarOut);
+
+            $this->pptBahanAjar->createPresentation($BahanAjarOut, $outputPath);
+
+            // Assuming the merge operation is successful
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Dokumen PPT berhasil dibuat',
+                'data' => ['output_path' => $outputPath, 'download_url' => url('ppt_output/' . basename($outputPath))],
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

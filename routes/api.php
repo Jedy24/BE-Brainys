@@ -108,6 +108,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group(['prefix' => 'bahan-ajar'], function () {
         Route::post('/generate', [BahanAjarController::class, 'generate']);
         Route::post('/export-word', [BahanAjarController::class, 'convertToWord']);
+        Route::post('/export-ppt', [BahanAjarController::class, 'convertToPPT']);
         Route::get('/history', [BahanAjarController::class, 'history']);
         Route::get('/history/{id}', [BahanAjarController::class, 'historyDetail']);
     });
