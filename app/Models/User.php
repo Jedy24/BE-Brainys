@@ -57,7 +57,8 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function providers(){
+    public function providers()
+    {
         return $this->hasMany(Provider::class, 'user_id', 'id');
     }
 
@@ -86,8 +87,18 @@ class User extends Authenticatable
         return $this->hasMany(BahanAjarHistories::class, 'user_id', 'id');
     }
 
-    public function generateAllSum(){
-        return ($this->materialHistory()->count() + $this->syllabusHistory()->count() + $this->exerciseHistory()->count());
+    public function gamificationHistory()
+    {
+        return $this->hasMany(GamificationHistories::class, 'user_id', 'id');
+    }
+
+    public function generateAllSum()
+    {
+        return (
+            $this->materialHistory()->count()
+            + $this->syllabusHistory()->count()
+            + $this->exerciseHistory()->count()
+        );
     }
 
     public function feedbackReviews()

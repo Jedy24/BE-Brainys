@@ -2,7 +2,9 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\BahanAjarHistories;
 use App\Models\ExerciseHistories;
+use App\Models\GamificationHistories;
 use App\Models\MaterialHistories;
 use App\Models\SyllabusHistories;
 use App\Models\User;
@@ -13,7 +15,7 @@ class WidgetGeneratedChart extends ChartWidget
 {
     protected static ?string $heading = 'User Generated Activity Over the Last 7 Days';
     protected int | string | array $columnSpan = 'full';
-    protected static ?string $maxHeight = '300px';
+    // protected static ?string $maxHeight = '500px';
 
     protected function getData(): array
     {
@@ -33,6 +35,8 @@ class WidgetGeneratedChart extends ChartWidget
         $materialData = $aggregateData(MaterialHistories::class);
         $syllabusData = $aggregateData(SyllabusHistories::class);
         $exerciseData = $aggregateData(ExerciseHistories::class);
+        $bahanAjarData = $aggregateData(BahanAjarHistories::class);
+        $gamificationData = $aggregateData(GamificationHistories::class);
 
         // Generate all dates in the range
         $dates = [];
@@ -50,27 +54,41 @@ class WidgetGeneratedChart extends ChartWidget
                 [
                     'label' => 'Material Histories',
                     'data' => $mergeData($materialData),
-                    'backgroundColor' => 'rgba(255, 99, 132, 0.5)',
-                    'borderColor' => 'rgb(255, 99, 132)',
+                    'backgroundColor' => 'rgba(255, 99, 132, 0.5)', // Merah Muda Transparan
+                    'borderColor' => 'rgb(255, 99, 132)', // Merah Muda
                     'fill' => false,
                 ],
                 [
                     'label' => 'Syllabus Histories',
                     'data' => $mergeData($syllabusData),
-                    'backgroundColor' => 'rgba(54, 162, 235, 0.5)',
-                    'borderColor' => 'rgb(54, 162, 235)',
+                    'backgroundColor' => 'rgba(54, 162, 235, 0.5)', // Biru Transparan
+                    'borderColor' => 'rgb(54, 162, 235)', // Biru
                     'fill' => false,
                 ],
                 [
                     'label' => 'Exercise Histories',
                     'data' => $mergeData($exerciseData),
-                    'backgroundColor' => 'rgba(75, 192, 192, 0.5)',
-                    'borderColor' => 'rgb(75, 192, 192)',
+                    'backgroundColor' => 'rgba(75, 192, 192, 0.5)', // Aqua Transparan
+                    'borderColor' => 'rgb(75, 192, 192)', // Aqua
+                    'fill' => false,
+                ],
+                [
+                    'label' => 'Bahan Ajar Histories',
+                    'data' => $mergeData($bahanAjarData),
+                    'backgroundColor' => 'rgba(255, 205, 86, 0.5)', // Kuning Transparan
+                    'borderColor' => 'rgb(255, 205, 86)', // Kuning
+                    'fill' => false,
+                ],
+                [
+                    'label' => 'Gamification Histories',
+                    'data' => $mergeData($gamificationData),
+                    'backgroundColor' => 'rgba(153, 102, 255, 0.5)', // Ungu Transparan
+                    'borderColor' => 'rgb(153, 102, 255)', // Ungu
                     'fill' => false,
                 ]
             ],
             'labels' => array_keys($dates),
-        ];
+        ];        
     }
 
 
