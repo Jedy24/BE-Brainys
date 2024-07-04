@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\GamificationController;
 use App\Http\Controllers\Api\OpenAIController;
 use App\Http\Controllers\Api\SendInvitationController;
 use App\Http\Controllers\Api\UserInvitationController;
+use App\Http\Controllers\Service\CapaianPembelajaranController;
 
 /*
 |--------------------------------------------------------------------------
@@ -132,6 +133,14 @@ Route::get('/show-updates/{id}', [UpdateMessageController::class, 'showUpdates']
 // Open AI API
 Route::group(['prefix' => 'open-ai'], function () {
     Route::get('/credit', [OpenAIController::class, 'checkCredit']);
+});
+
+// Capaian Pembelajaran
+Route::group(['prefix' => 'capaian-pembelajaran'], function () {
+    Route::post('/mata-pelajaran', [CapaianPembelajaranController::class, 'getMataPelajaran']);
+    Route::post('/fase', [CapaianPembelajaranController::class, 'getFase']);
+    Route::post('/element', [CapaianPembelajaranController::class, 'getElement']);
+    Route::post('/subelement', [CapaianPembelajaranController::class, 'getSubElement']);
 });
 
 Route::post('/send-invitation', [SendInvitationController::class, 'sendInvitation'])->name('api.send-invitation');
