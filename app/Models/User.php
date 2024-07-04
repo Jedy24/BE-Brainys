@@ -98,6 +98,8 @@ class User extends Authenticatable
             $this->materialHistory()->count()
             + $this->syllabusHistory()->count()
             + $this->exerciseHistory()->count()
+            + $this->bahanAjarHistory()->count()
+            + $this->gamificationHistory()->count()
         );
     }
 
