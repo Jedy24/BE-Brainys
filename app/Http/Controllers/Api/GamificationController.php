@@ -169,7 +169,7 @@ class GamificationController extends Controller
             $user = $request->user();
 
             // Get gamification histories for the authenticated user
-            $gamificationHistories = $user->gamificationHistories()
+            $gamificationHistories = $user->gamificationHistory()
                 ->select(['id', 'name', 'subject', 'grade', 'notes', 'game_scheme', 'output_data', 'created_at', 'updated_at', 'user_id'])
                 ->get();
 
@@ -212,7 +212,7 @@ class GamificationController extends Controller
             $user = $request->user();
 
             // Get a specific gamification history by ID for the authenticated user
-            $gamificationHistory = $user->gamificationHistories()->find($id);
+            $gamificationHistory = $user->gamificationHistory()->find($id);
 
             if (!$gamificationHistory) {
                 return response()->json([
