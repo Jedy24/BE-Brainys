@@ -11,8 +11,11 @@ class HintHistories extends Model
 
     protected $fillable = [
         'name',
-        'subject',
+        'pokok_materi',
         'grade',
+        'subject',
+        'elemen_capaian',
+        'jumlah_soal',
         'notes',
         'generate_output',
         'user_id'

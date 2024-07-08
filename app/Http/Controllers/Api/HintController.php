@@ -23,9 +23,12 @@ class HintController extends Controller
             // Input validation
             $request->validate([
                 'name'  =>'required',
-                'subject' => 'required',
+                'pokok_materi' => 'required',
                 'grade' => 'required',
-                'notes' => 'required',
+                'subject' => 'required',
+                'elemen_capaian' => 'required',
+                'jumlah_soal' => 'required|integer',
+                'notes' => 'nullable',
             ]);
 
             // Retrieve the authenticated user
@@ -45,10 +48,6 @@ class HintController extends Controller
                     'status' => 'failed',
                     'message' => 'Anda telah mencapai batas maksimal untuk riwayat kisi-kisi.',
                     'data' => [
-                        // 'generated_num' => $user->syllabusHistory()->count(),
-                        // 'generated_syllabus_num' => $user->syllabusHistory()->count(),
-                        // 'generated_material_num' => $user->materialHistory()->count(),
-                        // 'generated_exercise_num' => $user->exerciseHistory()->count(),
                         'generated_all_num' => $user->generateAllSum(),
                         'limit_all_num' => $user->limit_generate
                     ],
@@ -57,10 +56,13 @@ class HintController extends Controller
 
             // Parameters
             $namaKisiKisi   = $request->input('name');
-            $mataPelajaran  = $request->input('subject');
+            $pokokMateri    = $request->input('pokok_materi');
             $tingkatKelas   = $request->input('grade');
+            $mataPelajaran  = $request->input('subject');
+            $elemenCapaian  = $request->input('elemen_capaian');
+            $jumlahSoal     = $request->input('jumlah_soal');
             $addNotes       = $request->input('notes');
-            $prompt         = $this->openAI->generateHintsPrompt($mataPelajaran, $tingkatKelas, $addNotes);
+            $prompt         = $this->prompt($pokokMateri, $tingkatKelas, $mataPelajaran, $elemenCapaian, $jumlahSoal, $addNotes);
 
             // Send the message to OpenAI
             $resMessage = $this->openAI->sendMessage($prompt);
@@ -71,12 +73,20 @@ class HintController extends Controller
             $parsedResponse['informasi_umum']['nama_kisi_kisi'] = $namaKisiKisi;
             $parsedResponse['informasi_umum']['penyusun']       = $user->name;
             $parsedResponse['informasi_umum']['instansi']       = $user->school_name;
+            $parsedResponse['informasi_umum']['elemen_capaian'] = $elemenCapaian;
+            $parsedResponse['informasi_umum']['pokok_materi']   = $pokokMateri;
+            $parsedResponse['informasi_umum']['kelas']          = $tingkatKelas;
+            $parsedResponse['informasi_umum']['mata_pelajaran'] = $mataPelajaran;
+            $parsedResponse['informasi_umum']['jumlah_soal']    = $jumlahSoal;
 
             // Construct the response data for success
             $insertData = HintHistories::create([
                 'name' => $namaKisiKisi,
-                'subject' => $mataPelajaran,
+                'pokok_materi' => $pokokMateri,
                 'grade' => $tingkatKelas,
+                'subject' => $mataPelajaran,
+                'elemen_capaian' => $elemenCapaian,
+                'jumlah_soal' => $jumlahSoal,
                 'notes' => $addNotes,
                 'generate_output' => $parsedResponse,
                 'user_id' => auth()->id(),
@@ -135,7 +145,7 @@ class HintController extends Controller
 
             // Get hint histories for the authenticated user
             $hintHistories = $user->hintHistory()
-                ->select(['id', 'name', 'subject', 'grade', 'notes', 'user_id', 'created_at', 'updated_at'])
+                ->select(['id', 'name', 'pokok_materi', 'grade', 'subject', 'elemen_capaian', 'jumlah_soal', 'notes', 'user_id', 'created_at', 'updated_at'])
                 ->get();
 
             if ($hintHistories->isEmpty()) {
@@ -200,5 +210,34 @@ class HintController extends Controller
                 'data' => json_decode($e->getMessage(), true),
             ], 500);
         }
+    }
+
+    public function prompt($pokok_materi, $subject, $grade, $elemen_capaian, $jumlah_soal, $addNotes)
+    {
+        $prompt = "Tolong buatkan kisi-kisi untuk pokok materi: {$pokok_materi}, mata pelajaran: {$subject}, tingkat kelas: {$grade}, elemen capaian {$elemen_capaian}, dengan memerhatikan jumlah soal :{$jumlah_soal} dan catatan khusus: {$addNotes}. " . PHP_EOL .
+            "Perhatian: Mohon jawab dengan format JSON berikut:" . PHP_EOL .
+            '{
+                "informasi_umum": {
+                    "penyusun": "",
+                    "instansi": "",
+                    "kelas": "",
+                    "mata_pelajaran": "",
+                    "jumlah_soal": 0,
+                    "capaian_pembelajaran": "", //Perhatian: Mohon berikan capaian pembelajaran sesuai dengan catatan khusus, elemen capaian, dan pokok materi yang diberikan. Diakhir fase ....... peserta didik mampu .....
+                    "elemen_capaian": "",
+                    "pokok_materi": "",
+                },
+                "kisi_kisi": [
+                    {
+                        "no": 0,
+                        "indikator_soal": "",
+                        "no_soal": 0,
+                    },
+                ]
+            }' . PHP_EOL .
+            "Mohon berikan kisi_kisi sesuai dengan jumlah soal yang diberikan {$jumlah_soal}. Misalkan jumlah soal adalah 5 maka jumlah kisi_kisi ada sebanyak 5. " . PHP_EOL .
+            "Terima kasih atas kerja sama Anda.";
+
+        return $prompt;
     }
 }
