@@ -95,6 +95,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/generate', [GamificationController::class, 'generate']);
         Route::post('/export-word', [GamificationController::class, 'convertToWord']);
         Route::post('/export-ppt', [GamificationController::class, 'convertToPPT']);
+        Route::get('/history', [GamificationController::class, 'history']);
+        Route::get('/history/{id}', [GamificationController::class, 'historyDetail']);
     });
 
     // Hint

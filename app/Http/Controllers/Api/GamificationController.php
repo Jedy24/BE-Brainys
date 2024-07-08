@@ -162,6 +162,81 @@ class GamificationController extends Controller
         }
     }
 
+    public function history(Request $request)
+    {
+        try {
+            // Retrieve the authenticated user
+            $user = $request->user();
+
+            // Get gamification histories for the authenticated user
+            $gamificationHistories = $user->gamificationHistory()
+                ->select(['id', 'name', 'subject', 'grade', 'notes', 'game_scheme', 'output_data', 'created_at', 'updated_at', 'user_id'])
+                ->get();
+
+            if ($gamificationHistories->isEmpty()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Tidak ada riwayat gamifikasi untuk akun anda!',
+                    'data' => [
+                        'generated_num' => 0,
+                        'items' => [],
+                    ],
+                ], 200);
+            }
+
+            // Calculate the total generated gamification histories by the user
+            $generatedNum = $gamificationHistories->count();
+
+            // Return the response with gamification histories data
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Riwayat gamifikasi ditampilkan',
+                'data' => [
+                    'generated_num' => $generatedNum,
+                    'items' => $gamificationHistories,
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage(),
+                'data' => json_decode($e->getMessage(), true),
+            ], 500);
+        }
+    }
+
+    public function historyDetail(Request $request, $id)
+    {
+        try {
+            // Retrieve the authenticated user
+            $user = $request->user();
+
+            // Get a specific gamification history by ID for the authenticated user
+            $gamificationHistory = $user->gamificationHistory()->find($id);
+
+            if (!$gamificationHistory) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Riwayat hasil gamifikasi tidak tersedia di akun ini!',
+                    'data' => null,
+                ], 404);
+            }
+
+            // Return the response with gamification history data
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Riwayat gamifikasi ditampilkan',
+                'data' => $gamificationHistory,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage(),
+                'data' => json_decode($e->getMessage(), true),
+            ], 500);
+        }
+    }
+
     public function prompt($subject, $grade, $game_scheme, $material, $notes)
     {
         $prompt = '';
