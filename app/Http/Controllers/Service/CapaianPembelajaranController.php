@@ -88,13 +88,32 @@ class CapaianPembelajaranController extends Controller
                 ->where('mata_pelajaran', $mataPelajaran)
                 ->where('element', $element)
                 ->select('fase', 'mata_pelajaran', 'element', 'capaian_pembelajaran', 'capaian_pembelajaran_redaksi')
-                ->distinct()
                 ->get();
+
+            if ($finalData->isEmpty()) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'No data found',
+                    'data' => [],
+                ]);
+            }
+
+            // Merge capaian_pembelajaran and get the first capaian_pembelajaran_redaksi
+            $mergedCapaianPembelajaran = $finalData->pluck('capaian_pembelajaran')->implode(' ');
+            $firstCapaianPembelajaranRedaksi = $finalData->first()->capaian_pembelajaran_redaksi;
+
+            $result = [
+                'fase' => $fase,
+                'mata_pelajaran' => $mataPelajaran,
+                'element' => $element,
+                'capaian_pembelajaran' => $mergedCapaianPembelajaran,
+                'capaian_pembelajaran_redaksi' => $firstCapaianPembelajaranRedaksi,
+            ];
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Final data retrieved successfully',
-                'data' => $finalData,
+                'data' => $result,
             ]);
         } catch (\Exception $e) {
             return response()->json([
