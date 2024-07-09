@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AlurTujuanPembelajaranController;
 use App\Http\Controllers\Api\ExerciseController;
 use App\Http\Controllers\Api\HistoryController;
 use App\Http\Controllers\Api\MaterialController;
@@ -114,6 +115,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/export-ppt', [BahanAjarController::class, 'convertToPPT']);
         Route::get('/history', [BahanAjarController::class, 'history']);
         Route::get('/history/{id}', [BahanAjarController::class, 'historyDetail']);
+    });
+    
+    // Alur Tujuan Pembelajaran
+    Route::group(['prefix' => 'atp'], function () {
+        Route::post('/generate', [AlurTujuanPembelajaranController::class, 'generate']);
+        Route::post('/export-word', [AlurTujuanPembelajaranController::class, 'convertToWord']);
+        Route::get('/history', [AlurTujuanPembelajaranController::class, 'history']);
+        Route::get('/history/{id}', [AlurTujuanPembelajaranController::class, 'historyDetail']);
     });
 
     // Feedback
