@@ -139,10 +139,10 @@ Route::group(['prefix' => 'open-ai'], function () {
 
 // Capaian Pembelajaran
 Route::group(['prefix' => 'capaian-pembelajaran'], function () {
-    Route::post('/mata-pelajaran', [CapaianPembelajaranController::class, 'getMataPelajaran']);
     Route::post('/fase', [CapaianPembelajaranController::class, 'getFase']);
+    Route::post('/mata-pelajaran', [CapaianPembelajaranController::class, 'getMataPelajaran']);
     Route::post('/element', [CapaianPembelajaranController::class, 'getElement']);
-    Route::post('/subelement', [CapaianPembelajaranController::class, 'getSubElement']);
+    Route::post('/final', [CapaianPembelajaranController::class, 'getFinalData']);
 });
 
 Route::post('/send-invitation', [SendInvitationController::class, 'sendInvitation'])->name('api.send-invitation');

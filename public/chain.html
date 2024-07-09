@@ -15,15 +15,15 @@
             <h2 class="text-center">Capaian Pembelajaran - Chain Select</h2>
             <form>
                 <div class="form-group">
-                    <label for="mata-pelajaran">Mata Pelajaran</label>
-                    <select id="mata-pelajaran" class="form-control">
-                        <option value="">Select Mata Pelajaran</option>
+                    <label for="fase">Fase</label>
+                    <select id="fase" class="form-control">
+                        <option value="">Select Fase</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="fase">Fase</label>
-                    <select id="fase" class="form-control" disabled>
-                        <option value="">Select Fase</option>
+                    <label for="mata-pelajaran">Mata Pelajaran</label>
+                    <select id="mata-pelajaran" class="form-control" disabled>
+                        <option value="">Select Mata Pelajaran</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -33,14 +33,12 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="subelemen">Sub Element</label>
-                    <select id="subelemen" class="form-control" disabled>
-                        <option value="">Select Sub Element</option>
-                    </select>
-                </div>
-                <div class="form-group">
                     <label for="capaian-pembelajaran">Capaian Pembelajaran</label>
                     <textarea id="capaian-pembelajaran" class="form-control" rows="5" readonly></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="capaian-pembelajaran-redaksi">Capaian Pembelajaran Redaksi</label>
+                    <textarea id="capaian-pembelajaran-redaksi" class="form-control" rows="5" readonly></textarea>
                 </div>
             </form>
         </div>
@@ -48,47 +46,42 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
         <script>
             $(document).ready(function () {
-                var API_URL = "https://testing.brainys.oasys.id/api";
-                // Fetch Mata Pelajaran
+                var API_URL = 'https://testing.brainys.oasys.id/api';
+                // var API_URL = 'http://127.0.0.1:8000/api';
+
+                // Fetch Fase
                 $.ajax({
-                    url: API_URL + "/capaian-pembelajaran/mata-pelajaran",
+                    url: API_URL + "/capaian-pembelajaran/fase",
                     method: "POST",
                     success: function (response) {
                         if (response.status === "success") {
                             response.data.forEach(function (item) {
-                                $("#mata-pelajaran").append(
-                                    new Option(
-                                        item.mata_pelajaran,
-                                        item.mata_pelajaran
-                                    )
-                                );
+                                $("#fase").append(new Option(item.fase, item.fase));
                             });
                         }
                     },
                 });
 
-                // Fetch Fase based on Mata Pelajaran
-                $("#mata-pelajaran").on("change", function () {
-                    let mataPelajaran = $(this).val();
-                    $("#fase")
+                // Fetch Mata Pelajaran based on Fase
+                $("#fase").on("change", function () {
+                    let fase = $(this).val();
+                    $("#mata-pelajaran")
                         .prop("disabled", true)
                         .empty()
-                        .append(new Option("Select Fase", ""));
+                        .append(new Option("Select Mata Pelajaran", ""));
 
-                    if (mataPelajaran) {
+                    if (fase) {
                         $.ajax({
-                            url: API_URL + "/capaian-pembelajaran/fase",
+                            url: API_URL + "/capaian-pembelajaran/mata-pelajaran",
                             method: "POST",
                             contentType: "application/json",
-                            data: JSON.stringify({
-                                mata_pelajaran: mataPelajaran,
-                            }),
+                            data: JSON.stringify({ fase: fase }),
                             success: function (response) {
                                 if (response.status === "success") {
-                                    $("#fase").prop("disabled", false);
+                                    $("#mata-pelajaran").prop("disabled", false);
                                     response.data.forEach(function (item) {
-                                        $("#fase").append(
-                                            new Option(item.fase, item.fase)
+                                        $("#mata-pelajaran").append(
+                                            new Option(item.mata_pelajaran, item.mata_pelajaran)
                                         );
                                     });
                                 }
@@ -97,33 +90,30 @@
                     }
                 });
 
-                // Fetch Element based on Fase
-                $("#fase").on("change", function () {
-                    let mataPelajaran = $("#mata-pelajaran").val();
-                    let fase = $(this).val();
+                // Fetch Element based on Mata Pelajaran and Fase
+                $("#mata-pelajaran").on("change", function () {
+                    let fase = $("#fase").val();
+                    let mataPelajaran = $(this).val();
                     $("#element")
                         .prop("disabled", true)
                         .empty()
                         .append(new Option("Select Element", ""));
 
-                    if (mataPelajaran && fase) {
+                    if (fase && mataPelajaran) {
                         $.ajax({
                             url: API_URL + "/capaian-pembelajaran/element",
                             method: "POST",
                             contentType: "application/json",
                             data: JSON.stringify({
-                                mata_pelajaran: mataPelajaran,
                                 fase: fase,
+                                mata_pelajaran: mataPelajaran,
                             }),
                             success: function (response) {
                                 if (response.status === "success") {
                                     $("#element").prop("disabled", false);
                                     response.data.forEach(function (item) {
                                         $("#element").append(
-                                            new Option(
-                                                item.element,
-                                                item.element
-                                            )
+                                            new Option(item.element, item.element)
                                         );
                                     });
                                 }
@@ -132,70 +122,34 @@
                     }
                 });
 
-                // Fetch Sub Element based on Element
+                // Fetch Capaian Pembelajaran and Capaian Pembelajaran Redaksi based on Element
                 $("#element").on("change", function () {
-                    let mataPelajaran = $("#mata-pelajaran").val();
                     let fase = $("#fase").val();
+                    let mataPelajaran = $("#mata-pelajaran").val();
                     let element = $(this).val();
-                    $("#subelemen")
-                        .prop("disabled", true)
-                        .empty()
-                        .append(new Option("Select Sub Element", ""));
 
-                    if (mataPelajaran && fase && element) {
+                    if (fase && mataPelajaran && element) {
                         $.ajax({
-                            url: API_URL + "/capaian-pembelajaran/subelement",
+                            url: API_URL + "/capaian-pembelajaran/final",
                             method: "POST",
                             contentType: "application/json",
                             data: JSON.stringify({
-                                mata_pelajaran: mataPelajaran,
                                 fase: fase,
+                                mata_pelajaran: mataPelajaran,
                                 element: element,
                             }),
                             success: function (response) {
                                 if (response.status === "success") {
-                                    $("#subelemen").prop("disabled", false);
-                                    response.data.forEach(function (item) {
-                                        $("#subelemen").append(
-                                            new Option(
-                                                item.subelemen,
-                                                item.subelemen
-                                            )
-                                        );
-                                    });
-                                }
-                            },
-                        });
-                    }
-                });
+                                    if (response.data.length > 0) {
+                                        let capaianPembelajaran = response.data.map(item => item.capaian_pembelajaran).join("\n");
+                                        let capaianPembelajaranRedaksi = response.data.map(item => item.capaian_pembelajaran_redaksi).join("\n");
 
-                // Fetch Capaian Pembelajaran based on Sub Element
-                $("#subelemen").on("change", function () {
-                    let mataPelajaran = $("#mata-pelajaran").val();
-                    let fase = $("#fase").val();
-                    let element = $("#element").val();
-                    let subelemen = $(this).val();
-
-                    if (mataPelajaran && fase && element && subelemen) {
-                        $.ajax({
-                            url: API_URL + "/capaian-pembelajaran/subelement",
-                            method: "POST",
-                            contentType: "application/json",
-                            data: JSON.stringify({
-                                mata_pelajaran: mataPelajaran,
-                                fase: fase,
-                                element: element,
-                                subelemen: subelemen,
-                            }),
-                            success: function (response) {
-                                if (response.status === "success") {
-                                    $("#capaian-pembelajaran").val(
-                                        response.data[0].capaian_pembelajaran
-                                    );
-                                } else {
-                                    $("#capaian-pembelajaran").val(
-                                        "No data available"
-                                    );
+                                        $("#capaian-pembelajaran").val(capaianPembelajaran);
+                                        $("#capaian-pembelajaran-redaksi").val(capaianPembelajaranRedaksi);
+                                    } else {
+                                        $("#capaian-pembelajaran").val("No data available");
+                                        $("#capaian-pembelajaran-redaksi").val("No data available");
+                                    }
                                 }
                             },
                         });

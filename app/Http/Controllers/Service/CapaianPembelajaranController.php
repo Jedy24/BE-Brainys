@@ -8,34 +8,10 @@ use Illuminate\Http\Request;
 
 class CapaianPembelajaranController extends Controller
 {
-    public function getMataPelajaran(Request $request)
-    {
-        try {
-            $mataPelajaran = CapaianPembelajaran::select('mata_pelajaran')->distinct()->get();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Mata Pelajaran retrieved successfully',
-                'data' => $mataPelajaran,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'failed',
-                'message' => $e->getMessage(),
-                'data' => [],
-            ]);
-        }
-    }
-
     public function getFase(Request $request)
     {
-        $mataPelajaran = $request->input('mata_pelajaran');
-
         try {
-            $fase = CapaianPembelajaran::where('mata_pelajaran', $mataPelajaran)
-                ->select('fase')
-                ->distinct()
-                ->get();
+            $fase = CapaianPembelajaran::select('fase')->distinct()->get();
 
             return response()->json([
                 'status' => 'success',
@@ -51,22 +27,20 @@ class CapaianPembelajaranController extends Controller
         }
     }
 
-    public function getElement(Request $request)
+    public function getMataPelajaran(Request $request)
     {
-        $mataPelajaran = $request->input('mata_pelajaran');
         $fase = $request->input('fase');
 
         try {
-            $element = CapaianPembelajaran::where('mata_pelajaran', $mataPelajaran)
-                ->where('fase', $fase)
-                ->select('element')
+            $mataPelajaran = CapaianPembelajaran::where('fase', $fase)
+                ->select('mata_pelajaran')
                 ->distinct()
                 ->get();
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Element retrieved successfully',
-                'data' => $element,
+                'message' => 'Mata Pelajaran retrieved successfully',
+                'data' => $mataPelajaran,
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -77,24 +51,50 @@ class CapaianPembelajaranController extends Controller
         }
     }
 
-    public function getSubElement(Request $request)
+    public function getElement(Request $request)
     {
-        $mataPelajaran = $request->input('mata_pelajaran');
         $fase = $request->input('fase');
-        $element = $request->input('element');
+        $mataPelajaran = $request->input('mata_pelajaran');
 
         try {
-            $subElement = CapaianPembelajaran::where('mata_pelajaran', $mataPelajaran)
-                ->where('fase', $fase)
-                ->where('element', $element)
-                ->select('subelemen', 'capaian_pembelajaran')
+            $elements = CapaianPembelajaran::where('fase', $fase)
+                ->where('mata_pelajaran', $mataPelajaran)
+                ->select('element')
                 ->distinct()
                 ->get();
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'SubElement retrieved successfully',
-                'data' => $subElement,
+                'message' => 'Elements retrieved successfully',
+                'data' => $elements,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage(),
+                'data' => [],
+            ]);
+        }
+    }
+
+    public function getFinalData(Request $request)
+    {
+        $fase = $request->input('fase');
+        $mataPelajaran = $request->input('mata_pelajaran');
+        $element = $request->input('element');
+
+        try {
+            $finalData = CapaianPembelajaran::where('fase', $fase)
+                ->where('mata_pelajaran', $mataPelajaran)
+                ->where('element', $element)
+                ->select('fase', 'mata_pelajaran', 'element', 'capaian_pembelajaran', 'capaian_pembelajaran_redaksi')
+                ->distinct()
+                ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Final data retrieved successfully',
+                'data' => $finalData,
             ]);
         } catch (\Exception $e) {
             return response()->json([
