@@ -62,6 +62,24 @@ class HintController extends Controller
             $elemenCapaian  = $request->input('elemen_capaian');
             $jumlahSoal     = $request->input('jumlah_soal');
             $addNotes       = $request->input('notes');
+
+            $finalData = \DB::table('capaian_pembelajaran')
+                ->where('fase', $tingkatKelas)
+                ->where('mata_pelajaran', $mataPelajaran)
+                ->where('element', $elemenCapaian)
+                ->select('capaian_pembelajaran', 'capaian_pembelajaran_redaksi')
+                ->first();
+
+            if (!$finalData) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Data tidak ditemukan untuk kombinasi fase, mata pelajaran, dan elemen capaian yang diberikan',
+                    'data' => [],
+                ], 400);
+            }
+
+            $capaianPembelajaranRedaksi = $finalData->capaian_pembelajaran_redaksi;
+
             $prompt         = $this->prompt($pokokMateri, $tingkatKelas, $mataPelajaran, $elemenCapaian, $jumlahSoal, $addNotes);
 
             // Send the message to OpenAI
@@ -70,14 +88,26 @@ class HintController extends Controller
             $parsedResponse = json_decode($resMessage, true);
             $user = $request->user();
 
-            $parsedResponse['informasi_umum']['nama_kisi_kisi'] = $namaKisiKisi;
-            $parsedResponse['informasi_umum']['penyusun']       = $user->name;
-            $parsedResponse['informasi_umum']['instansi']       = $user->school_name;
-            $parsedResponse['informasi_umum']['elemen_capaian'] = $elemenCapaian;
-            $parsedResponse['informasi_umum']['pokok_materi']   = $pokokMateri;
-            $parsedResponse['informasi_umum']['kelas']          = $tingkatKelas;
-            $parsedResponse['informasi_umum']['mata_pelajaran'] = $mataPelajaran;
-            $parsedResponse['informasi_umum']['jumlah_soal']    = $jumlahSoal;
+            $faseToKelas = [
+                'Fase A' => 'Kelas 1 - 2 SD',
+                'Fase B' => 'Kelas 3 - 4 SD',
+                'Fase C' => 'Kelas 5 - 6 SD',
+                'Fase D' => 'Kelas 7 - 9 SMP',
+                'Fase E' => 'Kelas 10 SMA',
+                'Fase F' => 'Kelas 11 - 12 SMA'
+            ];
+
+            $kelas = isset($faseToKelas[$tingkatKelas]) ? "{$tingkatKelas} ({$faseToKelas[$tingkatKelas]})" : $tingkatKelas;
+
+            $parsedResponse['informasi_umum']['nama_kisi_kisi']                  = $namaKisiKisi;
+            $parsedResponse['informasi_umum']['penyusun']                        = $user->name;
+            $parsedResponse['informasi_umum']['instansi']                        = $user->school_name;
+            $parsedResponse['informasi_umum']['elemen_capaian']                  = $elemenCapaian;
+            $parsedResponse['informasi_umum']['pokok_materi']                    = $pokokMateri;
+            $parsedResponse['informasi_umum']['kelas']                           = $kelas;
+            $parsedResponse['informasi_umum']['mata_pelajaran']                  = $mataPelajaran;
+            $parsedResponse['informasi_umum']['jumlah_soal']                     = $jumlahSoal;
+            $parsedResponse['informasi_umum']['capaian_pembelajaran_redaksi']    = $capaianPembelajaranRedaksi;
 
             // Construct the response data for success
             $insertData = HintHistories::create([
@@ -214,6 +244,17 @@ class HintController extends Controller
 
     public function prompt($pokok_materi, $subject, $grade, $elemen_capaian, $jumlah_soal, $addNotes)
     {
+        $faseToKelas = [
+            'Fase A' => 'Kelas 1 - 2 SD',
+            'Fase B' => 'Kelas 3 - 4 SD',
+            'Fase C' => 'Kelas 5 - 6 SD',
+            'Fase D' => 'Kelas 7 - 9 SMP',
+            'Fase E' => 'Kelas 10 SMA',
+            'Fase F' => 'Kelas 11 - 12 SMA'
+        ];
+
+        $kelas = isset($faseToKelas[$grade]) ? "{$grade} ({$faseToKelas[$grade]})" : "Fase tidak dikenal";
+
         $prompt = "Tolong buatkan kisi-kisi untuk pokok materi: {$pokok_materi}, mata pelajaran: {$subject}, tingkat kelas: {$grade}, elemen capaian {$elemen_capaian}, dengan memerhatikan jumlah soal :{$jumlah_soal} dan catatan khusus: {$addNotes}. " . PHP_EOL .
             "Perhatian: Mohon jawab dengan format JSON berikut:" . PHP_EOL .
             '{
@@ -223,7 +264,7 @@ class HintController extends Controller
                     "kelas": "",
                     "mata_pelajaran": "",
                     "jumlah_soal": 0,
-                    "capaian_pembelajaran": "", //Perhatian: Mohon berikan capaian pembelajaran sesuai dengan catatan khusus, elemen capaian, dan pokok materi yang diberikan. Diakhir fase ....... peserta didik mampu .....
+                    "capaian_pembelajaran_redaksi": "",
                     "elemen_capaian": "",
                     "pokok_materi": "",
                 },
@@ -231,7 +272,7 @@ class HintController extends Controller
                     {
                         "no": 0,
                         "indikator_soal": "",
-                        "no_soal": 0,
+                        "no_soal": 0, // Mengikuti nomor soal (no).
                     },
                 ]
             }' . PHP_EOL .
