@@ -43,6 +43,15 @@ class ImportCapaianPembelajaran extends Command
             $this->info('Total Successful: ' . $import->successCount);
             $this->info('Total Failed: ' . $import->failureCount);
 
+            if (!empty($import->failures)) {
+                $this->info('Failed Rows:');
+                foreach ($import->failures as $failure) {
+                    $this->info('Row: ' . $failure['row']);
+                    $this->info('Errors: ' . implode(', ', $failure['errors']));
+                    $this->info('Values: ' . json_encode($failure['values']));
+                }
+            }
+
             return 0;
         } catch (\Exception $e) {
             $this->error('Error during import: ' . $e->getMessage());

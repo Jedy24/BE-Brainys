@@ -17,5 +17,6 @@ class CapaianPembelajaran extends Model
         'element',
         'subelemen',
         'capaian_pembelajaran',
+        'capaian_pembelajaran_redaksi',
     ];
 }
