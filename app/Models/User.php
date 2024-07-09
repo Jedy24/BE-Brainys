@@ -100,6 +100,7 @@ class User extends Authenticatable
             + $this->exerciseHistory()->count()
             + $this->bahanAjarHistory()->count()
             + $this->gamificationHistory()->count()
+            + $this->hintHistory()->count()
         );
     }
 
