@@ -845,28 +845,28 @@ class OpenAIService
                     "judul_materi": "", //Perhatian: Mohon berikan judul materi sesuai dengan catatan khusus.
                 },
                 "pendahuluan": {
-                    "definisi": "(Berupa paragraf yang menjelaskan definisi dari judul materi)",
+                    "definisi": "(Berupa paragraf yang menjelaskan definisi dari judul materi secara detail)",
                 },
-                "konten":[
+                "konten":[ //Perhatian: Pastikan konten (materi) memiliki jumlah yang sesuai yaitu 5 atau sesuai catatan khusus.
                     {
                         "nama_konten": "", //Perhatian: Nama konten adalah sub bab materi dari judul materi.
-                        "isi_konten": "(Berupa paragraf yang menjelaskan materi)",
+                        "isi_konten": "(Berupa paragraf yang menjelaskan materi secara detail beberapa paragraf)",
                     },
                     {
                         "nama_konten": "", //Perhatian: Nama konten adalah sub bab materi dari judul materi.
-                        "isi_konten": "(Berupa paragraf yang menjelaskan materi)",
+                        "isi_konten": "(Berupa paragraf yang menjelaskan materi secara detail beberapa paragraf)",
                     },
                     {
                         "nama_konten": "", //Perhatian: Nama konten adalah sub bab materi dari judul materi.
-                        "isi_konten": "(Berupa paragraf yang menjelaskan materi)",
+                        "isi_konten": "(Berupa paragraf yang menjelaskan materi secara detail beberapa paragraf)",
                     },
                     {
                         "nama_konten": "", //Perhatian: Nama konten adalah sub bab materi dari judul materi.
-                        "isi_konten": "(Berupa paragraf yang menjelaskan materi)",
+                        "isi_konten": "(Berupa paragraf yang menjelaskan materi secara detail beberapa paragraf)",
                     },
                     {
                         "nama_konten": "", //Perhatian: Nama konten adalah sub bab materi dari judul materi.
-                        "isi_konten": "(Berupa paragraf yang menjelaskan materi)",
+                        "isi_konten": "(Berupa paragraf yang menjelaskan materi secara detail beberapa paragraf)",
                     },
                 ],
                 "studi_kasus": [
