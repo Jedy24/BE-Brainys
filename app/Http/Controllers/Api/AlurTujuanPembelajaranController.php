@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\ATPExport;
 use App\Http\Controllers\Controller;
 use App\Models\AlurTujuanPembelajaranHistories;
 use App\Models\CapaianPembelajaran;
 use App\Services\OpenAIService;
 use icircle\Template\Docx\DocxTemplate;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AlurTujuanPembelajaranController extends Controller
 {
@@ -87,7 +89,7 @@ class AlurTujuanPembelajaranController extends Controller
             $parsedResponse = json_decode($resMessage, true);
 
             $user = $request->user();
-            
+
             $parsedResponse['informasi_umum']['nama']               = $name;
             $parsedResponse['informasi_umum']['penyusun']           = $user->name;
             $parsedResponse['informasi_umum']['instansi']           = $user->school_name;
@@ -140,7 +142,7 @@ class AlurTujuanPembelajaranController extends Controller
 
             $data = $AlurTujuan->output_data;
 
-            for ($i=0; $i < count($data['alur']); $i++) { 
+            for ($i = 0; $i < count($data['alur']); $i++) {
                 $data['alur'][$i]['kata_frase_kunci'] = implode(", ", $data['alur'][$i]['kata_frase_kunci']);
                 $data['alur'][$i]['profil_pelajar_pancasila'] = implode(", ", $data['alur'][$i]['profil_pelajar_pancasila']);
             }
@@ -161,6 +163,41 @@ class AlurTujuanPembelajaranController extends Controller
             ], 500);
         }
     }
+
+    public function convertToExcel(Request $request)
+    {
+        try {
+            $AlurTujuanId = $request->input('id');
+            $AlurTujuan = AlurTujuanPembelajaranHistories::find($AlurTujuanId);
+    
+            $data = $AlurTujuan->output_data;
+            // $dataArray = json_decode($data, true);
+    
+            $fileName = 'capaian_pembelajaran.xlsx';
+            $filePath = storage_path('app/public/' . $fileName);
+    
+            // Buat dan simpan file Excel
+            Excel::store(new ATPExport($data), 'public/' . $fileName);
+    
+            $outputPath = asset('storage/' . $fileName);
+            $downloadUrl = url('storage/' . $fileName);
+    
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Dokumen Excel berhasil dibuat',
+                'data' => [
+                    'output_path' => $outputPath,
+                    'download_url' => $downloadUrl
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage(),
+                'data' => json_decode($e->getMessage(), true),
+            ], 500);
+        }
+    }    
 
     public function history(Request $request)
     {

@@ -75,7 +75,7 @@ class GamificationController extends Controller
             $parsedResponse['informasi_umum']['instansi'] = $user->school_name;
             $parsedResponse['informasi_umum']['kelas'] = $tingkatKelas;
             $parsedResponse['informasi_umum']['mata_pelajaran'] = $mataPelajaran;
-            $parsedResponse['informasi_umum']['materi_pelajaran'] = 'TBC';
+            $parsedResponse['informasi_umum']['materi_pelajaran'] = $material;
             $parsedResponse['informasi_umum']['nama_gamifikasi'] = $gameName;
             $parsedResponse['informasi_umum']['tahun_penyusunan'] = Date('Y');
 

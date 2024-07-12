@@ -121,6 +121,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group(['prefix' => 'atp'], function () {
         Route::post('/generate', [AlurTujuanPembelajaranController::class, 'generate']);
         Route::post('/export-word', [AlurTujuanPembelajaranController::class, 'convertToWord']);
+        Route::post('/export-excel', [AlurTujuanPembelajaranController::class, 'convertToExcel']);
         Route::get('/history', [AlurTujuanPembelajaranController::class, 'history']);
         Route::get('/history/{id}', [AlurTujuanPembelajaranController::class, 'historyDetail']);
     });
