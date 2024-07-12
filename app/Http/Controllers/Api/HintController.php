@@ -108,6 +108,7 @@ class HintController extends Controller
             $parsedResponse['informasi_umum']['mata_pelajaran']                  = $mataPelajaran;
             $parsedResponse['informasi_umum']['jumlah_soal']                     = $jumlahSoal;
             $parsedResponse['informasi_umum']['capaian_pembelajaran_redaksi']    = $capaianPembelajaranRedaksi;
+            $parsedResponse['informasi_umum']['tahun_penyusunan']                = Date('Y');
 
             // Construct the response data for success
             $insertData = HintHistories::create([
@@ -267,12 +268,13 @@ class HintController extends Controller
                     "capaian_pembelajaran_redaksi": "",
                     "elemen_capaian": "",
                     "pokok_materi": "",
+                    "tahun_penyusunan": "",
                 },
                 "kisi_kisi": [
                     {
-                        "no": 0,
-                        "indikator_soal": "",
-                        "no_soal": 0, // Mengikuti nomor soal (no).
+                        "nomor": 0,
+                        "indikator_soal": "", // Perhatan: berikan indikator soal yang jelas seperti "Peserta didik......", "Diberikan soal.... Peserta didik....." dan sebagainya.
+                        "no_soal": 0, // Mengikuti nomor soal (nomor).
                     },
                 ]
             }' . PHP_EOL .
