@@ -204,6 +204,7 @@ class HintController extends Controller
             $sheet = $spreadsheet->getActiveSheet();
 
             // Mengisi data ke dalam template sesuai dengan format yang diberikan
+            $sheet->setCellValue('E3', $data['informasi_umum']['tahun_penyusunan']);
             $sheet->setCellValue('C6', $data['informasi_umum']['instansi']);
             $sheet->setCellValue('C7', $data['informasi_umum']['mata_pelajaran']);
             $sheet->setCellValue('C8', $data['informasi_umum']['kelas']);
@@ -213,20 +214,30 @@ class HintController extends Controller
             $sheet->setCellValue('C14', $data['informasi_umum']['elemen_capaian']);
             $sheet->setCellValue('C15', $data['informasi_umum']['pokok_materi']);
 
-            // Mengatur tinggi baris secara otomatis dan wrapping text
-            $sheet->getDefaultRowDimension()->setRowHeight(-1);
-            $sheet->getStyle('C13:C15')->getAlignment()->setWrapText(true);
-
             // Mengisi data kisi-kisi
-            $row = 17;
-            foreach ($data['kisi_kisi'] as $kisi) {
-                $sheet->setCellValue("B{$row}", $kisi['nomor']);
-                $sheet->setCellValue("C{$row}", $kisi['indikator_soal']);
-                $sheet->setCellValue("F{$row}", $kisi['no_soal']);
+            $templateRow = 17;
+            $rowCount = count($data['kisi_kisi']);
+            $highestRow = $templateRow + $rowCount - 1;
+
+            for ($row = $templateRow; $row <= $highestRow; $row++) {
+                if ($row != $templateRow) {
+                    $sheet->duplicateStyle($sheet->getStyle('B' . $templateRow . ':F' . $templateRow), 'B' . $row . ':F' . $row);
+                }
+
+                $sheet->mergeCells("C{$row}:E{$row}");
+
+                $sheet->setCellValue("B{$row}", $data['kisi_kisi'][$row - $templateRow]['nomor']);
+                $sheet->setCellValue("C{$row}", $data['kisi_kisi'][$row - $templateRow]['indikator_soal']);
+                $sheet->setCellValue("F{$row}", $data['kisi_kisi'][$row - $templateRow]['no_soal']);
+
+                // Mengatur tinggi baris dan wrapping text
                 $sheet->getRowDimension($row)->setRowHeight(-1);
                 $sheet->getStyle("B{$row}:F{$row}")->getAlignment()->setWrapText(true);
-                $row++;
+                $sheet->getStyle("C{$row}:E{$row}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
             }
+
+            // Adjust column width to fit content
+
 
             // Menyimpan spreadsheet ke file baru
             $fileName = 'Kisi_Kisi_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.xlsx';
@@ -389,14 +400,13 @@ class HintController extends Controller
                 "kisi_kisi": [
                     {
                         "nomor": 0,
-                        "indikator_soal": "",
+                        "indikator_soal": "", // Tujuan yang ingin dicapai peserta didik dalam mengerjakan soal.
                         "no_soal": 0, // Mengikuti nomor soal (nomor).
                     },
                 ]
             }' . PHP_EOL .
-            "Bayangkan Anda adalah seorang guru, indikator_soal adalah suatu tujuan yang ingin dicapai oleh peserta didik dalam mengerjakan soal-soal." . PHP_EOL .
             "Mohon berikan kisi_kisi sesuai dengan jumlah soal yang diberikan {$jumlah_soal}. Misalkan jumlah soal adalah 5 maka jumlah kisi_kisi ada sebanyak 5. " . PHP_EOL .
-            "Pastikan mengisi dengan format yang telah ditentukan." . PHP_EOL .
+            "Pastikan format JSON yang diberikan sudah benar secara struktur dan hasilnya." . PHP_EOL .
             "Terima kasih atas kerja sama Anda.";
 
         return $prompt;
