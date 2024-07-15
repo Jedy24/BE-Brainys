@@ -236,9 +236,6 @@ class HintController extends Controller
                 $sheet->getStyle("C{$row}:E{$row}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
             }
 
-            // Adjust column width to fit content
-
-
             // Menyimpan spreadsheet ke file baru
             $fileName = 'Kisi_Kisi_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.xlsx';
             $filePath = public_path('excel_output/' . $fileName);
