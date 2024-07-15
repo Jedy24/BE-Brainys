@@ -6,6 +6,7 @@
 /public/word_output
 /public/ppt_output
 /public/json_example
+/public/excel_output
 /storage/*.key
 /vendor
 .env
