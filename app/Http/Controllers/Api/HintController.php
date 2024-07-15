@@ -7,6 +7,10 @@ use App\Models\HintHistories;
 use App\Services\OpenAIService;
 use icircle\Template\Docx\DocxTemplate;
 use Illuminate\Http\Request;
+// use Maatwebsite\Excel\Facades\Excel;
+// use App\Exports\HintHistoryExport;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class HintController extends Controller
 {
@@ -168,6 +172,118 @@ class HintController extends Controller
         }
     }
 
+    public function convertToExcel(Request $request)
+    {
+        try {
+            $hintHistoryId = $request->input('id');
+            if (!is_numeric($hintHistoryId)) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'ID tidak valid.',
+                ], 400);
+            }
+
+            $user = $request->user();
+            $hintHistory = $user->hintHistory()->find($hintHistoryId);
+
+            if (!$hintHistory) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Riwayat hasil kisi-kisi tidak tersedia pada akun ini!',
+                    'data' => null,
+                ], 404);
+            }
+
+            $data = $hintHistory->generate_output;
+
+            // Path template Excel
+            $templatePath = public_path('excel_template/Kisi_Kisi_Template.xlsx');
+
+            // Load template Excel
+            $spreadsheet = IOFactory::load($templatePath);
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Mengisi data ke dalam template sesuai dengan format yang diberikan
+            $sheet->setCellValue('C6', $data['informasi_umum']['instansi']);
+            $sheet->setCellValue('C7', $data['informasi_umum']['mata_pelajaran']);
+            $sheet->setCellValue('C8', $data['informasi_umum']['kelas']);
+            $sheet->setCellValue('F7', $data['informasi_umum']['jumlah_soal']);
+            $sheet->setCellValue('F9', $data['informasi_umum']['penyusun']);
+            $sheet->setCellValue('C13', $data['informasi_umum']['capaian_pembelajaran_redaksi']);
+            $sheet->setCellValue('C14', $data['informasi_umum']['elemen_capaian']);
+            $sheet->setCellValue('C15', $data['informasi_umum']['pokok_materi']);
+
+            // Mengatur tinggi baris secara otomatis dan wrapping text
+            $sheet->getDefaultRowDimension()->setRowHeight(-1);
+            $sheet->getStyle('C13:C15')->getAlignment()->setWrapText(true);
+
+            // Mengisi data kisi-kisi
+            $row = 17;
+            foreach ($data['kisi_kisi'] as $kisi) {
+                $sheet->setCellValue("B{$row}", $kisi['nomor']);
+                $sheet->setCellValue("C{$row}", $kisi['indikator_soal']);
+                $sheet->setCellValue("F{$row}", $kisi['no_soal']);
+                $sheet->getRowDimension($row)->setRowHeight(-1);
+                $sheet->getStyle("B{$row}:F{$row}")->getAlignment()->setWrapText(true);
+                $row++;
+            }
+
+            // Menyimpan spreadsheet ke file baru
+            $fileName = 'Kisi_Kisi_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.xlsx';
+            $filePath = public_path('excel_output/' . $fileName);
+
+            $writer = new Xlsx($spreadsheet);
+            $writer->save($filePath);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Dokumen Excel berhasil dibuat',
+                'data' => ['output_path' => $filePath, 'download_url' => url('excel_output/' . $fileName)],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage(),
+                'data' => json_decode($e->getMessage(), true),
+            ], 500);
+        }
+    }
+
+    // public function convertToExcel(Request $request)
+    // {
+    //     try {
+    //         $hintHistoryId = $request->input('id');
+    //         $hintHistory = HintHistories::find($hintHistoryId);
+
+    //         $data = $hintHistory->generate_output;
+    //         // $dataArray = json_decode($data, true);
+
+    //         $fileName = 'kisi_kisi.xlsx';
+    //         $filePath = storage_path('app/public/' . $fileName);
+
+    //         // Buat dan simpan file Excel
+    //         Excel::store(new HintHistoryExport($data), 'public/' . $fileName);
+
+    //         $outputPath = asset('storage/' . $fileName);
+    //         $downloadUrl = url('storage/' . $fileName);
+
+    //         return response()->json([
+    //             'status' => 'success',
+    //             'message' => 'Dokumen Excel berhasil dibuat',
+    //             'data' => [
+    //                 'output_path' => $outputPath,
+    //                 'download_url' => $downloadUrl
+    //             ]
+    //         ], 200);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'status' => 'failed',
+    //             'message' => $e->getMessage(),
+    //             'data' => json_decode($e->getMessage(), true),
+    //         ], 500);
+    //     }
+    // }
+
     public function history(Request $request)
     {
         try {
@@ -273,12 +389,14 @@ class HintController extends Controller
                 "kisi_kisi": [
                     {
                         "nomor": 0,
-                        "indikator_soal": "", // Perhatan: berikan indikator soal yang jelas seperti "Peserta didik......", "Diberikan soal.... Peserta didik....." dan sebagainya.
+                        "indikator_soal": "",
                         "no_soal": 0, // Mengikuti nomor soal (nomor).
                     },
                 ]
             }' . PHP_EOL .
+            "Bayangkan Anda adalah seorang guru, indikator_soal adalah suatu tujuan yang ingin dicapai oleh peserta didik dalam mengerjakan soal-soal." . PHP_EOL .
             "Mohon berikan kisi_kisi sesuai dengan jumlah soal yang diberikan {$jumlah_soal}. Misalkan jumlah soal adalah 5 maka jumlah kisi_kisi ada sebanyak 5. " . PHP_EOL .
+            "Pastikan mengisi dengan format yang telah ditentukan." . PHP_EOL .
             "Terima kasih atas kerja sama Anda.";
 
         return $prompt;

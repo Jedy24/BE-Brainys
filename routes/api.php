@@ -104,6 +104,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group(['prefix' => 'hint'], function () {
         Route::post('/generate', [HintController::class, 'generate']);
         Route::post('/export-word', [HintController::class, 'convertToWord']);
+        Route::post('/export-excel', [HintController::class, 'convertToExcel']);
         Route::get('/history', [HintController::class, 'history']);
         Route::get('/history/{id}', [HintController::class, 'historyDetail']);
     });
@@ -116,7 +117,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/history', [BahanAjarController::class, 'history']);
         Route::get('/history/{id}', [BahanAjarController::class, 'historyDetail']);
     });
-    
+
     // Alur Tujuan Pembelajaran
     Route::group(['prefix' => 'atp'], function () {
         Route::post('/generate', [AlurTujuanPembelajaranController::class, 'generate']);
