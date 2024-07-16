@@ -3,13 +3,15 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromArray;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
-class ATPExport implements FromArray, WithHeadings, WithStyles, WithEvents
+class ATPExport implements FromArray, WithStyles, WithEvents
 {
     protected $data;
 
@@ -20,52 +22,50 @@ class ATPExport implements FromArray, WithHeadings, WithStyles, WithEvents
 
     public function array(): array
     {
-        $result = [
-            ['Fase', 'Mata Pelajaran', 'Elemen', 'Capaian Pembelajaran', 'Capaian Pembelajaran Redaksi', 'Pekan', 'Alur']
-        ];
+        $result = [];
 
-        $data = $this->data;
+        // Add information rows before starting from A6
+        $result[] = ['ALUR TUJUAN PEMBELAJARAN'];
+        $result[] = [$this->data['informasi_umum']['mata_pelajaran']];
+        $result[] = [$this->data['informasi_umum']['kelas']];
+        $result[] = ['Penulis: '.$this->data['informasi_umum']['penyusun']];
+        $result[] = ['', ''];
 
-        $result[] = [
-            $data['fase'],
-            $data['mata_pelajaran'],
-            $data['elemen'],
-            $data['capaian_pembelajaran'],
-            $data['capaian_pembelajaran_per_tahun'],
-            $data['pekan'],
-            ''  // Placeholder for 'Alur'
-        ];
+        // Main Data starting from row 6
+        $result[] = ['CAPAIAN PEMBELAJARAN', $this->data['capaian_pembelajaran']];
+        $result[] = ['CAPAIAN PEMBELAJARAN PER TAHUN', $this->data['capaian_pembelajaran_per_tahun']];
+        $result[] = ['ELEMEN/DOMAIN', $this->data['elemen']];
+        $result[] = ['PEKAN', $this->data['pekan']];
+        $result[] = ['PEKAN KE', 'TUJUAN PEMBELAJARAN', 'KATA/FRASE KUNCI', 'PROFIL PELAJAR PANCASILA', 'GLOSARIUM'];
 
-        foreach ($data['alur'] as $alur) {
+        // Alur Data
+        foreach ($this->data['alur'] as $alur) {
             $result[] = [
-                '', '', '', '', '', '',
-                'No: ' . $alur['no'] . ' - ' . $alur['tujuan_pembelajaran'],
-                'Kata/Frase Kunci: ' . implode(', ', $alur['kata_frase_kunci']),
-                'Profil Pelajar Pancasila: ' . implode(', ', $alur['profil_pelajar_pancasila']),
-                'Glosasium: ' . $alur['glorasium']
+                $alur['no'],
+                $alur['tujuan_pembelajaran'],
+                implode(', ', $alur['kata_frase_kunci']),
+                implode(', ', $alur['profil_pelajar_pancasila']),
+                $alur['glorasium']
             ];
         }
 
         return $result;
     }
 
-    public function headings(): array
-    {
-        return [
-            'Fase',
-            'Mata Pelajaran',
-            'Elemen',
-            'Capaian Pembelajaran',
-            'Capaian Pembelajaran Redaksi',
-            'Pekan',
-            'Alur Details'
-        ];
-    }
-
     public function styles(Worksheet $sheet)
     {
         return [
-            1 => ['font' => ['bold' => true]],
+            'A1:A4' => [
+                'font' => ['bold' => true, 'size' => 14]
+            ],
+            'A6:A9' => [
+                'font' => ['bold' => true],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FCE5CD']]
+            ],
+            'A10:E10' => [
+                'font' => ['bold' => true],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FCE5CD']]
+            ]
         ];
     }
 
@@ -74,18 +74,53 @@ class ATPExport implements FromArray, WithHeadings, WithStyles, WithEvents
         return [
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-                $sheet->mergeCells('G1:I1');
-                $sheet->getColumnDimension('A')->setWidth(15);
-                $sheet->getColumnDimension('B')->setWidth(30);
-                $sheet->getColumnDimension('C')->setWidth(20);
-                $sheet->getColumnDimension('D')->setWidth(50);
-                $sheet->getColumnDimension('E')->setWidth(50);
-                $sheet->getColumnDimension('F')->setWidth(10);
-                $sheet->getColumnDimension('G')->setWidth(20);
-                $sheet->getColumnDimension('H')->setWidth(30);
-                $sheet->getColumnDimension('I')->setWidth(30);
-                $sheet->getRowDimension('1')->setRowHeight(30);
-                $sheet->getStyle('A1:I1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+                // Set column widths
+                $sheet->getColumnDimension('A')->setWidth(20);
+                $sheet->getColumnDimension('B')->setWidth(55);
+                $sheet->getColumnDimension('C')->setWidth(30);
+                $sheet->getColumnDimension('D')->setWidth(30);
+                $sheet->getColumnDimension('E')->setWidth(30);
+
+                // Merge cells
+                $sheet->mergeCells('A1:E1');
+                $sheet->mergeCells('A2:E2');
+                $sheet->mergeCells('A3:E3');
+                $sheet->mergeCells('A4:E4');
+                $sheet->mergeCells('B6:E6');
+                $sheet->mergeCells('B7:E7');
+                $sheet->mergeCells('B8:E8');
+                $sheet->mergeCells('B9:E9');
+
+                // Set text wrapping and auto-adjust row height for rows 6 to 11
+                $sheet->getStyle('A6:B9')->getAlignment()->setWrapText(true);
+                $sheet->getStyle('B11:E14')->getAlignment()->setWrapText(true);
+                foreach (range(6, 11) as $row) {
+                    $sheet->getRowDimension($row)->setRowHeight(-1);
+                }
+
+                // Set alignment
+                $sheet->getStyle('A1:A4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('A1:A4')->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
+                $sheet->getStyle('A6:B9')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+                $sheet->getStyle('A6:B9')->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
+                $sheet->getStyle('A10:E10')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('A10:E10')->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
+                $sheet->getStyle('A10:A14')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('A10:A14')->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
+                $sheet->getStyle('B11:E14')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+                $sheet->getStyle('B11:E14')->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
+
+                // Apply borders to range A6:E14
+                $styleArray = [
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'], // Black color
+                        ],
+                    ],
+                ];
+                $sheet->getStyle('A6:E14')->applyFromArray($styleArray);
             },
         ];
     }

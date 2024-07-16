@@ -79,8 +79,8 @@ class AlurTujuanPembelajaranController extends Controller
                 ]);
             }
 
-            $capaianPembelajaran = $finalData->pluck('capaian_pembelajaran')->implode(' ');
-            $capaianPembelajaranTahun = '';
+            $capaianPembelajaran = $finalData[0]->capaian_pembelajaran_redaksi;
+            $capaianPembelajaranTahun = $finalData->pluck('capaian_pembelajaran')->implode(' ');
 
             $prompt = $this->prompt($fase, $mataPelajaran, $elemen, $capaianPembelajaran, $capaianPembelajaranTahun, $pekan, $deskripsiNotes);
 
@@ -169,25 +169,25 @@ class AlurTujuanPembelajaranController extends Controller
         try {
             $AlurTujuanId = $request->input('id');
             $AlurTujuan = AlurTujuanPembelajaranHistories::find($AlurTujuanId);
-    
+
             $data = $AlurTujuan->output_data;
-            // $dataArray = json_decode($data, true);
-    
-            $fileName = 'capaian_pembelajaran.xlsx';
-            $filePath = storage_path('app/public/' . $fileName);
-    
-            // Buat dan simpan file Excel
-            Excel::store(new ATPExport($data), 'public/' . $fileName);
-    
-            $outputPath = asset('storage/' . $fileName);
-            $downloadUrl = url('storage/' . $fileName);
-    
+
+            $fileName   = 'Capaian_Pembelajaran_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.xlsx';
+            $filePath   = public_path('excel_output/' . $fileName);
+            $fileUrl    = url('storage/excel_output/' . $fileName);
+
+            if (!file_exists(public_path('excel_output'))) {
+                mkdir(public_path('excel_output'), 0777, true);
+            }
+
+            Excel::store(new ATPExport($data), 'excel_output/' . $fileName, 'public');
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Dokumen Excel berhasil dibuat',
                 'data' => [
-                    'output_path' => $outputPath,
-                    'download_url' => $downloadUrl
+                    'output_path' => $filePath,
+                    'download_url' => $fileUrl
                 ]
             ], 200);
         } catch (\Exception $e) {
@@ -197,7 +197,7 @@ class AlurTujuanPembelajaranController extends Controller
                 'data' => json_decode($e->getMessage(), true),
             ], 500);
         }
-    }    
+    }
 
     public function history(Request $request)
     {
