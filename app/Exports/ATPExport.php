@@ -35,7 +35,7 @@ class ATPExport implements FromArray, WithStyles, WithEvents
         $result[] = ['CAPAIAN PEMBELAJARAN', $this->data['capaian_pembelajaran']];
         $result[] = ['CAPAIAN PEMBELAJARAN PER TAHUN', $this->data['capaian_pembelajaran_per_tahun']];
         $result[] = ['ELEMEN/DOMAIN', $this->data['elemen']];
-        $result[] = ['PEKAN', $this->data['pekan']];
+        $result[] = ['PEKAN', $this->data['pekan'].' Pekan'];
         $result[] = ['PEKAN KE', 'TUJUAN PEMBELAJARAN', 'KATA/FRASE KUNCI', 'PROFIL PELAJAR PANCASILA', 'GLOSARIUM'];
 
         // Alur Data
