@@ -204,6 +204,7 @@ class HintController extends Controller
             $sheet = $spreadsheet->getActiveSheet();
 
             // Mengisi data ke dalam template sesuai dengan format yang diberikan
+            $sheet->setTitle($data['informasi_umum']['nama_kisi_kisi']);
             $sheet->setCellValue('E3', $data['informasi_umum']['tahun_penyusunan']);
             $sheet->setCellValue('C6', $data['informasi_umum']['instansi']);
             $sheet->setCellValue('C7', $data['informasi_umum']['mata_pelajaran']);
