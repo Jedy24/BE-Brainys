@@ -7,8 +7,6 @@ use App\Models\HintHistories;
 use App\Services\OpenAIService;
 use icircle\Template\Docx\DocxTemplate;
 use Illuminate\Http\Request;
-// use Maatwebsite\Excel\Facades\Excel;
-// use App\Exports\HintHistoryExport;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -258,41 +256,6 @@ class HintController extends Controller
         }
     }
 
-    // public function convertToExcel(Request $request)
-    // {
-    //     try {
-    //         $hintHistoryId = $request->input('id');
-    //         $hintHistory = HintHistories::find($hintHistoryId);
-
-    //         $data = $hintHistory->generate_output;
-    //         // $dataArray = json_decode($data, true);
-
-    //         $fileName = 'kisi_kisi.xlsx';
-    //         $filePath = storage_path('app/public/' . $fileName);
-
-    //         // Buat dan simpan file Excel
-    //         Excel::store(new HintHistoryExport($data), 'public/' . $fileName);
-
-    //         $outputPath = asset('storage/' . $fileName);
-    //         $downloadUrl = url('storage/' . $fileName);
-
-    //         return response()->json([
-    //             'status' => 'success',
-    //             'message' => 'Dokumen Excel berhasil dibuat',
-    //             'data' => [
-    //                 'output_path' => $outputPath,
-    //                 'download_url' => $downloadUrl
-    //             ]
-    //         ], 200);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'status' => 'failed',
-    //             'message' => $e->getMessage(),
-    //             'data' => json_decode($e->getMessage(), true),
-    //         ], 500);
-    //     }
-    // }
-
     public function history(Request $request)
     {
         try {
@@ -370,43 +333,33 @@ class HintController extends Controller
 
     public function prompt($pokok_materi, $subject, $grade, $elemen_capaian, $jumlah_soal, $addNotes)
     {
-        $faseToKelas = [
-            'Fase A' => 'Kelas 1 - 2 SD',
-            'Fase B' => 'Kelas 3 - 4 SD',
-            'Fase C' => 'Kelas 5 - 6 SD',
-            'Fase D' => 'Kelas 7 - 9 SMP',
-            'Fase E' => 'Kelas 10 SMA',
-            'Fase F' => 'Kelas 11 - 12 SMA'
-        ];
-
-        $kelas = isset($faseToKelas[$grade]) ? "{$grade} ({$faseToKelas[$grade]})" : "Fase tidak dikenal";
-
-        $prompt = "Tolong buatkan kisi-kisi untuk pokok materi: {$pokok_materi}, mata pelajaran: {$subject}, tingkat kelas: {$grade}, elemen capaian {$elemen_capaian}, dengan memerhatikan jumlah soal :{$jumlah_soal} dan catatan khusus: {$addNotes}. " . PHP_EOL .
-            "Perhatian: Mohon jawab dengan format JSON berikut:" . PHP_EOL .
-            '{
-                "informasi_umum": {
-                    "penyusun": "",
-                    "instansi": "",
-                    "kelas": "",
-                    "mata_pelajaran": "",
-                    "jumlah_soal": 0,
-                    "capaian_pembelajaran_redaksi": "",
-                    "elemen_capaian": "",
-                    "pokok_materi": "",
-                    "tahun_penyusunan": "",
-                },
-                "kisi_kisi": [
-                    {
-                        "nomor": 0,
-                        "indikator_soal": "", // Tujuan yang ingin dicapai peserta didik dalam mengerjakan soal.
-                        "no_soal": 0, // Mengikuti nomor soal (nomor).
-                    },
-                ]
-            }' . PHP_EOL .
-            "Mohon berikan kisi_kisi sesuai dengan jumlah soal yang diberikan {$jumlah_soal}. Misalkan jumlah soal adalah 5 maka jumlah kisi_kisi ada sebanyak 5. " . PHP_EOL .
-            "Pastikan format JSON yang diberikan sudah benar secara struktur dan hasilnya." . PHP_EOL .
+        $prompt = "Tolong buatkan kisi-kisi untuk pokok materi: {$pokok_materi}, mata pelajaran: {$subject}, tingkat kelas: {$grade}, elemen capaian {$elemen_capaian}, dengan memperhatikan jumlah soal: {$jumlah_soal} dan catatan khusus: {$addNotes}. " . PHP_EOL .
+            "Perhatian: Mohon jawab sesuai dengan format JSON berikut tanpa mengubah struktur format:" . PHP_EOL .
+            '{' . PHP_EOL .
+            '    "informasi_umum": {' . PHP_EOL .
+            '        "penyusun": "",' . PHP_EOL .
+            '        "instansi": "",' . PHP_EOL .
+            '        "kelas": "",' . PHP_EOL .
+            '        "mata_pelajaran": "",' . PHP_EOL .
+            '        "jumlah_soal": 0,' . PHP_EOL .
+            '        "capaian_pembelajaran_redaksi": "",' . PHP_EOL .
+            '        "elemen_capaian": "",' . PHP_EOL .
+            '        "pokok_materi": "",' . PHP_EOL .
+            '        "tahun_penyusunan": ""' . PHP_EOL .
+            '    },' . PHP_EOL .
+            '    "kisi_kisi": [' . PHP_EOL .
+            '        {' . PHP_EOL .
+            '            "nomor": 0,' . PHP_EOL .
+            '            "indikator_soal": "(Tujuan yang ingin dicapai oleh peserta didik dalam menyelesaikan persoalan yang diberikan. (Misalkan: Peserta didik mampu ... / Diberikan soal tentang ... / Format lain yang sesuai dengan soal yang diberikan. Minimal ada 2 format yang digunakan).",' . PHP_EOL .
+            '            "no_soal": 0' . PHP_EOL .
+            '        }' . PHP_EOL .
+            '    ]' . PHP_EOL .
+            '}' . PHP_EOL .
+            "Pastikan Anda memisahkan informasi umum dan kisi-kisi ke dalam objek JSON yang terpisah seperti yang dicontohkan di atas." . PHP_EOL .
+            "Berikan kisi_kisi sesuai dengan jumlah soal yang diberikan. Misalnya, jika jumlah soal adalah 5, maka jumlah objek dalam kisi_kisi juga harus 5." . PHP_EOL .
             "Terima kasih atas kerja sama Anda.";
 
         return $prompt;
     }
+
 }
