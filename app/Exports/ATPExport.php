@@ -106,8 +106,8 @@ class ATPExport implements FromArray, WithStyles, WithEvents
                 $sheet->getStyle('A6:B9')->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
                 $sheet->getStyle('A10:E10')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle('A10:E10')->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
-                $sheet->getStyle('A10:A14')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                $sheet->getStyle('A10:A14')->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
+                $sheet->getStyle('A10:A20')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('A10:A20')->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
                 $sheet->getStyle('B11:E20')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
                 $sheet->getStyle('B11:E20')->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
 
@@ -120,7 +120,7 @@ class ATPExport implements FromArray, WithStyles, WithEvents
                         ],
                     ],
                 ];
-                $sheet->getStyle('A6:E14')->applyFromArray($styleArray);
+                $sheet->getStyle('A6:E20')->applyFromArray($styleArray);
             },
         ];
     }
