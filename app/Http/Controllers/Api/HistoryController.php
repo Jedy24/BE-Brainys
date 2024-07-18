@@ -9,6 +9,7 @@ use App\Models\SyllabusHistories;
 use App\Models\HintHistories;
 use App\Models\BahanAjarHistories;
 use App\Models\GamificationHistories;
+use App\Models\AlurTujuanPembelajaranHistories;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -76,12 +77,34 @@ class HistoryController extends Controller
                     DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
                 ])->get();
 
+            $hintHistories = HintHistories::where('user_id', $user_id)
+                ->select([
+                    'id',
+                    'name',
+                    'notes AS description',
+                    DB::raw("'hint' AS type"),
+                    'created_at',
+                    DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
+                ])->get();
+
+            $alurTujuan = AlurTujuanPembelajaranHistories::where('user_id', $user_id)
+            ->select([
+                    'id',
+                    'name',
+                    'notes AS description',
+                    DB::raw("'atp' AS type"),
+                    'created_at',
+                    DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
+                ])->get();
+
             // Menggabungkan semua riwayat ke dalam satu koleksi
             $history = $syllabusHistories
                 ->concat($materialHistories)
                 ->concat($exerciseHistories)
                 ->concat($bahanAjarHistories)
-                ->concat($gamificationHistories);
+                ->concat($gamificationHistories)
+                ->concat($hintHistories)
+                ->concat($alurTujuan);
 
             // Sort the merged collection by created_at in descending order
             $sortedHistory = $history->sortByDesc('created_at');
