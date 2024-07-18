@@ -172,7 +172,7 @@ class AlurTujuanPembelajaranController extends Controller
 
             $data = $AlurTujuan->output_data;
 
-            $fileName   = 'Capaian_Pembelajaran_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.xlsx';
+            $fileName   = 'Alur_Tujuan_Pembelajaran_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.xlsx';
             $filePath   = public_path('excel_output/' . $fileName);
             $fileUrl    = url('storage/excel_output/' . $fileName);
 

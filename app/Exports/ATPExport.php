@@ -94,7 +94,7 @@ class ATPExport implements FromArray, WithStyles, WithEvents
 
                 // Set text wrapping and auto-adjust row height for rows 6 to 11
                 $sheet->getStyle('A6:B9')->getAlignment()->setWrapText(true);
-                $sheet->getStyle('B11:E14')->getAlignment()->setWrapText(true);
+                $sheet->getStyle('B11:E20')->getAlignment()->setWrapText(true);
                 foreach (range(6, 11) as $row) {
                     $sheet->getRowDimension($row)->setRowHeight(-1);
                 }
@@ -108,8 +108,8 @@ class ATPExport implements FromArray, WithStyles, WithEvents
                 $sheet->getStyle('A10:E10')->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
                 $sheet->getStyle('A10:A14')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle('A10:A14')->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
-                $sheet->getStyle('B11:E14')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-                $sheet->getStyle('B11:E14')->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
+                $sheet->getStyle('B11:E20')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+                $sheet->getStyle('B11:E20')->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
 
                 // Apply borders to range A6:E14
                 $styleArray = [
