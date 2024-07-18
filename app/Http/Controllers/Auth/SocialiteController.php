@@ -77,26 +77,37 @@ class SocialiteController extends Controller
         /**Generate token. */
         $token = $userCreated->createToken('token-name')->plainTextToken;
 
-        /**Ekstrak domain email */
-        $emailDomain = substr(strrchr($user->getEmail(), "@"), 1);
+        // Cek apakah user is_active bernilai 0 atau false
+        if (!$userCreated->is_active) {
+            // Ekstrak domain email
+            $emailDomain = substr(strrchr($user->getEmail(), "@"), 1);
 
-        /**Cek apakah email_domain ada dan is_active bernilai 1 */
-        $autoInviteEmail = AutoInviteEmail::where('email_domain', $emailDomain)
-            ->where('is_active', 1)
-            ->first();
+            // Cek apakah email_domain ada dan is_active bernilai 1
+            $autoInviteEmail = AutoInviteEmail::where('email_domain', $emailDomain)
+                ->where('is_active', 1)
+                ->first();
 
-        if ($autoInviteEmail) {
-            /**Membuat invite code */
-            $inviteCode = $this->generateRandomCode(8);
-            $invitation = UserInvitation::create([
-                'email' => $user->email,
-                'invite_code' => $inviteCode,
-                'is_used' => false,
-                'expired_at' => now()->addDays(30),
-            ]);
+            if ($autoInviteEmail) {
+                // Periksa apakah sudah ada undangan untuk email ini
+                $existingInvitation = UserInvitation::where('email', $user->getEmail())->first();
 
-            /**Mengirim email undangan */
-            self::sendInvitation($invitation);
+                if ($existingInvitation) {
+                    // Jika sudah ada undangan, kirim ulang undangan
+                    self::sendInvitation($existingInvitation);
+                } else {
+                    // Membuat invite code
+                    $inviteCode = $this->generateRandomCode(8);
+                    $invitation = UserInvitation::create([
+                        'email' => $user->getEmail(),
+                        'invite_code' => $inviteCode,
+                        'is_used' => false,
+                        'expired_at' => now()->addDays(30),
+                    ]);
+
+                    // Mengirim email undangan
+                    self::sendInvitation($invitation);
+                }
+            }
         }
 
         /**Response JSON akan mengembalikan data user berupa ID, nama, email, dan token. */
