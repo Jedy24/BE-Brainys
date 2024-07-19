@@ -38,7 +38,7 @@ class UserChart extends ChartWidget
         // Generate all dates in the range
         $dates = [];
         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
-            $dates[$date->format('d M Y')] = 0;
+            $dates[$date->format('Y-m-d')] = 0;
         }
 
         // Merge and fill missing dates with zeros
