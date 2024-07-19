@@ -2,20 +2,26 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\AlurTujuanPembelajaranHistories;
 use App\Models\BahanAjarHistories;
 use App\Models\ExerciseHistories;
 use App\Models\GamificationHistories;
+use App\Models\HintHistories;
 use App\Models\MaterialHistories;
 use App\Models\SyllabusHistories;
 use App\Models\User;
 use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
 
-class WidgetGeneratedChart extends ChartWidget
+class ModulesWidget extends ChartWidget
 {
-    protected static ?string $heading = 'User Generated Activity Over the Last 7 Days';
+    protected static ?int $sort = 3;
+
+    protected static ?string $heading = 'Generated Activity Last 7 Days';
+
+    protected static ?string $maxHeight = '500px';
+    
     protected int | string | array $columnSpan = 'full';
-    // protected static ?string $maxHeight = '500px';
 
     protected function getData(): array
     {
@@ -37,11 +43,13 @@ class WidgetGeneratedChart extends ChartWidget
         $exerciseData = $aggregateData(ExerciseHistories::class);
         $bahanAjarData = $aggregateData(BahanAjarHistories::class);
         $gamificationData = $aggregateData(GamificationHistories::class);
+        $hintData = $aggregateData(HintHistories::class);
+        $ATPData = $aggregateData(AlurTujuanPembelajaranHistories::class);
 
         // Generate all dates in the range
         $dates = [];
         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
-            $dates[$date->format('Y-m-d')] = 0;
+            $dates[$date->format('d M Y')] = 0;
         }
 
         // Merge and fill missing dates with zeros
@@ -85,10 +93,24 @@ class WidgetGeneratedChart extends ChartWidget
                     'backgroundColor' => 'rgba(153, 102, 255, 0.5)', // Ungu Transparan
                     'borderColor' => 'rgb(153, 102, 255)', // Ungu
                     'fill' => false,
+                ],
+                [
+                    'label' => 'Hint Histories',
+                    'data' => $mergeData($hintData),
+                    'backgroundColor' => 'rgba(255, 159, 64, 0.5)', // Oranye Transparan
+                    'borderColor' => 'rgb(255, 159, 64)', // Oranye
+                    'fill' => false,
+                ],
+                [
+                    'label' => 'ATP Histories',
+                    'data' => $mergeData($ATPData),
+                    'backgroundColor' => 'rgba(75, 192, 192, 0.5)', // Aqua Transparan
+                    'borderColor' => 'rgb(75, 192, 192)', // Aqua
+                    'fill' => false,
                 ]
             ],
             'labels' => array_keys($dates),
-        ];        
+        ];       
     }
 
 
@@ -98,29 +120,30 @@ class WidgetGeneratedChart extends ChartWidget
     }
 
     protected function getOptions(): array
-    {
-        return [
-            'scales' => [
-                'yAxes' => [
-                    [
-                        'ticks' => [
-                            'beginAtZero' => true,
-                            'stepSize' => 1,  // Memaksa interval antar ticks menjadi bilangan bulat.
-                            // 'precision' => 0, // Menentukan bahwa tidak ada desimal pada ticks.
-                            // 'suggestedMax' => 10, // Sesuaikan berdasarkan maksimal data yang Anda perkirakan.
-                        ]
+{
+    return [
+        'scales' => [
+            'yAxes' => [
+                [
+                    'ticks' => [
+                        'beginAtZero' => true,
+                        'stepSize' => 1,  // Memaksa interval antar ticks menjadi bilangan bulat.
+                        'callback' => function($value) {
+                            return intval($value) == $value ? $value : null;  // Menghilangkan desimal
+                        },
+                        'suggestedMax' => 10, // Sesuaikan berdasarkan maksimal data yang Anda perkirakan.
                     ]
                 ]
+            ]
+        ],
+        'plugins' => [
+            'legend' => [
+                'display' => true,
+                'position' => 'top',
             ],
-            'plugins' => [
-                'legend' => [
-                    'display' => true,
-                    'position' => 'top',
-                ],
-            ],
-            'responsive' => true,
-            'maintainAspectRatio' => false,
-        ];
-    
-    }
+        ],
+        'responsive' => true,
+        'maintainAspectRatio' => true,
+    ];
+}
 }

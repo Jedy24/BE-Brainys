@@ -278,39 +278,39 @@ class AlurTujuanPembelajaranController extends Controller
     {
         $prompt = '';
         $prompt .= '
-        Generate a JSON object for a learning objectives flow based on the following parameters:
+        Buatlah objek JSON untuk alur tujuan pembelajaran berdasarkan parameter berikut:
 
-        - **fase**: ' . $fase . ' 
-        - **mata_pelajaran**: ' . $mataPelajaran . ' 
-        - **elemen**: ' . $elemen . ' 
-        - **capaian_pembelajaran**: ' . $capaianPembelajaran . ' 
-        - **capaian_pembelajaran_per_tahun**: ' . $capaianPembelajaranTahun . ' 
-        - **pekan**: ' . $pekan . ' 
-
-        Create an array called "alur" where the number of learning objectives matches the specified number of weeks (`pekan`).
-        Each learning objective should be based on the `capaian_pembelajaran` and `elemen`.
-        Additional Notes in Indonesian: ' . $deskripsiNotes . '
+        - fase: ' . $fase . '
+        - mata_pelajaran: ' . $mataPelajaran . '
+        - elemen: ' . $elemen . '
+        - capaian_pembelajaran: ' . $capaianPembelajaran . '
+        - capaian_pembelajaran_per_tahun: ' . $capaianPembelajaranTahun . '
+        - pekan: ' . $pekan . '
         
-        **Tujuan Pembelajaran (TP)** represents the description of achieving three aspects of competence (knowledge, skills, attitudes) that need to be developed through one or more learning activities. 
-        The learning objectives are arranged chronologically based on the sequence of learning over time that serves as a prerequisite towards achieving the learning outcomes (Capaian Pembelajaran - CP).
-
-        Operationally, the components of Learning Objectives should include:
+        Buatlah array bernama "alur" di mana jumlah tujuan pembelajaran sesuai dengan jumlah minggu (pekan) yang ditentukan. Setiap tujuan pembelajaran harus didasarkan pada capaian_pembelajaran dan elemen. Catatan tambahan dalam bahasa Indonesia: ' . $deskripsiNotes . '
         
-        - **Kompetensi**: The capability that can be demonstrated by students or shown in the form of a product indicating that students have successfully achieved the learning objective.
-        - **Konten**: The core knowledge or main concepts that need to be understood by the end of a learning unit.
-        - **Variasi**: Describes creative, critical, and higher-order thinking skills that students need to master to achieve the learning objectives, such as evaluating, analyzing, predicting, creating, etc.
-        
-        Include the following fields for each objective:
-        - **no**: A sequential number for the learning objective.
-        - **tujuan_pembelajaran**: Learning Objective that specifies what students should achieve each week. *Tujuan Pembelajaran (TP)** represents the description of achieving three aspects of competence (knowledge, skills, attitudes) that need to be developed through one or more learning activities. The learning objectives are arranged chronologically based on the sequence of learning over time that serves as a prerequisite towards achieving the learning outcomes (Capaian Pembelajaran - CP).
-        - **kata_frase_kunci**: Key Words/Phrases related to the learning objective.
-        - **profil_pelajar_pancasila**: Pancasila Student Profile characteristics that the objective aims to develop.
-        - **glorasium**: Glossary or explanation related to the learning objective.
+        Tujuan Pembelajaran (TP) menggambarkan pencapaian tiga aspek kompetensi (pengetahuan, keterampilan, sikap) yang perlu dikembangkan melalui satu atau lebih kegiatan pembelajaran. Tujuan pembelajaran diurutkan secara kronologis berdasarkan urutan pembelajaran dari waktu ke waktu yang menjadi prasyarat untuk mencapai hasil pembelajaran (Capaian Pembelajaran - CP).
 
-        The output should be in Indonesian and in JSON format. Each entry in the "alur" array should correspond to one week, ensuring there are as many entries as the specified number of weeks (`pekan`).
+        Secara operasional, komponen Tujuan Pembelajaran (tujuan_pembelajaran) harus mencakup:
+        - Kompetensi: Kemampuan yang dapat ditunjukkan oleh siswa atau ditampilkan dalam bentuk produk yang menunjukkan bahwa siswa telah berhasil mencapai tujuan pembelajaran.
+        - Konten: Pengetahuan inti atau konsep utama yang perlu dipahami pada akhir unit pembelajaran.
+        - Variasi: Menggambarkan keterampilan berpikir kreatif, kritis, dan tingkat tinggi yang perlu dikuasai siswa untuk mencapai tujuan pembelajaran, seperti mengevaluasi, menganalisis, memprediksi, menciptakan, dll.
 
-        Here is the structure of the JSON object:
-        
+        Daftar Profil Pelajar Pancasila:
+        - Beriman, Bertakwa kepada Tuhan YME, dan Berakhlak Mulia: Pelajar yang memiliki akhlak baik dalam hubungannya dengan Tuhan, sesama manusia, dan lingkungan, serta menunjukkan sikap beragama, pribadi, sosial, dan kenegaraan yang mulia.
+        - Berkebinekaan Global: Pelajar yang menghargai dan mempertahankan budaya serta identitas lokal sambil terbuka terhadap budaya lain, dengan kemampuan komunikasi dan refleksi interkultural yang baik.
+        - Bergotong Royong: Pelajar yang aktif dalam kolaborasi, berbagi, dan memiliki kepedulian terhadap keberhasilan bersama, mampu bekerja sama untuk mencapai tujuan bersama dengan semangat gotong royong.
+        - Mandiri: Pelajar yang bertanggung jawab atas proses dan hasil belajarnya, menunjukkan kesadaran diri dan kemampuan regulasi diri dalam mengelola belajar dan tantangan pribadi.
+        - Bernalar Kritis: Pelajar yang mampu memproses informasi secara objektif, menganalisis dan mengevaluasi data, serta membuat keputusan berdasarkan refleksi dan penalaran kritis.
+        - Kreatif: Pelajar yang mampu menghasilkan gagasan dan karya yang orisinal, memiliki kemampuan untuk berinovasi dan menciptakan solusi baru yang bermanfaat dan berdampak.
+
+        Sertakan bidang berikut untuk setiap alur tujuan:
+        - no: Nomor urut tujuan pembelajaran.
+        - tujuan_pembelajaran: Tujuan Pembelajaran yang menentukan apa yang harus dicapai siswa setiap minggu. Tujuan Pembelajaran (TP) menggambarkan pencapaian tiga aspek kompetensi (pengetahuan, keterampilan, sikap) yang perlu dikembangkan melalui satu atau lebih kegiatan pembelajaran. Tujuan pembelajaran diurutkan secara kronologis berdasarkan urutan pembelajaran dari waktu ke waktu yang menjadi prasyarat untuk mencapai hasil pembelajaran (Capaian Pembelajaran - CP). Panjang minimum tujuan_pembelajaran adalah 3 kalimat ya, tulis dalam bentuk narasi akademis.
+        - kata_frase_kunci: Kata/Frase Kunci terkait dengan tujuan pembelajaran.
+        - profil_pelajar_pancasila: Karakteristik Profil Pelajar Pancasila yang ingin dikembangkan melalui tujuan tersebut, dengan maksimal 2 dari 6 profil yang sesuai per minggu.
+        - glosarium: Buat daftar istilah secara alfabetis dalam domain pengetahuan tertentu dengan definisi untuk istilah-istilah tersebut, Dipisah dengan ; antara gabungan istilah dan penjelasan glorasium ya.
+
         {
             "fase": "{Fase}",
             "mata_pelajaran": "{Mata Pelajaran}",
@@ -321,7 +321,7 @@ class AlurTujuanPembelajaranController extends Controller
             "alur": [
                 {
                     "no": 1,
-                    "tujuan_pembelajaran": "{Tujuan Pembelajaran Pekan 1, 30 sampai 50 kata paragraf narasi}",
+                    "tujuan_pembelajaran": "{Tujuan Pembelajaran Pekan 1, minimal 3 sampai 5 kalimat per tujuan pembelajaran, agar detail ya}",
                     "kata_frase_kunci": [
                         "{Kata/Frase Kunci Pekan 1}"
                     ],
@@ -332,7 +332,7 @@ class AlurTujuanPembelajaranController extends Controller
                 },
                 {
                     "no": 2,
-                    "tujuan_pembelajaran": "{Tujuan Pembelajaran Pekan 2, 30 sampai 50 kata paragraf narasi}",
+                    "tujuan_pembelajaran": "{Tujuan Pembelajaran Pekan 2, minimal 3 sampai 5 kalimat per tujuan pembelajaran, agar detail ya}",
                     "kata_frase_kunci": [
                         "{Kata/Frase Kunci Pekan 2}"
                     ],
