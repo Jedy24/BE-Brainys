@@ -20,7 +20,7 @@ class ModulesWidget extends ChartWidget
     protected static ?string $heading = 'Generated Activity Last 7 Days';
 
     protected static ?string $maxHeight = '500px';
-    
+
     protected int | string | array $columnSpan = 'full';
 
     protected function getData(): array
@@ -110,7 +110,7 @@ class ModulesWidget extends ChartWidget
                 ]
             ],
             'labels' => array_keys($dates),
-        ];       
+        ];
     }
 
 
@@ -120,30 +120,30 @@ class ModulesWidget extends ChartWidget
     }
 
     protected function getOptions(): array
-{
-    return [
-        'scales' => [
-            'yAxes' => [
-                [
-                    'ticks' => [
-                        'beginAtZero' => true,
-                        'stepSize' => 1,  // Memaksa interval antar ticks menjadi bilangan bulat.
-                        'callback' => function($value) {
-                            return intval($value) == $value ? $value : null;  // Menghilangkan desimal
-                        },
-                        'suggestedMax' => 10, // Sesuaikan berdasarkan maksimal data yang Anda perkirakan.
+    {
+        return [
+            'scales' => [
+                'yAxes' => [
+                    [
+                        'ticks' => [
+                            'beginAtZero' => true,
+                            'stepSize' => 1,  // Memaksa interval antar ticks menjadi bilangan bulat.
+                            'callback' => function ($value) {
+                                return intval($value) == $value ? $value : null;  // Menghilangkan desimal
+                            },
+                            'suggestedMax' => 10, // Sesuaikan berdasarkan maksimal data yang Anda perkirakan.
+                        ]
                     ]
                 ]
-            ]
-        ],
-        'plugins' => [
-            'legend' => [
-                'display' => true,
-                'position' => 'top',
             ],
-        ],
-        'responsive' => true,
-        'maintainAspectRatio' => true,
-    ];
-}
+            'plugins' => [
+                'legend' => [
+                    'display' => true,
+                    'position' => 'top',
+                ],
+            ],
+            'responsive' => true,
+            'maintainAspectRatio' => true,
+        ];
+    }
 }

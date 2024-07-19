@@ -71,4 +71,32 @@ class UserChart extends ChartWidget
     {
         return 'line';
     }
+
+    protected function getOptions(): array
+    {
+        return [
+            'scales' => [
+                'yAxes' => [
+                    [
+                        'ticks' => [
+                            'beginAtZero' => true,
+                            'stepSize' => 1,  // Memaksa interval antar ticks menjadi bilangan bulat.
+                            'callback' => function ($value) {
+                                return intval($value) == $value ? $value : null;  // Menghilangkan desimal
+                            },
+                            'suggestedMax' => 10, // Sesuaikan berdasarkan maksimal data yang Anda perkirakan.
+                        ]
+                    ]
+                ]
+            ],
+            'plugins' => [
+                'legend' => [
+                    'display' => true,
+                    'position' => 'top',
+                ],
+            ],
+            'responsive' => true,
+            'maintainAspectRatio' => true,
+        ];
+    }
 }
