@@ -22,8 +22,10 @@ class HistoryController extends Controller
         $user_id = Auth::id();
 
         try {
-            // Retrieve syllabus history records for the specific user
-            $syllabusHistories = SyllabusHistories::where('user_id', $user_id)
+            // Retrieve all types of history records for the specific user
+            $histories = collect();
+
+            $histories = $histories->concat(SyllabusHistories::where('user_id', $user_id)
                 ->select([
                     'id',
                     'subject AS name',
@@ -31,10 +33,9 @@ class HistoryController extends Controller
                     DB::raw("'syllabus' AS type"),
                     'created_at',
                     DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
-                ])->get();
+                ])->get());
 
-            // Retrieve material history records for the specific user
-            $materialHistories = MaterialHistories::where('user_id', $user_id)
+            $histories = $histories->concat(MaterialHistories::where('user_id', $user_id)
                 ->select([
                     'id',
                     'name',
@@ -42,10 +43,9 @@ class HistoryController extends Controller
                     DB::raw("'material' AS type"),
                     'created_at',
                     DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
-                ])->get();
+                ])->get());
 
-            // Retrieve exercise history records for the specific user
-            $exerciseHistories = ExerciseHistories::where('user_id', $user_id)
+            $histories = $histories->concat(ExerciseHistories::where('user_id', $user_id)
                 ->select([
                     'id',
                     'name',
@@ -53,10 +53,9 @@ class HistoryController extends Controller
                     DB::raw("'exercise' AS type"),
                     'created_at',
                     DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
-                ])->get();
+                ])->get());
 
-            // Retrieve bahan ajar history records for the specific user
-            $bahanAjarHistories = BahanAjarHistories::where('user_id', $user_id)
+            $histories = $histories->concat(BahanAjarHistories::where('user_id', $user_id)
                 ->select([
                     'id',
                     'name',
@@ -64,10 +63,9 @@ class HistoryController extends Controller
                     DB::raw("'bahan-ajar' AS type"),
                     'created_at',
                     DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
-                ])->get();
+                ])->get());
 
-            // Retrieve gamification history records for the specific user
-            $gamificationHistories = GamificationHistories::where('user_id', $user_id)
+            $histories = $histories->concat(GamificationHistories::where('user_id', $user_id)
                 ->select([
                     'id',
                     'name',
@@ -75,9 +73,9 @@ class HistoryController extends Controller
                     DB::raw("'gamification' AS type"),
                     'created_at',
                     DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
-                ])->get();
+                ])->get());
 
-            $hintHistories = HintHistories::where('user_id', $user_id)
+            $histories = $histories->concat(HintHistories::where('user_id', $user_id)
                 ->select([
                     'id',
                     'name',
@@ -85,46 +83,44 @@ class HistoryController extends Controller
                     DB::raw("'hint' AS type"),
                     'created_at',
                     DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
-                ])->get();
+                ])->get());
 
-            $alurTujuan = AlurTujuanPembelajaranHistories::where('user_id', $user_id)
-            ->select([
+            $histories = $histories->concat(AlurTujuanPembelajaranHistories::where('user_id', $user_id)
+                ->select([
                     'id',
                     'name',
                     'notes AS description',
                     DB::raw("'atp' AS type"),
                     'created_at',
                     DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
-                ])->get();
-
-            // Menggabungkan semua riwayat ke dalam satu koleksi
-            $history = $syllabusHistories
-                ->concat($materialHistories)
-                ->concat($exerciseHistories)
-                ->concat($bahanAjarHistories)
-                ->concat($gamificationHistories)
-                ->concat($hintHistories)
-                ->concat($alurTujuan);
+                ])->get());
 
             // Sort the merged collection by created_at in descending order
-            $sortedHistory = $history->sortByDesc('created_at');
+            $sortedHistory = $histories->sortByDesc('created_at');
 
-            // Mengonversi koleksi menjadi array tanpa kunci
-            $historyArray = $sortedHistory->values()->all();
+            // Paginate the results
+            $perPage = 8;
+            $page = request('page', 1);
+            $pagedData = $sortedHistory->slice(($page - 1) * $perPage, $perPage)->values();
 
             // Generate URL for each item
-            foreach ($historyArray as &$item) {
-                $urlPrefix = 'https://be.brainys.oasys.id/api/';
+            $urlPrefix = 'https://be.brainys.oasys.id/api/';
+            $pagedData = $pagedData->map(function ($item) use ($urlPrefix) {
                 $item['url_api_data'] = $urlPrefix . $item['type'] . '/history/' . $item['id'];
-                // Assuming the base URL for word download is 'http://example.com/api/download/'
-                // $item['url_word_download'] = "http://example.com/api/download/{$item['type']}/{$item['id']}";
-            }
+                return $item;
+            });
 
-            // Return the response with the sorted history data
+            // Return the response with the paginated history data
             return response()->json([
                 'status' => 'success',
                 'message' => 'History retrieved successfully',
-                'data' => $historyArray,
+                'data' => $pagedData,
+                'pagination' => [
+                    'current_page' => $page,
+                    'per_page' => $perPage,
+                    'total' => $sortedHistory->count(),
+                    'last_page' => ceil($sortedHistory->count() / $perPage),
+                ]
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -140,37 +136,55 @@ class HistoryController extends Controller
         try {
             // Validasi input
             $request->validate([
-                'type' => 'required|in:syllabus,material,exercise',
+                'type' => 'required|in:syllabus,material,exercise,atp,bahan-ajar,gamification,hint',
+                'page' => 'integer|min:1'
             ]);
 
             // Retrieve the type from the request
             $type = $request->input('type');
+            $perPage = 8;
+            $page = $request->input('page', 1);
+            $user_id = Auth::id();
 
             // Initialize variable to hold history data
             $histories = [];
-
-            $user_id = Auth::id(); // Ambil ID pengguna yang terautentikasi, Anda mungkin perlu menggantinya dengan metode autentikasi yang sesuai dengan aplikasi Anda
 
             // Retrieve history records based on the type and user_id
             switch ($type) {
                 case 'syllabus':
                     $histories = SyllabusHistories::where('user_id', $user_id)
-                        ->orderByDesc('created_at')->get();
+                        ->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);
                     break;
                 case 'material':
                     $histories = MaterialHistories::where('user_id', $user_id)
-                        ->orderByDesc('created_at')->get();
+                        ->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);
                     break;
                 case 'exercise':
                     $histories = ExerciseHistories::where('user_id', $user_id)
-                        ->orderByDesc('created_at')->get();
+                        ->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);
+                    break;
+                case 'atp':
+                    $histories = AlurTujuanPembelajaranHistories::where('user_id', $user_id)
+                        ->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);
+                    break;
+                case 'bahan-ajar':
+                    $histories = BahanAjarHistories::where('user_id', $user_id)
+                        ->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);
+                    break;
+                case 'gamification':
+                    $histories = GamificationHistories::where('user_id', $user_id)
+                        ->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);
+                    break;
+                case 'hint':
+                    $histories = HintHistories::where('user_id', $user_id)
+                        ->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);
                     break;
                 default:
                     throw new \Exception('Invalid history type provided.');
             }
 
             // Prepare the response data
-            $responseData = $histories->map(function ($history) use ($type) {
+            $responseData = $histories->getCollection()->map(function ($history) use ($type) {
                 return [
                     'id' => $history->id,
                     'name' => ($type === 'syllabus' ? $history->subject : $history->name),
@@ -186,6 +200,12 @@ class HistoryController extends Controller
                 'status' => 'success',
                 'message' => 'History filtered successfully',
                 'data' => $responseData,
+                'pagination' => [
+                    'current_page' => $histories->currentPage(),
+                    'per_page' => $perPage,
+                    'total' => $histories->total(),
+                    'last_page' => $histories->lastPage(),
+                ]
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
