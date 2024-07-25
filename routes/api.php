@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\MaterialController;
 use App\Http\Controllers\Api\SyllabusController;
 use App\Http\Controllers\Api\HintController;
 use App\Http\Controllers\Api\BahanAjarController;
+use App\Http\Controllers\Api\ModulAjarController;
 use App\Http\Controllers\Api\UserStatusController;
 use App\Http\Controllers\Api\UpdateMessageController;
 use Illuminate\Http\Request;
@@ -72,6 +73,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/export-word', [MaterialController::class, 'convertToWord']);
         Route::get('/history', [MaterialController::class, 'history']);
         Route::get('/history/{id}', [MaterialController::class, 'historyDetail']);
+    });
+
+    // Modul Ajar V2
+    Route::group(['prefix' => 'modul-ajar'], function () {
+        Route::post('/generate', [ModulAjarController::class, 'generate']);
+        Route::post('/export-word', [ModulAjarController::class, 'convertToWord']);
+        Route::post('/export-excel', [ModulAjarController::class, 'convertToExcel']);
+        Route::get('/history', [ModulAjarController::class, 'history']);
+        Route::get('/history/{id}', [ModulAjarController::class, 'historyDetail']);
     });
 
     // Syllabus

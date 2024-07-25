@@ -109,9 +109,9 @@ class MaterialController extends Controller
     public function convertToWord(Request $request)
     {
         try {
-            $templatePath   = public_path('word_template/Bahan_Ajar_Template.docx');
+            $templatePath   = public_path('word_template/Modul_Ajar_Template.docx');
             $docxTemplate   = new DocxTemplate($templatePath);
-            $outputPath     = public_path('word_output/Bahan_Ajar_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.docx');
+            $outputPath     = public_path('word_output/Modul_Ajar_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.docx');
 
             $materialHistoryId  = $request->input('id');
             $materialHistory    = MaterialHistories::find($materialHistoryId);

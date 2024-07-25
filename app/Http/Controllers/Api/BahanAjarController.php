@@ -105,9 +105,9 @@ class BahanAjarController extends Controller
     public function convertToWord(Request $request)
     {
         try {
-            $templatePath   = public_path('word_template/Materi_Ajar_Template.docx');
+            $templatePath   = public_path('word_template/Bahan_Ajar_Template.docx');
             $docxTemplate   = new DocxTemplate($templatePath);
-            $outputPath     = public_path('word_output/Materi_Ajar_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.docx');
+            $outputPath     = public_path('word_output/Bahan_Ajar_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.docx');
 
             $bahanAjarHistoryId  = $request->input('id');
             $bahanAjarHistory    = BahanAjarHistories::find($bahanAjarHistoryId);
