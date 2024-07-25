@@ -97,6 +97,11 @@ class User extends Authenticatable
         return $this->hasMany(AlurTujuanPembelajaranHistories::class, 'user_id', 'id');
     }
 
+    public function modulAjarHistory()
+    {
+        return $this->hasMany(ModulAjarHistories::class, 'user_id', 'id');
+    }
+
     public function generateAllSum()
     {
         return (
@@ -107,6 +112,7 @@ class User extends Authenticatable
             + $this->gamificationHistory()->count()
             + $this->hintHistory()->count()
             + $this->alurTujuanPembelajaranHistory()->count()
+            + $this->modulAjarHistory()->count()
         );
     }
 
