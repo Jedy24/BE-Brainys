@@ -261,26 +261,37 @@ class AuthenticationController extends Controller
         $data['token'] = $token;
         $data['user'] = $user;
 
-        /**Ekstrak domain email */
-        $emailDomain = substr(strrchr($user->email, "@"), 1);
+        // Cek apakah user is_active bernilai 0 atau false
+        if (!$user->is_active) {
+            // Ekstrak domain email
+            $emailDomain = substr(strrchr($user->email, "@"), 1);
 
-        /**Cek apakah email_domain ada dan is_active bernilai 1 */
-        $autoInviteEmail = AutoInviteEmail::where('email_domain', $emailDomain)
-            ->where('is_active', 1)
-            ->first();
+            // Cek apakah email_domain ada dan is_active bernilai 1
+            $autoInviteEmail = AutoInviteEmail::where('email_domain', $emailDomain)
+                ->where('is_active', 1)
+                ->first();
 
-        if ($autoInviteEmail) {
-            /**Membuat invite code */
-            $inviteCode = $this->generateRandomCode(8);
-            $invitation = UserInvitation::create([
-                'email' => $user->email,
-                'invite_code' => $inviteCode,
-                'is_used' => false,
-                'expired_at' => now()->addDays(30),
-            ]);
+            if ($autoInviteEmail) {
+                // Periksa apakah sudah ada undangan untuk email ini
+                $existingInvitation = UserInvitation::where('email', $user->email)->first();
 
-            /**Mengirim email undangan */
-            self::sendInvitation($invitation);
+                if ($existingInvitation) {
+                    // Jika sudah ada undangan, kirim ulang undangan
+                    self::sendInvitation($existingInvitation);
+                } else {
+                    // Membuat invite code
+                    $inviteCode = $this->generateRandomCode(8);
+                    $invitation = UserInvitation::create([
+                        'email' => $user->email,
+                        'invite_code' => $inviteCode,
+                        'is_used' => false,
+                        'expired_at' => now()->addDays(30),
+                    ]);
+
+                    // Mengirim email undangan
+                    self::sendInvitation($invitation);
+                }
+            }
         }
 
         /**Memunculkan pesan sukses setelah selesai verifikasi. */
