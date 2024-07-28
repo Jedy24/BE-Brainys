@@ -68,7 +68,7 @@ class HintController extends Controller
             $finalData = \DB::table('capaian_pembelajaran')
                 ->where('fase', $tingkatKelas)
                 ->where('mata_pelajaran', $mataPelajaran)
-                ->where('element', $elemenCapaian)
+                ->where('element', 'LIKE', '%' . implode('%', explode(' ', $elemenCapaian)) . '%')
                 ->select('capaian_pembelajaran', 'capaian_pembelajaran_redaksi')
                 ->first();
 
