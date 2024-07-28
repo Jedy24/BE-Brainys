@@ -67,10 +67,10 @@ class HintController extends Controller
             $addNotes       = $request->input('notes');
 
             $finalData = CapaianPembelajaran::where('fase', $tingkatKelas)
-            ->where('mata_pelajaran', $mataPelajaran)
-            ->whereRaw("element REGEXP ?", [implode('.*', explode(' ', $elemenCapaian))])
-            ->select('capaian_pembelajaran', 'capaian_pembelajaran_redaksi')
-            ->first();
+                ->where('mata_pelajaran', $mataPelajaran)
+                ->where('element', 'LIKE', '%' . implode('%', explode(' ', $elemenCapaian)) . '%')
+                ->select('capaian_pembelajaran', 'capaian_pembelajaran_redaksi')
+                ->first();
 
             if (!$finalData) {
                 return response()->json([
