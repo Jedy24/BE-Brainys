@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\HintHistories;
+use App\Models\CapaianPembelajaran;
 use App\Services\OpenAIService;
 use icircle\Template\Docx\DocxTemplate;
 use Illuminate\Http\Request;
@@ -65,8 +66,7 @@ class HintController extends Controller
             $jumlahSoal     = $request->input('jumlah_soal');
             $addNotes       = $request->input('notes');
 
-            $finalData = \DB::table('capaian_pembelajaran')
-                ->where('fase', $tingkatKelas)
+            $finalData = CapaianPembelajaran::where('fase', $tingkatKelas)
                 ->where('mata_pelajaran', $mataPelajaran)
                 ->where('element', 'LIKE', '%' . implode('%', explode(' ', $elemenCapaian)) . '%')
                 ->select('capaian_pembelajaran', 'capaian_pembelajaran_redaksi')
