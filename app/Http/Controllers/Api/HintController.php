@@ -66,16 +66,11 @@ class HintController extends Controller
             $jumlahSoal     = $request->input('jumlah_soal');
             $addNotes       = $request->input('notes');
 
-            $elemenCapaianWords = explode(' ', $elemenCapaian);
-            $query = CapaianPembelajaran::where('fase', $tingkatKelas)
-                ->where('mata_pelajaran', $mataPelajaran);
-
-            foreach ($elemenCapaianWords as $word) {
-                $query->where('element', 'LIKE', "%$word%");
-            }
-
-            $finalData = $query->select('capaian_pembelajaran', 'capaian_pembelajaran_redaksi')->first();
-
+            $finalData = CapaianPembelajaran::where('fase', $tingkatKelas)
+            ->where('mata_pelajaran', $mataPelajaran)
+            ->whereRaw("element REGEXP ?", [implode('.*', explode(' ', $elemenCapaian))])
+            ->select('capaian_pembelajaran', 'capaian_pembelajaran_redaksi')
+            ->first();
 
             if (!$finalData) {
                 return response()->json([
