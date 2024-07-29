@@ -175,7 +175,7 @@ class ModulAjarController extends Controller
             $user = $request->user();
             $modulAjar = $user->modulAjarHistory()->find($modulAjarId);
 
-            if (!$hintHistory) {
+            if (!$modulAjar) {
                 return response()->json([
                     'status' => 'failed',
                     'message' => 'Riwayat modul ajar tidak tersedia pada akun ini!',
@@ -193,38 +193,82 @@ class ModulAjarController extends Controller
             $sheet = $spreadsheet->getActiveSheet();
 
             // Mengisi data ke dalam template sesuai dengan format yang diberikan
-            $sheet->setTitle($data['informasi_umum']['nama_kisi_kisi']);
-            $sheet->setCellValue('E3', $data['informasi_umum']['tahun_penyusunan']);
-            $sheet->setCellValue('C6', $data['informasi_umum']['instansi']);
-            $sheet->setCellValue('C7', $data['informasi_umum']['mata_pelajaran']);
-            $sheet->setCellValue('C8', $data['informasi_umum']['kelas']);
-            $sheet->setCellValue('F7', $data['informasi_umum']['jumlah_soal']);
-            $sheet->setCellValue('F9', $data['informasi_umum']['penyusun']);
-            $sheet->setCellValue('C13', $data['informasi_umum']['capaian_pembelajaran_redaksi']);
-            $sheet->setCellValue('C14', $data['informasi_umum']['elemen_capaian']);
-            $sheet->setCellValue('C15', $data['informasi_umum']['pokok_materi']);
+            $sheet->setTitle($data['informasi_umum']['nama_modul_ajar']);
+            $sheet->setCellValue('C1', $data['informasi_umum']['nama_modul_ajar']);
+            $sheet->setCellValue('C4', $data['informasi_umum']['penyusun']);
+            $sheet->setCellValue('C5', $data['informasi_umum']['jenjang_sekolah']);
+            $sheet->setCellValue('C6', $data['informasi_umum']['fase_kelas']);
+            $sheet->setCellValue('F4', $data['informasi_umum']['mata_pelajaran']);
+            $sheet->setCellValue('F5', $data['informasi_umum']['alokasi_waktu']);
+            $sheet->setCellValue('F6', $data['informasi_umum']['tahun_penyusunan']);
+            $sheet->setCellValue('C9', $data['informasi_umum']['kompetensi_awal']);
+            $sheet->setCellValue('C12', $data['informasi_umum']['profil_pelajar_pancasila']);
+            $sheet->setCellValue('C20', $data['informasi_umum']['target_peserta_didik']);
+            $sheet->setCellValue('C23', $data['informasi_umum']['model_pembelajaran']);
+            $sheet->setCellValue('C26', $data['informasi_umum']['capaian_pembelajaran']);
 
-            // Mengisi data kisi-kisi
-            $templateRow = 17;
-            $rowCount = count($data['kisi_kisi']);
-            $highestRow = $templateRow + $rowCount - 1;
+            $sheet->setCellValue('C16', $data['sarana_dan_prasarana']['sumber_belajar']);
+            $sheet->setCellValue('C17', $data['sarana_dan_prasarana']['lembar_kerja_peserta_didik']);
 
-            for ($row = $templateRow; $row <= $highestRow; $row++) {
-                if ($row != $templateRow) {
-                    $sheet->duplicateStyle($sheet->getStyle('B' . $templateRow . ':F' . $templateRow), 'B' . $row . ':F' . $row);
+            $tujuanPertemuan = '';
+            foreach ($data['tujuan_kegiatan_pembelajaran']['tujuan_pembelajaran_pertemuan'] as $index => $tujuan) {
+                $tujuanPertemuan .= 'Pertemuan ' . ($index + 1) . ': ' . $tujuan . PHP_EOL;
+            }
+            $sheet->setCellValue('C30', $tujuanPertemuan);
+
+            $tujuanTopik = '';
+            foreach ($data['tujuan_kegiatan_pembelajaran']['tujuan_pembelajaran_topik'] as $index => $tujuan) {
+                $tujuanTopik .= ($index + 1) . '. ' . $tujuan . PHP_EOL;
+            }
+            $sheet->setCellValue('C31', $tujuanTopik);
+
+            $sheet->setCellValue('C34', $data['pemahaman_bermakna']['topik']);
+
+            $pertanyaanPemantik = '';
+            foreach ($data['pertanyaan_pemantik'] as $index => $tujuan) {
+                $pertanyaanPemantik .= ($index + 1) . '. ' . $tujuan . PHP_EOL;
+            }
+            $sheet->setCellValue('C37', $pertanyaanPemantik);
+
+            $startRow = 41;
+            $baseStyle = $sheet->getStyle('B41:G41');
+            $baseHeight = $sheet->getRowDimension('41')->getRowHeight();
+
+            foreach ($data['kompetensi_dasar'] as $kdIndex => $kd) {
+                $currentRow = $startRow + $kdIndex;
+                $kompetensiDasar = ($kdIndex + 1) . '. ' . $kd['nama_kompetensi_dasar'] . PHP_EOL;
+                foreach ($kd['materi_pembelajaran'] as $materiIndex => $materi) {
+                    $kompetensiDasar .= '  ' . ($kdIndex + 1) . '.' . ($materiIndex + 1) . ' ' . $materi['materi'] . PHP_EOL;
+                    $kompetensiDasar .= '    Tujuan: ' . $materi['tujuan_pembelajaran_materi'] . PHP_EOL;
+                    $kompetensiDasar .= '    Indikator: ' . $materi['indikator'] . PHP_EOL;
+                    $kompetensiDasar .= '    Alokasi Waktu: ' . $materi['alokasi_waktu'] . PHP_EOL;
+                    $kompetensiDasar .= '    Penilaian:' . PHP_EOL;
+                    foreach ($materi['penilaian'] as $penilaian) {
+                        $kompetensiDasar .= '      - ' . $penilaian['jenis'] . ': ' . $penilaian['bobot'] . '%' . PHP_EOL;
+                    }
                 }
 
-                $sheet->mergeCells("C{$row}:E{$row}");
+                $sheet->mergeCells('B' . $currentRow . ':F' . $currentRow);
+                $sheet->setCellValue('B' . $currentRow, $kompetensiDasar);
+                $sheet->duplicateStyle($baseStyle, 'B' . $currentRow . ':F' . $currentRow);
 
-                $sheet->setCellValue("B{$row}", $data['kisi_kisi'][$row - $templateRow]['nomor']);
-                $sheet->setCellValue("C{$row}", $data['kisi_kisi'][$row - $templateRow]['indikator_soal']);
-                $sheet->setCellValue("F{$row}", $data['kisi_kisi'][$row - $templateRow]['no_soal']);
+                // Apply borders manually
+                $sheet->getStyle('B' . $currentRow . ':F' . $currentRow)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
-                // Mengatur tinggi baris dan wrapping text
-                $sheet->getRowDimension($row)->setRowHeight(-1);
-                $sheet->getStyle("B{$row}:F{$row}")->getAlignment()->setWrapText(true);
-                $sheet->getStyle("C{$row}:E{$row}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+                $sheet->getRowDimension($currentRow)->setRowHeight($baseHeight);
             }
+
+            $glosariumMateri = '';
+            foreach ($data['lampiran']['glosarium_materi'] as $tujuan) {
+                $glosariumMateri .= '• ' . $tujuan . PHP_EOL;
+            }
+            $sheet->setCellValue('C47', $glosariumMateri);
+
+            $daftarPustaka = '';
+            foreach ($data['lampiran']['daftar_pustaka'] as $index => $tujuan) {
+                $daftarPustaka .= '• ' . $tujuan . PHP_EOL;
+            }
+            $sheet->setCellValue('C48', $daftarPustaka);
 
             // Menyimpan spreadsheet ke file baru
             $fileName = 'Modul_Ajar_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.xlsx';
