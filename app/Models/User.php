@@ -119,7 +119,6 @@ class User extends Authenticatable
             + $this->hintHistory()->count()
             + $this->alurTujuanPembelajaranHistory()->count()
             + $this->modulAjarHistory()->count()
-            + $this->exerciseV2History()->count()
         );
     }
 
