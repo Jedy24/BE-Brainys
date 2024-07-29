@@ -10,6 +10,8 @@ use App\Models\HintHistories;
 use App\Models\BahanAjarHistories;
 use App\Models\GamificationHistories;
 use App\Models\AlurTujuanPembelajaranHistories;
+use App\Models\ModulAjarHistories;
+use App\Models\ExerciseV2Histories;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,7 +37,7 @@ class HistoryController extends Controller
                     DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
                 ])->get());
 
-            $histories = $histories->concat(MaterialHistories::where('user_id', $user_id)
+            $histories = $histories->concat(ModulAjarHistories::where('user_id', $user_id)
                 ->select([
                     'id',
                     'name',
@@ -45,7 +47,7 @@ class HistoryController extends Controller
                     DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
                 ])->get());
 
-            $histories = $histories->concat(ExerciseHistories::where('user_id', $user_id)
+            $histories = $histories->concat(ExerciseV2Histories::where('user_id', $user_id)
                 ->select([
                     'id',
                     'name',
@@ -156,11 +158,11 @@ class HistoryController extends Controller
                         ->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);
                     break;
                 case 'material':
-                    $histories = MaterialHistories::where('user_id', $user_id)
+                    $histories = ModulAjarHistories::where('user_id', $user_id)
                         ->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);
                     break;
                 case 'exercise':
-                    $histories = ExerciseHistories::where('user_id', $user_id)
+                    $histories = ExerciseV2Histories::where('user_id', $user_id)
                         ->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);
                     break;
                 case 'atp':
