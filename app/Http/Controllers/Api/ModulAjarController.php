@@ -322,57 +322,73 @@ class ModulAjarController extends Controller
         }
     }
 
-    public function prompt($faseKelas, $mataPelajaran, $elemen, $capaianPembelajaran, $addNotes)
+    public function prompt($kelas, $mataPelajaran, $elemen, $capaianPembelajaran, $addNotes)
     {
-        $prompt = 'Buatlah bahan ajar untuk mata pelajaran ' . $mataPelajaran . ' pada tingkat kelas ' . $faseKelas . ' dengan memperhatikan ' . $elemen . ' dan catatan khusus berikut: ' . $addNotes . '.
+        $prompt = '';
+        $prompt .= '
+        Buatlah objek JSON untuk Modul Ajar berdasarkan parameter berikut:
 
-        Jelaskan identitas modul, kompetensi awal, profil pelajar terkait Pancasila (jika ada), serta sarana dan prasarana yang diperlukan. Tentukan juga target peserta didik dan model pembelajaran yang sesuai.
+        - fase_kelas: ' . $kelas . '
+        - mata_pelajaran: ' . $mataPelajaran . '
+        - elemen: ' . $elemen . '
+        - capaian_pembelajaran: ' . $capaianPembelajaran . '
 
-        Selanjutnya, rinci tujuan pembelajaran, pemahaman bermakna, dan pertanyaan pemantik yang relevan untuk mencapai kompetensi yang ditetapkan. Terakhir, susun kegiatan pembelajaran dengan mencantumkan 4 objek kompetensi dasar. Setiap objek kompetensi dasar harus memiliki informasi tentang materi pembelajaran, indikator pencapaian, nilai karakter yang ingin ditanamkan, alokasi waktu, dan jenis penilaian beserta bobotnya.
+        Buatlah Modul ajar dimana array komponen_pembelajaran, tujuan_kegiatan_pembelajaran, pemahaman_bermakna, pertanyaan_pemantik, dan kompetensi_dasar isinya akan berdasarkan mata_pelajaran, capaian_pembelajaran, serta elemen. Catatan tambahan dalam bahasa Indonesia: ' . $addNotes . '
 
-        Pastikan setiap bagian memiliki informasi yang cukup dan relevan untuk membantu pendidik atau pembelajar memahami dan melaksanakan materi pembelajaran dengan efektif.
+        Modul Ajar merupakan materi pembelajaran terstruktur yang digunakan sebagai alat bantu guru dalam proses pengajaran dan proses pembelajaran siswa. Modul Ajar dirancang sedemikian rupa agar dapat mencapai target Capaian Pembelajaran (CP).
 
-        Berikan saya output dengan format JSON seperti ini:
+        Secara struktur, komponen dari Modul Ajar adalah sebagai berikut:
+        - alokasi_waktu : Alokasi waktu pada bagian informasi_umum merupakan waktu yang dibutuhkan untuk menyelesaikan seluruh Modul Ajar seperti materi dan aktivitas pembelajaran berupa berapa kali pertemuan yang dibutuhkan untuk menyelesaikannya.
+        - kompetensi_dasar : Array yang berisikan rincian materi dalam Modul ajar.
+               - nama_kompetensi_dasar : Bagian dari array kompetensi_dasar yang berisi nama materi pembelajaran dengan acuan dari mata_pelajaran, elemen, dan capaian_pembelajaran.
+               - materi_pembelajaran : Bagian dari array kompetensi_dasar yang berisi materi pembelajaran yang dibutuhkan untuk menyelesaikan kompetensi dasar.
+                         - materi : Bagian dari array materi_pembelajaran yang merupakan nama spesifik dari nama_kompetensi_dasar.
+                         - tujuan_pembelajaran_materi : Tujuan yang menjadi acuan peserta didik dianggap telah memahami materi pembelajaran.
+                         - indikator : Hasil akhir dari tujuan_pembelajaran_materi.
+                         - alokasi_waktu : Mengambil jatah alokasi_waktu pada informasi_umum. Total alokasi_waktu pada array materi_pembelajaran harus sesuai dengan alokasi_waktu pada informasi_umum.
+        - glosarium_materi : Memiliki 7 item yang diurutkan secara alfabet. Setiap item pada Glosarium Materi harus berkaitan dengan mata_pelajaran, capaian_pembelajaran, serta elemen. Satu item pada Glosarium Materi berupa 1 kata diikuti dengan definisinya. Misalkan "Air: senyawa tak berwarna, tak berbau,...".
+        - daftar_pustaka : Memiliki 5 item yang diurutkan secara alfabet. Daftar pustaka merupakan referensi yang digunakan untuk materi pada Modul Ajar. Setiap item pada Daftar Pustaka harus lengkap sesuai tata cara penulisan "petajukobit" yaitu penulis, tahun, judul, kota, penerbit. Pastikan setiap item pada Daftar Pustaka adalah referensi nyata bukan fiktif!
+
+        Sertakan bidang berikut untuk setiap bagian dari Modul Ajar sebagai berikut:
+        - kompetensi_awal : Persyaratan yang perlu dikuasai peserta didik sebelum mengikuti pembelajaran.
+        - profil_pelajar_pancasila : Jabarkan secara singkat sikap yang diperlukan oleh peserta didik sesuai dengan nilai-nilai yang terkandung dalam Pancasila dan berkaitan dengan elemen.
+        - target_peserta_didik : Tujuan yang dicapai oleh peserta didik setelah mengikuti pembelajaran.
+        - model_pembelajaran : Metode yang digunakan untuk menyampaikan materi pembelajaran. Misalkan menggunakan tugas proyek, pendekatan tugas, dan sejenisnya.
+        - sumber_belajar : Sumber materi yang digunakan dalam pembelajaran. Berikan dalam bentuk paragraf.
+        - lembar_kerja_peserta_didik : Media yang digunakan peserta didik untuk mengerjakan materi pembelajaran seperti buku catatan, lembar kerja siswa, dan sejenisnya. Berikan dalam bentuk paragraf.
+
+        Array "tujuan_kegiatan_pembelajaran" sebagai berikut:
+        - tujuan_pembelajaran_pertemuan : Tujuan pembelajaran pada setiap pertemuan tanpa menuliskan pertemuan ke berapa. Data untuk tujuan_pembelajaran_pertemuan menyesuaikan jumlah pertemuan dari "alokasi_waktu".
+        - tujuan_pembelajaran_topik : Hasil yang diharapkan dapat dicapai oleh peserta didik setelah mengikuti pembelajaran setiap pertemuan.
 
         {
             "informasi_umum": {
-                "penyusun": "",
-                "jenjang_sekolah": "",
-                "tahun_penyusunan": "",
-                "mata_pelajaran": "",
-                "fase_kelas": "",
-                "alokasi_waktu": "", Perhatian: Untuk satu kali pertemuan alokasi waktunya 2 jam, silahkan pikirkan berapa pertemuan, maksimal 4 pertemuan untuk 1 bahan ajar
-                "kompetensi_awal": "(Berbentuk 1 Paragraf/Alinea)",
-                "profil_pelajar_pancasila": "(Berbentuk 1 Paragraf/Alinea)", Perhatian: Pastikan profil pelajar sesuai dengan mata pelajaran yang dipilih, jangan ada unsur PPKN, dan harus ada profil pelajar yang mencerminkan pancasila.
-                "target_peserta_didik": "(Berbentuk 1 Paragraf/Alinea)",
-                "model_pembelajaran": "(Berbentuk 1 Paragraf/Alinea)",
-                "capaian_pembelajaran": ""
+                "alokasi_waktu": "{Alokasi Waktu}",
+                "kompetensi_awal": "{Kompetensi Awal}",
+                "profil_pelajar_pancasila": "{Profil Pelajar Pancasila}",
+                "target_peserta_didik": "{Target Peserta Didik}",
+                "model_pembelajaran": "{Model Pembelajaran}"
             },
             "sarana_dan_prasarana": {
-                "sumber_belajar": "(Berbentuk 1 Paragraf/Alinea)",
-                "lembar_kerja_peserta_didik": "(Berbentuk 1 Paragraf/Alinea)"
-            },
-            "komponen_pembelajaran": {
-                "perlengkapan_peserta_didik": ["", "", "", ""],
-                "perlengkapan_guru": ["", "", "", ""
-                ]
+                "sumber_belajar": "{Sumber Belajar}",
+                "lembar_kerja_peserta_didik": "{Lembar Kerja Peserta Didik}"
             },
             "tujuan_kegiatan_pembelajaran": {
-                "tujuan_pembelajaran_bab": "(Berbentuk 1 Paragraf/Alinea)",
-                "tujuan_pembelajaran_topik": ["", "", "", ""]
-                "tujuan_pembelajaran_pertemuan": ["", "", "", "", "", "", "", ""], "(Berbentuk 1 Paragraf/Alinea untuk setiap pertemuan tanpa menuliskan pertemuan ke berapa, ambil data "alokasi_waktu" di atas untuk menentukan berapa kali pertemuan)",
+                "tujuan_pembelajaran_bab": "{Tujuan Pembelajaran Bab}",
+                "tujuan_pembelajaran_topik": ["{Tujuan Pembelajaran Topik}"], // Berikan minimal 4 item.
+                "tujuan_pembelajaran_pertemuan": ["{Tujuan Pembelajaran Pertemuan}"] // Tanpa menuliskan pertemuan ke berapa, jumlahnya menyesuaikan dengan alokasi_waktu informasi_umum. Misalkan alokasi_waktu 8 pertemuan maka ada 8 item tujuan_pembelajaran_pertemuan.
             },
             "pemahaman_bermakna": {
-                "topik": "(Berbentuk 1 Paragraf/Alinea)"
+                "topik": "{Topik, berupa 1 paragraf}"
             },
             "pertanyaan_pemantik": ["", "", "", ""],
             "kompetensi_dasar": [
                 {
-                    "nama_kompetensi_dasar": "", //nama
+                    "nama_kompetensi_dasar": "",
                     "materi_pembelajaran": [
                         {
-                            "materi": "",
-                            "tujuan_pembelajaran_materi": "(Berbentuk 1 Paragraf/Alinea)",
+                            "materi": "{Materi}",
+                            "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
                             "indikator": "",
                             "nilai_karakter": "",
                             "kegiatan_pembelajaran": "",
@@ -389,8 +405,8 @@ class ModulAjarController extends Controller
                             ]
                         },
                         {
-                            "materi": "",
-                            "tujuan_pembelajaran_materi": "(Berbentuk 1 Paragraf/Alinea)",
+                            "materi": "{Materi}",
+                            "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
                             "indikator": "",
                             "nilai_karakter": "",
                             "kegiatan_pembelajaran": "",
@@ -408,8 +424,8 @@ class ModulAjarController extends Controller
                     "nama_kompetensi_dasar": "",
                     "materi_pembelajaran": [
                         {
-                            "materi": "",
-                            "tujuan_pembelajaran_materi": "(Berbentuk 1 Paragraf/Alinea)",
+                            "materi": "{Materi}",
+                            "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
                             "indikator": "",
                             "nilai_karakter": "",
                             "kegiatan_pembelajaran": "",
@@ -426,45 +442,8 @@ class ModulAjarController extends Controller
                             ]
                         },
                         {
-                            "materi": "",
-                            "tujuan_pembelajaran_materi": "(Berbentuk 1 Paragraf/Alinea)",
-                            "indikator": "",
-                            "nilai_karakter": "",
-                            "kegiatan_pembelajaran": "",
-                            "alokasi_waktu": "",
-                            "penilaian": [
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "nama_kompetensi_dasar": "",
-                    "materi_pembelajaran": [
-                        {
-                            "materi": "",
-                            "tujuan_pembelajaran_materi": "(Berbentuk 1 Paragraf/Alinea)",
-                            "indikator": "",
-                            "nilai_karakter": "",
-                            "kegiatan_pembelajaran": "",
-                            "alokasi_waktu": "",
-                            "penilaian": [
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                },
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                }
-                            ]
-                        },
-                        {
-                            "materi": "",
-                            "tujuan_pembelajaran_materi": "(Berbentuk 1 Paragraf/Alinea)",
+                            "materi": "{Materi}",
+                            "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
                             "indikator": "",
                             "nilai_karakter": "",
                             "kegiatan_pembelajaran": "",
@@ -478,15 +457,29 @@ class ModulAjarController extends Controller
                         }
                     ]
                 }
-            ]
+            ], // Pastikan alokasi_waktu pada kompetensi_dasar sesuai dengan alokasi_waktu pada informasi_umum.
             "lampiran": {
-                "glorasium_materi": ["", "", "", "", "", "", "", "", "", ""] //Berikan 10 item glorasium masing masing 1 item 1 kalimat penjelasan aftar alfabetis istilah dalam suatu ranah pengetahuan tertentu yang dilengkapi dengan definisi untuk istilah-istilah tersebut, dan harus ada nyata, jangan hanya contoh dan penjelasanya juga harus ada.
-                "daftar_pustaka": ["", "", "", "", "", "", "", "", "", ""] //Perhatian: Mohon berikan 10 daftar pustaka yang relevan dengan materi seperti mengutip dari jurnal ilmiah, artikel ilmiah, buku pelajaran, jangan berupa data fiktif! Pastikan daftar pustaka menggunakan format referensi yang sesuai.
+                "glosarium_materi": [
+                    "{Glosarium Materi 1}",
+                    "{Glosarium Materi 2}",
+                    "{Glosarium Materi 3}",
+                    "{Glosarium Materi 4}",
+                    "{Glosarium Materi 5}",
+                    "{Glosarium Materi 6}",
+                    "{Glosarium Materi 7}"
+                ],
+                "daftar_pustaka": [
+                    "{Daftar Pustaka 1}",
+                    "{Daftar Pustaka 2}",
+                    "{Daftar Pustaka 3}",
+                    "{Daftar Pustaka 4}",
+                    "{Daftar Pustaka 5}"
+                ]
             }
         }
-
         ';
 
         return $prompt;
     }
+
 }
