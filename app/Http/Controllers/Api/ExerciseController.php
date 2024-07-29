@@ -26,7 +26,6 @@ class ExerciseController extends Controller
                 'subject' => 'required|string',
                 'grade' => 'required|string',
                 'number_of_questions' => 'required|integer|min:1|max:15',
-                // 'notes' => 'optional|string',
             ]);
 
             // Retrieve the authenticated user
@@ -46,10 +45,6 @@ class ExerciseController extends Controller
                     'status' => 'failed',
                     'message' => 'Anda telah mencapai batas maksimal untuk riwayat bahan ajar.',
                     'data' => [
-                        // 'generated_num' => $user->syllabusHistory()->count(),
-                        // 'generated_syllabus_num' => $user->syllabusHistory()->count(),
-                        // 'generated_material_num' => $user->materialHistory()->count(),
-                        // 'generated_exercise_num' => $user->exerciseHistory()->count(),
                         'generated_all_num' => $user->generateAllSum(),
                         'limit_all_num' => $user->limit_generate
                     ],
@@ -87,7 +82,7 @@ class ExerciseController extends Controller
                 'notes' => $notes,
                 'type' => 'essay',
                 'output_data' => $parsedResponse,
-                'user_id' => auth()->id(), // Menggunakan ID pengguna yang sedang diotentikasi
+                'user_id' => auth()->id(),
             ]);
 
             $parsedResponse['id'] = $exerciseHistory->id;
@@ -117,7 +112,6 @@ class ExerciseController extends Controller
                 'subject' => 'required|string',
                 'grade' => 'required|string',
                 'number_of_questions' => 'required|integer|min:1|max:15',
-                // 'notes' => 'optional|string',
             ]);
 
             // Retrieve the authenticated user
@@ -129,10 +123,6 @@ class ExerciseController extends Controller
                     'status' => 'failed',
                     'message' => 'Anda telah mencapai batas maksimal untuk riwayat bahan ajar.',
                     'data' => [
-                        // 'generated_num' => $user->syllabusHistory()->count(),
-                        // 'generated_syllabus_num' => $user->syllabusHistory()->count(),
-                        // 'generated_material_num' => $user->materialHistory()->count(),
-                        // 'generated_exercise_num' => $user->exerciseHistory()->count(),
                         'generated_all_num' => $user->generateAllSum(),
                         'limit_all_num' => $user->limit_generate
                     ],
@@ -165,7 +155,6 @@ class ExerciseController extends Controller
 
             // Loop through each question
             foreach ($parsedResponse['soal_pilihan_ganda'] as $question) {
-                // Extract the correct option for the current question and add it to the $correct_options array
                 $correct_options[] = $question['correct_option'];
             }
 
