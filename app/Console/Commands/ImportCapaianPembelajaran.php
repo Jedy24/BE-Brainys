@@ -38,19 +38,19 @@ class ImportCapaianPembelajaran extends Command
             $import = new CapaianPembelajaranImport;
             Excel::import($import, $file);
 
-            $this->info('Data imported successfully.');
-            $this->info('Total Rows: ' . $import->totalRows);
-            $this->info('Total Successful: ' . $import->successCount);
-            $this->info('Total Failed: ' . $import->failureCount);
-
             if (!empty($import->failures)) {
                 $this->info('Failed Rows:');
                 foreach ($import->failures as $failure) {
                     $this->info('Row: ' . $failure['row']);
                     $this->info('Errors: ' . implode(', ', $failure['errors']));
-                    $this->info('Values: ' . json_encode($failure['values']));
+                    // $this->info('Values: ' . json_encode($failure['values']));
                 }
             }
+
+            $this->info('Data imported successfully.');
+            $this->info('Total Rows: ' . $import->totalRows);
+            $this->info('Total Successful: ' . $import->successCount);
+            $this->info('Total Failed: ' . $import->failureCount);
 
             return 0;
         } catch (\Exception $e) {

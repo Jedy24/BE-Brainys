@@ -74,7 +74,7 @@ class AlurTujuanPembelajaranController extends Controller
             if ($finalData->isEmpty()) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'No data CP found',
+                    'message' => 'Data tidak ditemukan untuk kombinasi fase, mata pelajaran, dan elemen capaian yang diberikan',
                     'data' => [],
                 ]);
             }

@@ -27,10 +27,10 @@ class CapaianPembelajaranImport implements ToModel, WithHeadingRow
         ++$this->totalRows;
 
         // Remove new lines from strings
-        $mata_pelajaran = $row['mata_pelajaran'] ?? null;
         $fase = $row['fase'] ?? null;
-        $element = $row['element'] ?? null;
-        $subelemen = $row['subelemen'] ?? null;
+        $mata_pelajaran =  isset($row['mata_pelajaran']) ? preg_replace('/\r\n|\r|\n/', ' ', $row['mata_pelajaran']) : null;
+        $element = isset($row['element']) ? preg_replace('/\r\n|\r|\n/', ' ', $row['element']) : null;
+        $subelemen = isset($row['subelemen']) ? preg_replace('/\r\n|\r|\n/', ' ', $row['subelemen']) : null;
         $capaian_pembelajaran = isset($row['capaian_pembelajaran']) ? preg_replace('/\r\n|\r|\n/', ' ', $row['capaian_pembelajaran']) : null;
         $capaian_pembelajaran_redaksi = isset($row['capaian_pembelajaran_redaksi']) ? preg_replace('/\r\n|\r|\n/', ' ', $row['capaian_pembelajaran_redaksi']) : null;
 
@@ -49,7 +49,7 @@ class CapaianPembelajaranImport implements ToModel, WithHeadingRow
             'element' => 'required|string',
             'subelemen' => 'required|string',
             'capaian_pembelajaran' => 'required|string',
-            'capaian_pembelajaran_redaksi' => 'required|string',
+            'capaian_pembelajaran_redaksi' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
