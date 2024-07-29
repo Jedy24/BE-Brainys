@@ -193,7 +193,6 @@ class ModulAjarController extends Controller
             $sheet = $spreadsheet->getActiveSheet();
 
             // Mengisi data ke dalam template sesuai dengan format yang diberikan
-            $sheet->setTitle($data['informasi_umum']['nama_modul_ajar']);
             $sheet->setCellValue('C1', $data['informasi_umum']['nama_modul_ajar']);
             $sheet->setCellValue('C4', $data['informasi_umum']['penyusun']);
             $sheet->setCellValue('C5', $data['informasi_umum']['jenjang_sekolah']);
