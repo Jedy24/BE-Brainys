@@ -77,6 +77,11 @@ class User extends Authenticatable
         return $this->hasMany(ExerciseHistories::class, 'user_id', 'id');
     }
 
+    public function exerciseV2History()
+    {
+        return $this->hasMany(ExerciseV2Histories::class, 'user_id', 'id');
+    }
+
     public function hintHistory()
     {
         return $this->hasMany(HintHistories::class, 'user_id', 'id');
@@ -108,6 +113,7 @@ class User extends Authenticatable
             $this->materialHistory()->count()
             + $this->syllabusHistory()->count()
             + $this->exerciseHistory()->count()
+            + $this->exerciseV2History()->count()
             + $this->bahanAjarHistory()->count()
             + $this->gamificationHistory()->count()
             + $this->hintHistory()->count()

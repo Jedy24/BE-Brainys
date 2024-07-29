@@ -785,7 +785,8 @@ class OpenAIService
                         "question": "",
                         "instructions": "",
                         "kriteria_penilaian": ["", "", ""], //Paragraf membentuk kriteria penialaian jawaban
-                    }
+                    },
+
                 ]
             }' . PHP_EOL .
             "Jumlah soal yang diminta: {$number_of_question}";

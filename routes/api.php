@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\MaterialController;
 use App\Http\Controllers\Api\SyllabusController;
 use App\Http\Controllers\Api\HintController;
 use App\Http\Controllers\Api\BahanAjarController;
+use App\Http\Controllers\Api\ExerciseControllerV2;
 use App\Http\Controllers\Api\ModulAjarController;
 use App\Http\Controllers\Api\UserStatusController;
 use App\Http\Controllers\Api\UpdateMessageController;
@@ -99,6 +100,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/export-word', [ExerciseController::class, 'convertToWord']);
         Route::get('/history', [ExerciseController::class, 'history']);
         Route::get('/history/{id}', [ExerciseController::class, 'historyDetail']);
+    });
+
+    // Exercise V2
+    Route::group(['prefix' => 'exercise-v2'], function () {
+        Route::post('/generate-essay', [ExerciseControllerV2::class, 'generateEssay']);
+        Route::post('/generate-choice', [ExerciseControllerV2::class, 'generateChoice']);
+        Route::post('/export-word', [ExerciseControllerV2::class, 'convertToWord']);
+        Route::get('/history', [ExerciseControllerV2::class, 'history']);
+        Route::get('/history/{id}', [ExerciseControllerV2::class, 'historyDetail']);
     });
 
     // Gamification
