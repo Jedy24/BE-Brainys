@@ -13,34 +13,45 @@
 <body>
     <div class="container mt-5">
         <h2 class="text-center">Capaian Pembelajaran - Chain Select</h2>
-        <form>
-            <div class="form-group">
+        <form class="row">
+            <div class="col-md-12 form-group">
                 <label for="fase">Fase</label>
                 <select id="fase" class="form-control">
                     <option value="">Select Fase</option>
                 </select>
             </div>
-            <div class="form-group">
+            <div class="col-md-12 form-group">
                 <label for="mata-pelajaran">Mata Pelajaran</label>
                 <select id="mata-pelajaran" class="form-control" disabled>
                     <option value="">Select Mata Pelajaran</option>
                 </select>
             </div>
-            <div class="form-group">
+            <div class="col-md-12 form-group">
                 <label for="element">Element</label>
                 <select id="element" class="form-control" disabled>
                     <option value="">Select Element</option>
                 </select>
             </div>
-            <div class="form-group">
+        </form>
+        <hr/>
+        <div class="row mb-4">
+            <div class="col-md-6 form-group">
+                <label for="val_mapel">Mata Pelajaran</label>
+                <textarea id="val_mapel" class="form-control" rows="5" readonly></textarea>
+            </div>
+            <div class="col-md-6 form-group">
+                <label for="val_element">Element</label>
+                <textarea id="val_element" class="form-control" rows="5" readonly></textarea>
+            </div>
+            <div class="col-md-6 form-group">
                 <label for="capaian-pembelajaran">Capaian Pembelajaran</label>
                 <textarea id="capaian-pembelajaran" class="form-control" rows="5" readonly></textarea>
             </div>
-            <div class="form-group">
+            <div class="col-md-6 form-group">
                 <label for="capaian-pembelajaran-redaksi">Capaian Pembelajaran Redaksi</label>
                 <textarea id="capaian-pembelajaran-redaksi" class="form-control" rows="5" readonly></textarea>
             </div>
-        </form>
+        </div>
     </div>
 
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -141,6 +152,8 @@
                         success: function (response) {
                             if (response.status === "success") {
                                 if (response.data) {
+                                    $("#val_mapel").val(response.data.mata_pelajaran || "No data available");
+                                    $("#val_element").val(response.data.element || "No data available");
                                     $("#capaian-pembelajaran").val(response.data.capaian_pembelajaran || "No data available");
                                     $("#capaian-pembelajaran-redaksi").val(response.data.capaian_pembelajaran_redaksi || "No data available");
                                 } else {
