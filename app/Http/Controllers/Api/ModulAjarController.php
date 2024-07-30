@@ -10,6 +10,8 @@ use icircle\Template\Docx\DocxTemplate;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\RichText\RichText;
+use PhpOffice\PhpSpreadsheet\RichText\Run;
 
 class ModulAjarController extends Controller
 {
@@ -102,8 +104,8 @@ class ModulAjarController extends Controller
             $parsedResponse['informasi_umum']['jenjang_sekolah']        = $user->school_name;
             $parsedResponse['informasi_umum']['fase_kelas']             = $kelas;
             $parsedResponse['informasi_umum']['mata_pelajaran']         = $mataPelajaran;
+            $parsedResponse['informasi_umum']['element']                = $elemen;
             $parsedResponse['informasi_umum']['capaian_pembelajaran']   = $capaianPembelajaran;
-            $parsedResponse['informasi_umum']['tahun_penyusunan']       = Date('Y');
 
             // Construct the response data for success
             $insertData = ModulAjarHistories::create([
@@ -186,88 +188,112 @@ class ModulAjarController extends Controller
             $data = $modulAjar->output_data;
 
             // Path template Excel
-            $templatePath = public_path('excel_template/Modul_Ajar_Template.xlsx');
+            $templatePath = public_path('excel_template/Modul_Ajar_V2_Template.xlsx');
 
             // Load template Excel
             $spreadsheet = IOFactory::load($templatePath);
             $sheet = $spreadsheet->getActiveSheet();
 
             // Mengisi data ke dalam template sesuai dengan format yang diberikan
-            $sheet->setCellValue('C1', $data['informasi_umum']['nama_modul_ajar']);
-            $sheet->setCellValue('C4', $data['informasi_umum']['penyusun']);
-            $sheet->setCellValue('C5', $data['informasi_umum']['jenjang_sekolah']);
-            $sheet->setCellValue('C6', $data['informasi_umum']['fase_kelas']);
-            $sheet->setCellValue('F4', $data['informasi_umum']['mata_pelajaran']);
-            $sheet->setCellValue('F5', $data['informasi_umum']['alokasi_waktu']);
-            $sheet->setCellValue('F6', $data['informasi_umum']['tahun_penyusunan']);
-            $sheet->setCellValue('C9', $data['informasi_umum']['kompetensi_awal']);
-            $sheet->setCellValue('C12', $data['informasi_umum']['profil_pelajar_pancasila']);
-            $sheet->setCellValue('C20', $data['informasi_umum']['target_peserta_didik']);
-            $sheet->setCellValue('C23', $data['informasi_umum']['model_pembelajaran']);
-            $sheet->setCellValue('C26', $data['informasi_umum']['capaian_pembelajaran']);
+            $sheet->setCellValue('B2', $data['informasi_umum']['nama_modul_ajar']);
+            $sheet->setCellValue('B6', $data['informasi_umum']['penyusun']);
+            $sheet->setCellValue('B7', $data['informasi_umum']['jenjang_sekolah']);
+            $sheet->setCellValue('B8', $data['informasi_umum']['fase_kelas']);
+            $sheet->setCellValue('B9', $data['informasi_umum']['mata_pelajaran']);
+            $sheet->setCellValue('B10', $data['informasi_umum']['alokasi_waktu']);
+            $sheet->setCellValue('B11', $data['informasi_umum']['kompetensi_awal']);
+            $sheet->setCellValue('B12', $data['informasi_umum']['profil_pelajar_pancasila']);
+            $sheet->setCellValue('B13', $data['informasi_umum']['target_peserta_didik']);
+            $sheet->setCellValue('B14', $data['informasi_umum']['model_pembelajaran']);
+            $sheet->setCellValue('B21', $data['informasi_umum']['element']);
+            $sheet->setCellValue('B22', $data['informasi_umum']['capaian_pembelajaran']);
 
-            $sheet->setCellValue('C16', $data['sarana_dan_prasarana']['sumber_belajar']);
-            $sheet->setCellValue('C17', $data['sarana_dan_prasarana']['lembar_kerja_peserta_didik']);
+            $sheet->setCellValue('B17', $data['sarana_dan_prasarana']['sumber_belajar']);
+            $sheet->setCellValue('B18', $data['sarana_dan_prasarana']['lembar_kerja_peserta_didik']);
 
             $tujuanPertemuan = '';
             foreach ($data['tujuan_kegiatan_pembelajaran']['tujuan_pembelajaran_pertemuan'] as $index => $tujuan) {
                 $tujuanPertemuan .= 'Pertemuan ' . ($index + 1) . ': ' . $tujuan . PHP_EOL;
             }
-            $sheet->setCellValue('C30', $tujuanPertemuan);
+            $sheet->setCellValue('B25', $tujuanPertemuan);
 
             $tujuanTopik = '';
             foreach ($data['tujuan_kegiatan_pembelajaran']['tujuan_pembelajaran_topik'] as $index => $tujuan) {
                 $tujuanTopik .= ($index + 1) . '. ' . $tujuan . PHP_EOL;
             }
-            $sheet->setCellValue('C31', $tujuanTopik);
+            $sheet->setCellValue('B26', $tujuanTopik);
 
-            $sheet->setCellValue('C34', $data['pemahaman_bermakna']['topik']);
+            $sheet->setCellValue('B27', $data['pemahaman_bermakna']['topik']);
 
             $pertanyaanPemantik = '';
             foreach ($data['pertanyaan_pemantik'] as $index => $tujuan) {
                 $pertanyaanPemantik .= ($index + 1) . '. ' . $tujuan . PHP_EOL;
             }
-            $sheet->setCellValue('C37', $pertanyaanPemantik);
+            $sheet->setCellValue('B28', $pertanyaanPemantik);
 
-            $startRow = 41;
-            $baseStyle = $sheet->getStyle('B41:G41');
-            $baseHeight = $sheet->getRowDimension('41')->getRowHeight();
-
+            $startRow = 31;
             foreach ($data['kompetensi_dasar'] as $kdIndex => $kd) {
                 $currentRow = $startRow + $kdIndex;
-                $kompetensiDasar = ($kdIndex + 1) . '. ' . $kd['nama_kompetensi_dasar'] . PHP_EOL;
+
+                $sheet->setCellValue('A' . $currentRow, $kd['nama_kompetensi_dasar']);
+
+                $kompetensiDasar = new RichText();
+
+                $addBoldText = function($text, $container) {
+                    $run = new Run($text);
+                    $run->getFont()->setBold(true);
+                    $container->addText($run);
+                };
+
+                $addNormalText = function($text, $container) {
+                    $run = new Run($text);
+                    $container->addText($run);
+                };
+
                 foreach ($kd['materi_pembelajaran'] as $materiIndex => $materi) {
-                    $kompetensiDasar .= '  ' . ($kdIndex + 1) . '.' . ($materiIndex + 1) . ' ' . $materi['materi'] . PHP_EOL;
-                    $kompetensiDasar .= '    Tujuan: ' . $materi['tujuan_pembelajaran_materi'] . PHP_EOL;
-                    $kompetensiDasar .= '    Indikator: ' . $materi['indikator'] . PHP_EOL;
-                    $kompetensiDasar .= '    Alokasi Waktu: ' . $materi['alokasi_waktu'] . PHP_EOL;
-                    $kompetensiDasar .= '    Penilaian:' . PHP_EOL;
-                    foreach ($materi['penilaian'] as $penilaian) {
-                        $kompetensiDasar .= '      - ' . $penilaian['jenis'] . ': ' . $penilaian['bobot'] . '%' . PHP_EOL;
+                    $addBoldText("Materi: ", $kompetensiDasar);
+                    $addNormalText($materi['materi'] . "\n", $kompetensiDasar);
+
+                    $addBoldText("Tujuan: ", $kompetensiDasar);
+                    $addNormalText($materi['tujuan_pembelajaran_materi'] . "\n", $kompetensiDasar);
+
+                    $addBoldText("Indikator: ", $kompetensiDasar);
+                    $addNormalText($materi['indikator'] . "\n", $kompetensiDasar);
+
+                    $addBoldText("Nilai Karakter: ", $kompetensiDasar);
+                    $addNormalText($materi['nilai_karakter'] . "\n", $kompetensiDasar);
+
+                    $addBoldText("Kegiatan Pembelajaran: ", $kompetensiDasar);
+                    $addNormalText($materi['kegiatan_pembelajaran'] . "\n", $kompetensiDasar);
+
+                    $addBoldText("Alokasi Waktu: ", $kompetensiDasar);
+                    $addNormalText($materi['alokasi_waktu'] . "\n", $kompetensiDasar);
+
+                    $addBoldText("Penilaian: ", $kompetensiDasar);
+                    $addNormalText("\n", $kompetensiDasar);
+
+                    foreach ($materi['penilaian'] as $index => $penilaian) {
+                        $addNormalText(chr(97 + $index) . ". " . $penilaian['jenis'] . ': ' . $penilaian['bobot'] . '%' . "\n", $kompetensiDasar);
                     }
                 }
 
-                $sheet->mergeCells('B' . $currentRow . ':F' . $currentRow);
                 $sheet->setCellValue('B' . $currentRow, $kompetensiDasar);
-                $sheet->duplicateStyle($baseStyle, 'B' . $currentRow . ':F' . $currentRow);
-
-                // Apply borders manually
-                $sheet->getStyle('B' . $currentRow . ':F' . $currentRow)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
-
-                $sheet->getRowDimension($currentRow)->setRowHeight($baseHeight);
+            }
+            foreach (range($startRow, $startRow + count($data['kompetensi_dasar']) - 1) as $row) {
+                $sheet->getRowDimension($row)->setRowHeight(-1);
             }
 
             $glosariumMateri = '';
-            foreach ($data['lampiran']['glosarium_materi'] as $tujuan) {
-                $glosariumMateri .= '• ' . $tujuan . PHP_EOL;
+            foreach ($data['lampiran']['glosarium_materi'] as $index => $tujuan) {
+                $glosariumMateri .= ($index + 1) . ') '. $tujuan . PHP_EOL;
             }
-            $sheet->setCellValue('C47', $glosariumMateri);
+            $sheet->setCellValue('B36', $glosariumMateri);
 
             $daftarPustaka = '';
             foreach ($data['lampiran']['daftar_pustaka'] as $index => $tujuan) {
-                $daftarPustaka .= '• ' . $tujuan . PHP_EOL;
+                $daftarPustaka .= ($index + 1) . ') ' . $tujuan . PHP_EOL;
             }
-            $sheet->setCellValue('C48', $daftarPustaka);
+            $sheet->setCellValue('B37', $daftarPustaka);
 
             // Menyimpan spreadsheet ke file baru
             $fileName = 'Modul_Ajar_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.xlsx';
@@ -373,7 +399,7 @@ class ModulAjarController extends Controller
 
         - fase_kelas: ' . $kelas . '
         - mata_pelajaran: ' . $mataPelajaran . '
-        - elemen: ' . $elemen . '
+        - element: ' . $elemen . '
         - capaian_pembelajaran: ' . $capaianPembelajaran . '
 
         Buatlah Modul ajar dimana array komponen_pembelajaran, tujuan_kegiatan_pembelajaran, pemahaman_bermakna, pertanyaan_pemantik, dan kompetensi_dasar isinya akan berdasarkan mata_pelajaran, capaian_pembelajaran, serta elemen. Catatan tambahan dalam bahasa Indonesia: ' . $addNotes . '
@@ -381,24 +407,33 @@ class ModulAjarController extends Controller
         Modul Ajar merupakan materi pembelajaran terstruktur yang digunakan sebagai alat bantu guru dalam proses pengajaran dan proses pembelajaran siswa. Modul Ajar dirancang sedemikian rupa agar dapat mencapai target Capaian Pembelajaran (CP).
 
         Secara struktur, komponen dari Modul Ajar adalah sebagai berikut:
-        - alokasi_waktu : Alokasi waktu pada bagian informasi_umum merupakan waktu yang dibutuhkan untuk menyelesaikan seluruh Modul Ajar seperti materi dan aktivitas pembelajaran berupa berapa kali pertemuan yang dibutuhkan untuk menyelesaikannya.
+        - alokasi_waktu : Alokasi waktu pada bagian informasi_umum merupakan waktu yang dibutuhkan untuk menyelesaikan seluruh Modul Ajar seperti materi dan aktivitas pembelajaran. Berikan Alokasi Waktu dalam format berapa pekan / berapa jam pelajaran (JP) / berapa pertemuan.
         - kompetensi_dasar : Array yang berisikan rincian materi dalam Modul ajar.
-               - nama_kompetensi_dasar : Bagian dari array kompetensi_dasar yang berisi nama materi pembelajaran dengan acuan dari mata_pelajaran, elemen, dan capaian_pembelajaran.
-               - materi_pembelajaran : Bagian dari array kompetensi_dasar yang berisi materi pembelajaran yang dibutuhkan untuk menyelesaikan kompetensi dasar.
-                         - materi : Bagian dari array materi_pembelajaran yang merupakan nama spesifik dari nama_kompetensi_dasar.
-                         - tujuan_pembelajaran_materi : Tujuan yang menjadi acuan peserta didik dianggap telah memahami materi pembelajaran.
-                         - indikator : Hasil akhir dari tujuan_pembelajaran_materi.
-                         - alokasi_waktu : Mengambil jatah alokasi_waktu pada informasi_umum. Total alokasi_waktu pada array materi_pembelajaran harus sesuai dengan alokasi_waktu pada informasi_umum.
-        - glosarium_materi : Memiliki 7 item yang diurutkan secara alfabet. Setiap item pada Glosarium Materi harus berkaitan dengan mata_pelajaran, capaian_pembelajaran, serta elemen. Satu item pada Glosarium Materi berupa 1 kata diikuti dengan definisinya. Misalkan "Air: senyawa tak berwarna, tak berbau,...".
+               -- nama_kompetensi_dasar : Bagian dari array kompetensi_dasar yang berisi nama materi pembelajaran dengan acuan dari mata_pelajaran, elemen, dan capaian_pembelajaran.
+               -- materi_pembelajaran : Bagian dari array kompetensi_dasar yang berisi materi pembelajaran yang dibutuhkan untuk menyelesaikan kompetensi dasar.
+                         --- materi : Bagian dari array materi_pembelajaran yang merupakan nama spesifik dari nama_kompetensi_dasar.
+                         --- tujuan_pembelajaran_materi : Tujuan yang menjadi acuan peserta didik dianggap telah memahami materi pembelajaran.
+                         --- indikator : Hasil akhir dari tujuan_pembelajaran_materi.
+                         --- alokasi_waktu : Mengambil jatah alokasi_waktu pada informasi_umum. Total alokasi_waktu pada array materi_pembelajaran harus sesuai dengan alokasi_waktu pada informasi_umum.
+        - glosarium_materi : Memiliki 10 item yang diurutkan secara alfabet. Setiap item pada Glosarium Materi harus berkaitan dengan mata_pelajaran, capaian_pembelajaran, serta elemen.
         - daftar_pustaka : Memiliki 5 item yang diurutkan secara alfabet. Daftar pustaka merupakan referensi yang digunakan untuk materi pada Modul Ajar. Setiap item pada Daftar Pustaka harus lengkap sesuai tata cara penulisan "petajukobit" yaitu penulis, tahun, judul, kota, penerbit. Pastikan setiap item pada Daftar Pustaka adalah referensi nyata bukan fiktif!
+
+        Daftar Profil Pelajar Pancasila:
+        - Beriman, Bertakwa kepada Tuhan YME, dan Berakhlak Mulia: Pelajar yang memiliki akhlak baik dalam hubungannya dengan Tuhan, sesama manusia, dan lingkungan, serta menunjukkan sikap beragama, pribadi, sosial, dan kenegaraan yang mulia.
+        - Berkebinekaan Global: Pelajar yang menghargai dan mempertahankan budaya serta identitas lokal sambil terbuka terhadap budaya lain, dengan kemampuan komunikasi dan refleksi interkultural yang baik.
+        - Bergotong Royong: Pelajar yang aktif dalam kolaborasi, berbagi, dan memiliki kepedulian terhadap keberhasilan bersama, mampu bekerja sama untuk mencapai tujuan bersama dengan semangat gotong royong.
+        - Mandiri: Pelajar yang bertanggung jawab atas proses dan hasil belajarnya, menunjukkan kesadaran diri dan kemampuan regulasi diri dalam mengelola belajar dan tantangan pribadi.
+        - Bernalar Kritis: Pelajar yang mampu memproses informasi secara objektif, menganalisis dan mengevaluasi data, serta membuat keputusan berdasarkan refleksi dan penalaran kritis.
+        - Kreatif: Pelajar yang mampu menghasilkan gagasan dan karya yang orisinal, memiliki kemampuan untuk berinovasi dan menciptakan solusi baru yang bermanfaat dan berdampak.
 
         Sertakan bidang berikut untuk setiap bagian dari Modul Ajar sebagai berikut:
         - kompetensi_awal : Persyaratan yang perlu dikuasai peserta didik sebelum mengikuti pembelajaran.
-        - profil_pelajar_pancasila : Jabarkan secara singkat sikap yang diperlukan oleh peserta didik sesuai dengan nilai-nilai yang terkandung dalam Pancasila dan berkaitan dengan elemen.
+        - profil_pelajar_pancasila: Karakteristik Profil Pelajar Pancasila yang ingin dikembangkan melalui tujuan pembelajaran dengan mengambil maksimal 3 dari 6 daftar Profil Pelajar Pancasila.
         - target_peserta_didik : Tujuan yang dicapai oleh peserta didik setelah mengikuti pembelajaran.
         - model_pembelajaran : Metode yang digunakan untuk menyampaikan materi pembelajaran. Misalkan menggunakan tugas proyek, pendekatan tugas, dan sejenisnya.
         - sumber_belajar : Sumber materi yang digunakan dalam pembelajaran. Berikan dalam bentuk paragraf.
         - lembar_kerja_peserta_didik : Media yang digunakan peserta didik untuk mengerjakan materi pembelajaran seperti buku catatan, lembar kerja siswa, dan sejenisnya. Berikan dalam bentuk paragraf.
+        - pertanyaan_pemantik : Pertanyaan untuk peserta didik yang berkaitan dengan mata_pelajaran, element, dan capaian_pembelajaran.
 
         Array "tujuan_kegiatan_pembelajaran" sebagai berikut:
         - tujuan_pembelajaran_pertemuan : Tujuan pembelajaran pada setiap pertemuan tanpa menuliskan pertemuan ke berapa. Data untuk tujuan_pembelajaran_pertemuan menyesuaikan jumlah pertemuan dari "alokasi_waktu".
@@ -406,7 +441,7 @@ class ModulAjarController extends Controller
 
         {
             "informasi_umum": {
-                "alokasi_waktu": "{Alokasi Waktu}",
+                "alokasi_waktu": "{Alokasi Waktu}", //Pastikan sesuai dengan format.
                 "kompetensi_awal": "{Kompetensi Awal}",
                 "profil_pelajar_pancasila": "{Profil Pelajar Pancasila}",
                 "target_peserta_didik": "{Target Peserta Didik}",
@@ -417,7 +452,6 @@ class ModulAjarController extends Controller
                 "lembar_kerja_peserta_didik": "{Lembar Kerja Peserta Didik}"
             },
             "tujuan_kegiatan_pembelajaran": {
-                "tujuan_pembelajaran_bab": "{Tujuan Pembelajaran Bab}",
                 "tujuan_pembelajaran_topik": ["{Tujuan Pembelajaran Topik}"], // Berikan minimal 4 item.
                 "tujuan_pembelajaran_pertemuan": ["{Tujuan Pembelajaran Pertemuan}"] // Tanpa menuliskan pertemuan ke berapa, jumlahnya menyesuaikan dengan alokasi_waktu informasi_umum. Misalkan alokasi_waktu 8 pertemuan maka ada 8 item tujuan_pembelajaran_pertemuan.
             },
