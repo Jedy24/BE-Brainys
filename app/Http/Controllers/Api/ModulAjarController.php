@@ -407,7 +407,8 @@ class ModulAjarController extends Controller
         Modul Ajar merupakan materi pembelajaran terstruktur yang digunakan sebagai alat bantu guru dalam proses pengajaran dan proses pembelajaran siswa. Modul Ajar dirancang sedemikian rupa agar dapat mencapai target Capaian Pembelajaran (CP).
 
         Secara struktur, komponen dari Modul Ajar adalah sebagai berikut:
-        - alokasi_waktu : Alokasi waktu pada bagian informasi_umum merupakan waktu yang dibutuhkan untuk menyelesaikan seluruh Modul Ajar seperti materi dan aktivitas pembelajaran. Berikan Alokasi Waktu dalam format berapa pekan / berapa jam pelajaran (JP) / berapa pertemuan.
+        - alokasi_waktu : Alokasi waktu pada bagian informasi_umum merupakan waktu yang dibutuhkan untuk menyelesaikan seluruh Modul Ajar seperti materi dan aktivitas pembelajaran.
+          //Perhatikan: alokasi_waktu memiliki struktur format: berapa pekan, berapa JP, berapa pertemuan. Asumsikan bahwa rasio pekan : JP : pertemuan adalah 1 : 3 : 1.
         - kompetensi_dasar : Array yang berisikan rincian materi dalam Modul ajar.
                -- nama_kompetensi_dasar : Bagian dari array kompetensi_dasar yang berisi nama materi pembelajaran dengan acuan dari mata_pelajaran, elemen, dan capaian_pembelajaran.
                -- materi_pembelajaran : Bagian dari array kompetensi_dasar yang berisi materi pembelajaran yang dibutuhkan untuk menyelesaikan kompetensi dasar.
@@ -434,6 +435,17 @@ class ModulAjarController extends Controller
         - sumber_belajar : Sumber materi yang digunakan dalam pembelajaran. Berikan dalam bentuk paragraf.
         - lembar_kerja_peserta_didik : Media yang digunakan peserta didik untuk mengerjakan materi pembelajaran seperti buku catatan, lembar kerja siswa, dan sejenisnya. Berikan dalam bentuk paragraf.
         - pertanyaan_pemantik : Pertanyaan untuk peserta didik yang berkaitan dengan mata_pelajaran, element, dan capaian_pembelajaran.
+        - kompetensi_dasar : Array yang berisikan rincian materi dalam Modul ajar.
+                -- nama_kompetensi_dasar : Bagian dari array kompetensi_dasar yang berisi nama materi pembelajaran dengan acuan dari mata_pelajaran, elemen, dan capaian_pembelajaran.
+                -- materi_pembelajaran : BAgian dari array kompetensi_dasar yang merupakan materi pembelajaran yang akan dipelajari peserta didik.
+                    --- materi : Bagian dari array materi_pembelajaran yang merupakan nama spesifik dari nama_kompetensi_dasar.
+                    --- tujuan_pembelajaran_materi : Tujuan yang menjadi acuan peserta didik dianggap telah memahami materi pembelajaran.
+                    --- indikator : Hasil akhir dari tujuan_pembelajaran_materi.
+                    --- nilai_karakter : Karakter yang diperlukan oleh peserta didik untuk mengikuti materi pembelajaran.
+                    --- kegiatan_pembelajaran : Kegiatan yang akan dilakukan peserta didik saat mengikuti materi_pembelajaran.
+                    --- alokasi_waktu : Perhitungan waktu yang diperlukan peserta didik untuk mengikuti materi pembelajaran.
+                    --- penilaian : Penilaian yang akan diberikan kepada peserta didik.
+
 
         Array "tujuan_kegiatan_pembelajaran" sebagai berikut:
         - tujuan_pembelajaran_pertemuan : Tujuan pembelajaran pada setiap pertemuan tanpa menuliskan pertemuan ke berapa. Data untuk tujuan_pembelajaran_pertemuan menyesuaikan jumlah pertemuan dari "alokasi_waktu".
@@ -441,7 +453,7 @@ class ModulAjarController extends Controller
 
         {
             "informasi_umum": {
-                "alokasi_waktu": "{Alokasi Waktu}", //Pastikan sesuai dengan format.
+                "alokasi_waktu": "(Berupa berapa pekan, berapa JP, berapa pertemuan)", //Pastikan sesuai dengan format.
                 "kompetensi_awal": "{Kompetensi Awal}",
                 "profil_pelajar_pancasila": "{Profil Pelajar Pancasila}",
                 "target_peserta_didik": "{Target Peserta Didik}",
@@ -461,15 +473,15 @@ class ModulAjarController extends Controller
             "pertanyaan_pemantik": ["", "", "", ""],
             "kompetensi_dasar": [
                 {
-                    "nama_kompetensi_dasar": "",
+                    "nama_kompetensi_dasar": "{Nama Kompetensi Dasar}",
                     "materi_pembelajaran": [
                         {
                             "materi": "{Materi}",
                             "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
-                            "indikator": "",
-                            "nilai_karakter": "",
-                            "kegiatan_pembelajaran": "",
-                            "alokasi_waktu": "",
+                            "indikator": "{Indikator}",
+                            "nilai_karakter": "{Nilai Karakter}",
+                            "kegiatan_pembelajaran": "{Kegiatan Pembelajaran}",
+                            "alokasi_waktu": "{Alokasi Waktu, berupa berapa pertemuan}",
                             "penilaian": [
                                 {
                                     "jenis": "",
@@ -484,10 +496,28 @@ class ModulAjarController extends Controller
                         {
                             "materi": "{Materi}",
                             "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
-                            "indikator": "",
-                            "nilai_karakter": "",
-                            "kegiatan_pembelajaran": "",
-                            "alokasi_waktu": "",
+                            "indikator": "{Indikator}",
+                            "nilai_karakter": "{Nilai Karakter}",
+                            "kegiatan_pembelajaran": "{Kegiatan Pembelajaran}",
+                            "alokasi_waktu": "{Alokasi Waktu, berupa berapa pertemuan}",
+                            "penilaian": [
+                                {
+                                    "jenis": "",
+                                    "bobot": 0
+                                },
+                                {
+                                    "jenis": "",
+                                    "bobot": 0
+                                }
+                            ]
+                        },
+                        {
+                            "materi": "{Materi}",
+                            "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
+                            "indikator": "{Indikator}",
+                            "nilai_karakter": "{Nilai Karakter}",
+                            "kegiatan_pembelajaran": "{Kegiatan Pembelajaran}",
+                            "alokasi_waktu": "{Alokasi Waktu, berupa berapa pertemuan}",
                             "penilaian": [
                                 {
                                     "jenis": "",
@@ -498,15 +528,15 @@ class ModulAjarController extends Controller
                     ]
                 },
                 {
-                    "nama_kompetensi_dasar": "",
+                    "nama_kompetensi_dasar": "{Nama Kompetensi Dasar}",
                     "materi_pembelajaran": [
                         {
                             "materi": "{Materi}",
                             "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
-                            "indikator": "",
-                            "nilai_karakter": "",
-                            "kegiatan_pembelajaran": "",
-                            "alokasi_waktu": "",
+                            "indikator": "{Indikator}",
+                            "nilai_karakter": "{Nilai Karakter}",
+                            "kegiatan_pembelajaran": "{Kegiatan Pembelajaran}",
+                            "alokasi_waktu": "{Alokasi Waktu, berupa berapa pertemuan}",
                             "penilaian": [
                                 {
                                     "jenis": "",
@@ -521,10 +551,10 @@ class ModulAjarController extends Controller
                         {
                             "materi": "{Materi}",
                             "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
-                            "indikator": "",
-                            "nilai_karakter": "",
-                            "kegiatan_pembelajaran": "",
-                            "alokasi_waktu": "",
+                            "indikator": "{Indikator}",
+                            "nilai_karakter": "{Nilai Karakter}",
+                            "kegiatan_pembelajaran": "{Kegiatan Pembelajaran}",
+                            "alokasi_waktu": "{Alokasi Waktu, berupa berapa pertemuan}",
                             "penilaian": [
                                 {
                                     "jenis": "",
@@ -534,7 +564,7 @@ class ModulAjarController extends Controller
                         }
                     ]
                 }
-            ], // Pastikan alokasi_waktu pada kompetensi_dasar sesuai dengan alokasi_waktu pada informasi_umum.
+            ],
             "lampiran": {
                 "glosarium_materi": [
                     "{Glosarium Materi 1}",
@@ -554,6 +584,7 @@ class ModulAjarController extends Controller
                 ]
             }
         }
+        Pastikan mengisi semua field yang ada di atas dengan data dan format yang benar. Terima kasih atas kerja sama Anda.
         ';
 
         return $prompt;
