@@ -14,12 +14,24 @@ class CapaianPembelajaranController extends Controller
             $fase = CapaianPembelajaran::select('fase')->distinct()->get();
 
             $faseArray = [
-                'Fase A | Kelas 1 - 2 SD',
-                'Fase B | Kelas 3 - 4 SD',
-                'Fase C | Kelas 5 - 6 SD',
-                'Fase D | Kelas 7 - 9 SMP',
-                'Fase E | Kelas 10 SMA',
-                'Fase F | Kelas 11 - 12 SMA'
+                [
+                    'fase' => 'Fase A | Kelas 1 - 2 SD',
+                ],
+                [
+                    'fase' => 'Fase B | Kelas 3 - 4 SD',
+                ],
+                [
+                    'fase' => 'Fase C | Kelas 5 - 6 SD',
+                ],
+                [
+                    'fase' => 'Fase D | Kelas 7 - 9 SMP',
+                ],
+                [
+                    'fase' => 'Fase E | Kelas 10 SMA',
+                ],
+                [
+                    'fase' => 'Fase F | Kelas 11 - 12 SMA',
+                ]
             ];
 
             return response()->json([
