@@ -59,7 +59,10 @@ class ModulAjarController extends Controller
 
             // Parameters
             $namaModulAjar  = $request->input('name');
-            $faseKelas      = $request->input('phase');
+            $faseRaw        = $request->input('phase');
+            $faseSplit      = explode('|', $faseRaw);
+            $faseKelas      = trim($faseSplit[0]);
+            $kelas          = trim($faseSplit[1]);
             $mataPelajaran  = $request->input('subject');
             $elemen         = $request->input('element');
             $addNotes       = $request->input('notes');

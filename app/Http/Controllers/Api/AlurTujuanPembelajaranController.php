@@ -58,7 +58,10 @@ class AlurTujuanPembelajaranController extends Controller
 
             // Parameters
             $name               = $request->input('name');
-            $fase               = $request->input('phase');
+            $faseRaw            = $request->input('phase');
+            $faseSplit          = explode('|', $faseRaw);
+            $fase               = trim($faseSplit[0]);
+            $kelas              = trim($faseSplit[1]);
             $mataPelajaran      = $request->input('subject');
             $elemen             = $request->input('element');
             $pekan              = $request->input('weeks');

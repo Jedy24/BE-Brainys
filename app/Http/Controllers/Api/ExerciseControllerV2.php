@@ -56,7 +56,11 @@ class ExerciseControllerV2 extends Controller
 
             // Ambil data dari permintaan
             $exerciseName   = $request->input('name');
-            $faseKelas      = $request->input('phase');
+            // $faseKelas      = $request->input('phase');
+            $faseRaw        = $request->input('phase');
+            $faseSplit      = explode('|', $faseRaw);
+            $faseKelas      = trim($faseSplit[0]);
+            $kelas          = trim($faseSplit[1]);
             $mataPelajaran  = $request->input('subject');
             $element        = $request->input('element');
             $jumlahSoal     = $request->input('number_of_questions');
@@ -158,7 +162,11 @@ class ExerciseControllerV2 extends Controller
 
             // Ambil data dari permintaan
             $exerciseName   = $request->input('name');
-            $faseKelas      = $request->input('phase');
+            // $faseKelas      = $request->input('phase');
+            $faseRaw        = $request->input('phase');
+            $faseSplit      = explode('|', $faseRaw);
+            $faseKelas      = trim($faseSplit[0]);
+            $kelas          = trim($faseSplit[1]);
             $mataPelajaran  = $request->input('subject');
             $element        = $request->input('element');
             $jumlahSoal     = $request->input('number_of_questions');

@@ -13,10 +13,19 @@ class CapaianPembelajaranController extends Controller
         try {
             $fase = CapaianPembelajaran::select('fase')->distinct()->get();
 
+            $faseArray = [
+                'Fase A | Kelas 1 - 2 SD',
+                'Fase B | Kelas 3 - 4 SD',
+                'Fase C | Kelas 5 - 6 SD',
+                'Fase D | Kelas 7 - 9 SMP',
+                'Fase E | Kelas 10 SMA',
+                'Fase F | Kelas 11 - 12 SMA'
+            ];
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Fase retrieved successfully',
-                'data' => $fase,
+                'data' => $faseArray,
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -29,7 +38,10 @@ class CapaianPembelajaranController extends Controller
 
     public function getMataPelajaran(Request $request)
     {
-        $fase = $request->input('fase');
+        $faseRaw    = $request->input('fase');
+        $faseSplit  = explode('|', $faseRaw);
+        $fase       = trim($faseSplit[0]);
+        $kelas      = trim($faseSplit[1]);
 
         try {
             $mataPelajaran = CapaianPembelajaran::where('fase', $fase)
@@ -53,8 +65,11 @@ class CapaianPembelajaranController extends Controller
 
     public function getElement(Request $request)
     {
-        $fase = $request->input('fase');
-        $mataPelajaran = $request->input('mata_pelajaran');
+        $faseRaw        = $request->input('fase');
+        $faseSplit      = explode('|', $faseRaw);
+        $fase           = trim($faseSplit[0]);
+        $kelas          = trim($faseSplit[1]);
+        $mataPelajaran  = $request->input('mata_pelajaran');
 
         try {
             $elements = CapaianPembelajaran::where('fase', $fase)
@@ -79,9 +94,12 @@ class CapaianPembelajaranController extends Controller
 
     public function getFinalData(Request $request)
     {
-        $fase = $request->input('fase');
-        $mataPelajaran = $request->input('mata_pelajaran');
-        $element = $request->input('element');
+        $faseRaw        = $request->input('fase');
+        $faseSplit      = explode('|', $faseRaw);
+        $fase           = trim($faseSplit[0]);
+        $kelas          = trim($faseSplit[1]);
+        $mataPelajaran  = $request->input('mata_pelajaran');
+        $element        = $request->input('element');
 
         try {
             $finalData = CapaianPembelajaran::where('fase', $fase)
@@ -103,7 +121,7 @@ class CapaianPembelajaranController extends Controller
             $firstCapaianPembelajaranRedaksi = $finalData->first()->capaian_pembelajaran_redaksi;
 
             $result = [
-                'fase' => $fase,
+                'fase' => $faseRaw,
                 'mata_pelajaran' => $mataPelajaran,
                 'element' => $element,
                 'capaian_pembelajaran' => $mergedCapaianPembelajaran,

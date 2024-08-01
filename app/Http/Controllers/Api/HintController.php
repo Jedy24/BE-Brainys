@@ -60,7 +60,11 @@ class HintController extends Controller
             // Parameters
             $namaKisiKisi   = $request->input('name');
             $pokokMateri    = $request->input('pokok_materi');
-            $tingkatKelas   = $request->input('grade');
+            // $tingkatKelas   = $request->input('grade');
+            $faseRaw        = $request->input('phase');
+            $faseSplit      = explode('|', $faseRaw);
+            $tingkatKelas   = trim($faseSplit[0]);
+            $kelas          = trim($faseSplit[1]);
             $mataPelajaran  = $request->input('subject');
             $elemenCapaian  = $request->input('elemen_capaian');
             $jumlahSoal     = $request->input('jumlah_soal');
