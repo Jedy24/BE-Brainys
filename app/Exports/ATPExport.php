@@ -49,7 +49,7 @@ class ATPExport implements FromArray, WithStyles, WithEvents
                 $alur['tujuan_pembelajaran'],
                 implode(', ', $alur['kata_frase_kunci']),
                 implode(', ', $alur['profil_pelajar_pancasila']),
-                $alur['glorasium']
+                $alur['glosarium']
             ];
         }
 

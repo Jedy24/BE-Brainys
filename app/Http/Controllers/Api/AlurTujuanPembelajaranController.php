@@ -314,42 +314,34 @@ class AlurTujuanPembelajaranController extends Controller
         - profil_pelajar_pancasila: Karakteristik Profil Pelajar Pancasila yang ingin dikembangkan melalui tujuan tersebut, dengan maksimal 2 dari 6 profil yang sesuai per minggu.
         - glosarium: Buat daftar istilah secara alfabetis dalam domain pengetahuan tertentu dengan definisi untuk istilah-istilah tersebut, Dipisah dengan ; antara gabungan istilah dan penjelasan glorasium ya.
 
+        Perhatian: Mohon jawab dengan format JSON berikut:
         {
-            "fase": "{Fase}",
-            "mata_pelajaran": "{Mata Pelajaran}",
-            "elemen": "{Elemen}",
-            "capaian_pembelajaran": "{Capaian Pembelajaran}",
-            "capaian_pembelajaran_per_tahun": "{Capaian Pembelajaran per Tahun}",
-            "pekan": "{Pekan}",
-            "alur": [
-                {
-                    "no": 1,
-                    "tujuan_pembelajaran": "{Tujuan Pembelajaran Pekan 1, minimal 3 sampai 5 kalimat per tujuan pembelajaran, agar detail ya}",
-                    "kata_frase_kunci": [
-                        "{Kata/Frase Kunci Pekan 1}"
-                    ],
-                    "profil_pelajar_pancasila": [
-                        "{Profil Pelajar Pancasila Pekan 1}"
-                    ],
-                    "glorasium": "{Glorasium Pekan 1}"
-                },
-                {
-                    "no": 2,
-                    "tujuan_pembelajaran": "{Tujuan Pembelajaran Pekan 2, minimal 3 sampai 5 kalimat per tujuan pembelajaran, agar detail ya}",
-                    "kata_frase_kunci": [
-                        "{Kata/Frase Kunci Pekan 2}"
-                    ],
-                    "profil_pelajar_pancasila": [
-                        "{Profil Pelajar Pancasila Pekan 2}"
-                    ],
-                    "glorasium": "{Glorasium Pekan 2}"
-                }
-                // Continue this pattern up to the number of weeks specified
-            ]
-        }
+            "fase": "' . $fase . '",
+            "mata_pelajaran": "' . $mataPelajaran . '",
+            "elemen": "' . $elemen . '",
+            "capaian_pembelajaran": "' . $capaianPembelajaran . '",
+            "capaian_pembelajaran_per_tahun": "' . $capaianPembelajaranTahun . '",
+            "pekan": "' . $pekan . '",
+            "alur": [';
 
-        ';
-        $prompt .= '';
+            for ($i = 1; $i <= $pekan; $i++) {
+                $prompt .= '
+                {
+                    "no": ' . $i . ',
+                    "tujuan_pembelajaran": "", //Diisi dengan tujuan Pembelajaran Pekan ' . $i . ', minimal 3 sampai 5 kalimat per tujuan pembelajaran, agar detail ya
+                    "kata_frase_kunci": [
+                        "" // Diisi dengan Kata/Frase Kunci Pekan ' . $i . '
+                    ],
+                    "profil_pelajar_pancasila": [
+                        "" // Diisi dengan Profil Pelajar Pancasila Pekan ' . $i . '
+                    ],
+                    "glosarium": "" //Diiisi dengan Glosarium Pekan ' . $i . '
+                }' . ($i < $pekan ? ',' : '');
+            }
+
+            $prompt .= '
+            ]
+        }';
 
         return $prompt;
     }
