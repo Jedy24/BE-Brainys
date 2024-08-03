@@ -441,7 +441,7 @@ class ExerciseControllerV2 extends Controller
         - kompetensi_awal: Diisi dengan kompetensi awal yang diperlukan sebelum mengikuti latihan, berbentuk 1 paragraf/alinea.
         - soal_pilihan_ganda: Diisi dengan array daftar soal pilihan ganda.
             -- question: Diisi dengan pertanyaan soal pilihan ganda.
-            -- options: Diisi dengan opsi untuk menjawab soal.
+            -- options: Diisi dengan opsi untuk menjawab soal A sampai E.
             -- correct_option: Diisi dengan jawaban yang tepat, berbentuk Abjad!.
         
         Perhatian: Mohon jawab dengan format template JSON berikut dan isi sesuai Penjelasan Template Format JSON ya:
