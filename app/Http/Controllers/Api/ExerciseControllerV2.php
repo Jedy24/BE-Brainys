@@ -418,65 +418,73 @@ class ExerciseControllerV2 extends Controller
     {
         $prompt = '';
         $prompt .= '
-        Anda adalah seorang guru yang berdedikasi untuk menyediakan latihan esai berkualitas bagi siswa Anda.
-        Mata pelajaran yang Anda ajarkan adalah ' . $mataPelajaran . ' untuk tingkat kelas ' . $faseKelas . '
-        Saat ini, Anda diminta untuk membuat latihan esai dengan memperhatikan catatan khusus berikut: ' . $notes . '
+    Anda adalah seorang guru yang berdedikasi untuk menyediakan latihan esai berkualitas bagi siswa Anda.
+    Mata pelajaran yang Anda ajarkan adalah ' . $mataPelajaran . ' untuk tingkat kelas ' . $faseKelas . '
+    Saat ini, Anda diminta untuk membuat latihan esai dengan memperhatikan catatan khusus berikut: ' . $notes . '
 
-        Tujuan latihan ini adalah untuk membantu siswa memahami dan menguasai konsep yang diajarkan dalam pelajaran ini.
-        Oleh karena itu, Anda perlu membuat latihan yang terstruktur dengan baik dan mudah dipahami oleh siswa.
-        
-        Elemen yang akan dibahas dalam latihan ini adalah: ' . $element . '
-        Capaian pembelajaran yang diharapkan dari latihan ini adalah: ' . $capaianPembelajaran . '
-        Capaian pembelajaran redaksi sesuai kurikulum kementrian pendidikan adalah: ' . $capaianPembelajaranRedaksi . '
-        
-        Penjelasan Template Format JSON:
-        - penyusun: Diisi dengan nama penyusun latihan.
-        - instansi: Diisi dengan nama instansi atau sekolah penyusun.
-        - tahun_penyusunan: Diisi dengan tahun penyusunan latihan.
-        - jenjang_sekolah: Diisi dengan tingkat jenjang sekolah sesuai fase (misalnya SD, SMP, SMA).
-        - mata_pelajaran: Diisi dengan nama mata pelajaran.
-        - fase_kelas: Diisi dengan fase atau tingkat kelas.
-        - topik: Diisi dengan topik utama dari latihan, berbentuk 1 paragraf/alinea.
-        - alokasi_waktu: Diisi dengan alokasi waktu yang diperlukan untuk menyelesaikan latihan.
-        - kompetensi_awal: Diisi dengan kompetensi awal yang diperlukan sebelum mengikuti latihan, berbentuk 1 paragraf/alinea.
-        - soal_pilihan_ganda: Diisi dengan array daftar soal pilihan ganda.
-            -- question: Diisi dengan pertanyaan soal pilihan ganda.
-            -- options: Diisi dengan opsi untuk menjawab soal A sampai E.
-            -- correct_option: Diisi dengan jawaban yang tepat, berbentuk Abjad!.
-        
-        Perhatian: Mohon jawab dengan format template JSON berikut dan isi sesuai Penjelasan Template Format JSON ya:
-        {
-            "informasi_umum": {
-                "penyusun": "",
-                "instansi": "",
-                "tahun_penyusunan": "",
-                "jenjang_sekolah": "",
-                "fase_kelas": "' . $faseKelas . '",
-                "mata_pelajaran": "' . $mataPelajaran . '",
-                "element": "' . $element . '",
-                "capaian_pembelajaran": "' . $capaianPembelajaran . '",
-                "capaian_pembelajaran_redaksi": "' . $capaianPembelajaranRedaksi . '",
-                "topik": "(Berbentuk 1 Paragraf/Alinea)",
-                "kompetensi_awal": "(Berbentuk 1 Paragraf/Alinea)",
-                "alokasi_waktu": "",
-            },
-            "soal_pilihan_ganda": [
-                {
-                    "question": "",
-                    "options": {
-                        "a": "",
-                        "b": "",
-                        "c": "",
-                        "d": "",
-                        "e": ""
-                    },
-                    "correct_option": ""
+    Tujuan latihan ini adalah untuk membantu siswa memahami dan menguasai konsep yang diajarkan dalam pelajaran ini.
+    Oleh karena itu, Anda perlu membuat latihan yang terstruktur dengan baik dan mudah dipahami oleh siswa.
+    
+    Elemen yang akan dibahas dalam latihan ini adalah: ' . $element . '
+    Capaian pembelajaran yang diharapkan dari latihan ini adalah: ' . $capaianPembelajaran . '
+    Capaian pembelajaran redaksi sesuai kurikulum kementrian pendidikan adalah: ' . $capaianPembelajaranRedaksi . '
+    
+    Penjelasan Template Format JSON:
+    - penyusun: Diisi dengan nama penyusun latihan.
+    - instansi: Diisi dengan nama instansi atau sekolah penyusun.
+    - tahun_penyusunan: Diisi dengan tahun penyusunan latihan.
+    - jenjang_sekolah: Diisi dengan tingkat jenjang sekolah sesuai fase (misalnya SD, SMP, SMA).
+    - mata_pelajaran: Diisi dengan nama mata pelajaran.
+    - fase_kelas: Diisi dengan fase atau tingkat kelas.
+    - topik: Diisi dengan topik utama dari latihan, berbentuk 1 paragraf/alinea.
+    - alokasi_waktu: Diisi dengan alokasi waktu yang diperlukan untuk menyelesaikan latihan.
+    - kompetensi_awal: Diisi dengan kompetensi awal yang diperlukan sebelum mengikuti latihan, berbentuk 1 paragraf/alinea.
+    - soal_pilihan_ganda: Diisi dengan array daftar soal pilihan ganda.
+        -- question: Diisi dengan pertanyaan soal pilihan ganda.
+        -- options: Diisi dengan opsi untuk menjawab soal A sampai E.
+        -- correct_option: Diisi dengan jawaban yang tepat, berbentuk Abjad!.
+
+    Perhatian: Mohon jawab dengan format template JSON berikut dan isi sesuai Penjelasan Template Format JSON ya:
+    {
+        "informasi_umum": {
+            "penyusun": "",
+            "instansi": "",
+            "tahun_penyusunan": "",
+            "jenjang_sekolah": "",
+            "fase_kelas": "' . $faseKelas . '",
+            "mata_pelajaran": "' . $mataPelajaran . '",
+            "element": "' . $element . '",
+            "capaian_pembelajaran": "' . $capaianPembelajaran . '",
+            "capaian_pembelajaran_redaksi": "' . $capaianPembelajaranRedaksi . '",
+            "topik": "(Berbentuk 1 Paragraf/Alinea)",
+            "kompetensi_awal": "(Berbentuk 1 Paragraf/Alinea)",
+            "alokasi_waktu": "",
+        },
+        "soal_pilihan_ganda": [';
+
+        for ($i = 0; $i < $jumlahSoal; $i++) {
+            $prompt .= '
+            {
+                "question": "",
+                "options": {
+                    "a": "",
+                    "b": "",
+                    "c": "",
+                    "d": "",
+                    "e": ""
                 },
-                // Lanjutkan pola ini sampai jumlah soal_essay mencapai ' . $jumlahSoal . '
-            ]
+                "correct_option": ""
+            }';
+            if ($i < $jumlahSoal - 1) {
+                $prompt .= ',';
+            }
         }
 
-        Jumlah soal yang diminta: ' . $jumlahSoal . ' dan Jangan sampai anda memngembalikan JSON template kosongan atau data dummy, tolong dengan real isi!';
+        $prompt .= '
+        ]
+    }
+
+    Jumlah soal yang diminta: ' . $jumlahSoal . ' dan Jangan sampai anda memngembalikan JSON template kosongan atau data dummy, tolong dengan real isi!';
 
         return $prompt;
     }
