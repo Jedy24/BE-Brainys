@@ -467,7 +467,8 @@ class ExerciseControllerV2 extends Controller
                         "a": "",
                         "b": "",
                         "c": "",
-                        "d": ""
+                        "d": "",
+                        "e": ""
                     },
                     "correct_option": ""
                 },
