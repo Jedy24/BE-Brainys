@@ -17,7 +17,21 @@ class PackageResource extends Resource
 {
     protected static ?string $model = Package::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?int $navigationSort = 10;
+
+    protected static ?string $navigationGroup = 'Package & Credit';
+
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
+
+    public static function getLabel(): string
+    {
+        return 'Package';
+    }
+
+    public static function getPluralLabel(): string
+    {
+        return 'Packages';
+    }
 
     public static function form(Form $form): Form
     {

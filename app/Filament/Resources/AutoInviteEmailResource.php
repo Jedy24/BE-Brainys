@@ -17,7 +17,7 @@ class AutoInviteEmailResource extends Resource
 {
     protected static ?string $model = AutoInviteEmail::class;
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 12;
 
     protected static ?string $navigationGroup = 'System';
 

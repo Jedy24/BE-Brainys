@@ -24,7 +24,7 @@ class UserInvitationResource extends Resource
 {
     protected static ?string $model = UserInvitation::class;
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 12;
 
     protected static ?string $navigationGroup = 'User';
 

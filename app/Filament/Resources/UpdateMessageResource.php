@@ -17,7 +17,7 @@ class UpdateMessageResource extends Resource
 {
     protected static ?string $model = UpdateMessage::class;
     
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 13;
 
     protected static ?string $navigationGroup = 'System';
 
