@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UserSyllabusResource\Pages;
-use App\Filament\Resources\UserSyllabusResource\RelationManagers;
+use App\Filament\Resources\UsersHintResource\Pages;
+use App\Filament\Resources\UsersHintResource\RelationManagers;
 use App\Models\User;
+use App\Models\UsersHint;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,31 +14,26 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class UserSyllabusResource extends Resource
+class UsersHintResource extends Resource
 {
     protected static ?string $model = User::class;
-
-    protected static ?int $navigationSort = 4;
+    
+    protected static ?int $navigationSort = 8;
 
     protected static ?string $navigationGroup = 'Users Modules';
 
-    protected static ?string $navigationLabel = 'Users Syllabus';
+    protected static ?string $navigationLabel = 'Users Hint';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function getSlug(): string
-    {
-        return 'user-syllabus';
-    }
-
     public static function getLabel(): string
     {
-        return 'Users Syllabus';
+        return 'Users Hint';
     }
 
     public static function getPluralLabel(): string
     {
-        return 'Users Syllabus';
+        return 'Users Hint';
     }
 
     public static function form(Form $form): Form
@@ -51,8 +47,8 @@ class UserSyllabusResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->heading('Users Syllabus')
-            ->description('Show user generated for syllabus module')
+            ->heading('Users Hint')
+            ->description('Show user generated for hint (kisi-kisi) module')
             ->defaultSort('created_at', 'DESC')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
@@ -64,8 +60,8 @@ class UserSyllabusResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('generate_count')
-                    ->label('Generated Syllabus Count')
-                    ->getStateUsing(fn (User $record) => $record->syllabusHistory()->count())
+                    ->label('Generated Hint Count')
+                    ->getStateUsing(fn (User $record) => $record->hintHistory()->count())
                     ->alignCenter(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('User Register')
@@ -77,10 +73,10 @@ class UserSyllabusResource extends Resource
                 //
             ])
             ->actions([
-                // Tables\Actions\EditAction::make(),
+                // 
             ])
             ->bulkActions([
-                //
+                // 
             ]);
     }
 
@@ -94,7 +90,7 @@ class UserSyllabusResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUserSyllabus::route('/'),
+            'index' => Pages\ListUsersHints::route('/'),
         ];
     }
 }

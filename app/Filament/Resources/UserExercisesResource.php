@@ -47,7 +47,7 @@ class UserExercisesResource extends Resource
     {
         return $table
             ->heading('Users Exercise')
-            ->description('Show user generated for exercise module')
+            ->description('Show user generated for exercise (latihan soal) module')
             ->defaultSort('created_at', 'DESC')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
@@ -59,7 +59,7 @@ class UserExercisesResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('generate_count')
-                    ->label('Generate Exercise Count')
+                    ->label('Generated Exercise Count')
                     ->getStateUsing(fn (User $record) => $record->exerciseHistory()->count())
                     ->alignCenter(),
                 Tables\Columns\TextColumn::make('created_at')

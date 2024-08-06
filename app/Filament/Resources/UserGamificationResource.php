@@ -48,7 +48,7 @@ class UserGamificationResource extends Resource
     {
         return $table
             ->heading('Users Bahan Ajar')
-            ->description('Show user generated for gamification module')
+            ->description('Show user generated for gamification (materi gamifikasi) module')
             ->defaultSort('created_at', 'DESC')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
@@ -60,7 +60,7 @@ class UserGamificationResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('generate_count')
-                    ->label('Generate Gamification Count')
+                    ->label('Generated Gamification Count')
                     ->getStateUsing(fn (User $record) => $record->gamificationHistory()->count())
                     ->alignCenter(),
                 Tables\Columns\TextColumn::make('created_at')

@@ -17,22 +17,22 @@ class UserMaterialsResource extends Resource
 {
     protected static ?string $model = User::class;
     
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationGroup = 'Users Modules';
 
-    protected static ?string $navigationLabel = 'Users Materials';
+    protected static ?string $navigationLabel = 'Users Modul Ajar';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function getLabel(): string
     {
-        return 'Users Material';
+        return 'Users Modul Ajar';
     }
 
     public static function getPluralLabel(): string
     {
-        return 'Users Material';
+        return 'Users Modul Ajar';
     }
 
     public static function form(Form $form): Form
@@ -47,7 +47,7 @@ class UserMaterialsResource extends Resource
     {
         return $table
             ->heading('Users Material')
-            ->description('Show user generated for material module')
+            ->description('Show user generated for material (modul ajar) module')
             ->defaultSort('created_at', 'DESC')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
@@ -59,7 +59,7 @@ class UserMaterialsResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('generate_count')
-                    ->label('Generate Material Count')
+                    ->label('Generated Material Count')
                     ->getStateUsing(fn (User $record) => $record->materialHistory()->count())
                     ->alignCenter(),
                 Tables\Columns\TextColumn::make('created_at')
