@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $description
  * @property int $credit_add_monthly
  * @property int $price
+ * @property \Illuminate\Database\Eloquent\Collection|PackageDetail[] $details
  */
 class Package extends Model
 {
@@ -28,4 +29,12 @@ class Package extends Model
         'credit_add_monthly',
         'price',
     ];
+
+    /**
+     * Get the details for the package.
+     */
+    public function details()
+    {
+        return $this->hasMany(PackageDetail::class, 'id_package');
+    }
 }
