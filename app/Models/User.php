@@ -219,4 +219,14 @@ class User extends Authenticatable
             + $this->modulAjarHistory()->count()
         );
     }
+
+    /**
+     * Get the user packages for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function userPackages()
+    {
+        return $this->hasMany(UserPackage::class, 'id_user', 'id');
+    }
 }

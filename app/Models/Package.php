@@ -31,10 +31,12 @@ class Package extends Model
     ];
 
     /**
-     * Get the details for the package.
+     * Get the package details for the package.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function details()
     {
-        return $this->hasMany(PackageDetail::class, 'id_package');
+        return $this->hasMany(PackageDetail::class, 'id_package', 'id');
     }
 }
