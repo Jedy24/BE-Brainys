@@ -15,14 +15,14 @@ class AddUsersToPackage extends Command
      *
      * @var string
      */
-    protected $signature = 'add:users-to-package';
+    protected $signature = 'add:users-to-package {packageId}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Add or update all users in a given package';
 
     /**
      * Execute the console command.
