@@ -33,6 +33,18 @@ class AuthenticationController extends Controller
             ], 401);
         }
 
+        // Get the user's packages with the package names
+        $userPackages = $user->userPackages()->with('package')->get()->map(function ($userPackage) {
+            return [
+                'package_id' => $userPackage->id,
+                'package_name' => $userPackage->package->name,
+                'package_description' => $userPackage->package->description,
+                'package_description_mod' => 'Mendapatkan '.$userPackage->package->credit_add_monthly.' credit setiap bulannya',
+                'credit_add_monthly' => $userPackage->package->credit_add_monthly,
+                'price' => $userPackage->package->price,
+            ];
+        });
+
         /**Mengambil data user berupa nama, email, nama sekolah, dan profesi. */
         $response = [
             'status' => 'success',
@@ -44,6 +56,7 @@ class AuthenticationController extends Controller
                 'profession' => $user->profession,
                 'email' => $user->email,
                 'is_active' => $user->is_active,
+                'package' => $userPackages
                 // 'password' => $user->password,
             ],
         ];
