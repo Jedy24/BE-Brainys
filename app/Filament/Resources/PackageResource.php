@@ -44,6 +44,7 @@ class PackageResource extends Resource
                 Forms\Components\Select::make('type')
                     ->label('Package Type')
                     ->options([
+                        'free' => 'Free',
                         'monthly' => 'Monthly',
                         'annually' => 'Annually',
                     ])
@@ -93,6 +94,7 @@ class PackageResource extends Resource
                     ->label('Package Type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
+                        'free' => 'gray',
                         'monthly' => 'primary',
                         'annually' => 'success',
                     })
