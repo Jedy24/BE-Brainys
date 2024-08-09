@@ -20,6 +20,7 @@ use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\Api\FeedbackReviewController;
 use App\Http\Controllers\Api\GamificationController;
 use App\Http\Controllers\Api\OpenAIController;
+use App\Http\Controllers\Api\PackageController;
 use App\Http\Controllers\Api\SendInvitationController;
 use App\Http\Controllers\Api\UserInvitationController;
 use App\Http\Controllers\Service\CapaianPembelajaranController;
@@ -151,6 +152,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group(['prefix' => 'feedback'], function () {
         Route::get('/', [FeedbackReviewController::class, 'index']);
         Route::post('/create', [FeedbackReviewController::class, 'store']);
+    });
+
+    // Package
+    Route::group(['prefix' => 'package'], function () {
+        Route::get('/', [PackageController::class, 'getPackage']);
     });
 });
 
