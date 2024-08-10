@@ -40,7 +40,7 @@ class UserPackageResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('id_user')
-                    ->relationship('user', 'name')
+                    ->relationship('user', 'email')
                     ->label('User')
                     ->required(),
                 Forms\Components\Select::make('id_package')
@@ -56,8 +56,8 @@ class UserPackageResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user.name')
-                    ->label('User')
+                Tables\Columns\TextColumn::make('user.email')
+                    ->label('User Email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('package.name')
                     ->label('Package')
