@@ -4,7 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserPackageResource\Pages;
 use App\Filament\Resources\UserPackageResource\RelationManagers;
+use App\Models\Package;
 use App\Models\UserPackage;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -46,9 +48,65 @@ class UserPackageResource extends Resource
                 Forms\Components\Select::make('id_package')
                     ->relationship('package', 'name')
                     ->label('Package')
-                    ->required(),
-                Forms\Components\DateTimePicker::make('enroll_at'),
-                Forms\Components\DateTimePicker::make('expired_at'),
+                    ->getOptionLabelFromRecordUsing(function ($record) {
+                        return ucwords($record->name) . ' (' . ucwords($record->type) . ')';
+                    })
+                    ->required()
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set, ?UserPackage $record) {
+                        if ($record) {
+                            $originalPackageId = $record->id_package;
+                            $newPackageId = $state;
+
+                            if ($originalPackageId !== $newPackageId) {
+                                $newPackageType = Package::find($newPackageId)->type;
+                                $expiryDate = now();
+
+                                if ($newPackageType === 'monthly') {
+                                    $expiryDate->addDays(30);
+                                } elseif ($newPackageType === 'annually') {
+                                    $expiryDate->addYear();
+                                }
+
+                                $set('expired_at', $expiryDate->toDateTimeString()); // Convert to string
+                            }
+                        }
+                    }),
+
+                Forms\Components\DateTimePicker::make('enroll_at')
+                    ->label('Enroll Date')
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set, ?UserPackage $record) {
+                        if ($record) {
+                            $packageType = $record->package->type;
+                            $expiryDate = $state ? Carbon::parse($state) : now();
+
+                            if ($packageType === 'monthly') {
+                                $expiryDate->addDays(30);
+                            } elseif ($packageType === 'annually') {
+                                $expiryDate->addYear();
+                            }
+
+                            $set('expired_at', $expiryDate->toDateTimeString()); // Convert to string
+                        }
+                    }),
+
+                Forms\Components\DateTimePicker::make('expired_at')
+                    ->label('Expiry Date')
+                    ->afterStateUpdated(function ($state, callable $set, ?UserPackage $record) {
+                        if (!$record) {
+                            $packageType = $set('id_package') ? Package::find($set('id_package'))->type : null;
+                            $expiryDate = now();
+
+                            if ($packageType === 'monthly') {
+                                $expiryDate->addDays(30);
+                            } elseif ($packageType === 'annually') {
+                                $expiryDate->addYear();
+                            }
+
+                            $set('expired_at', $expiryDate->toDateTimeString()); // Convert to string
+                        }
+                    }),
             ]);
     }
 
@@ -61,7 +119,10 @@ class UserPackageResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('package.name')
                     ->label('Package')
-                    ->searchable(),
+                    ->searchable()
+                    ->formatStateUsing(function ($record) {
+                        return ucwords($record->package->name) . ' (' . ucwords($record->package->type) . ')';
+                    }),
                 Tables\Columns\TextColumn::make('enroll_at')
                     ->label('Enroll Date')
                     ->dateTime(),
