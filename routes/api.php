@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\MaterialController;
 use App\Http\Controllers\Api\SyllabusController;
 use App\Http\Controllers\Api\HintController;
 use App\Http\Controllers\Api\BahanAjarController;
+use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\ExerciseControllerV2;
 use App\Http\Controllers\Api\ExtraCreditController;
 use App\Http\Controllers\Api\ModulAjarController;
@@ -159,6 +160,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group(['prefix' => 'subscription'], function () {
         Route::get('/package', [PackageController::class, 'getPackage']);
         Route::get('/extra-credit', [ExtraCreditController::class, 'getExtraCredit']);
+    });
+
+    // Checkout
+    Route::group(['prefix' => 'checkout'], function () {
+        Route::post('/get-info', [CheckoutController::class, 'getInfo']);
     });
 });
 

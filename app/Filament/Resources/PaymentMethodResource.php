@@ -64,6 +64,15 @@ class PaymentMethodResource extends Resource
                     ->label('Provider Gateway Code/ID API')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\Select::make('category')
+                    ->label('Payment Category')
+                    ->options([
+                        'virtual_account' => 'Virtual Account',
+                        'e_wallet' => 'E-Wallet',
+                        'others' => 'Others',
+                    ])
+                    ->required()
+                    ->columnSpanFull(),
                 Forms\Components\RichEditor::make('description')
                     ->label('Description')
                     ->required()

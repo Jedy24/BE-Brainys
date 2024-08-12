@@ -33,5 +33,6 @@ class PaymentMethod extends Model
         'provider',
         'provider_code',
         'description',
+        'category',
     ];
 }
