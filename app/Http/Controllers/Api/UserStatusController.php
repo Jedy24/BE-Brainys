@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\ExerciseHistories;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\MaterialHistories;
-use App\Models\SyllabusHistories;
 use App\Models\UserNotification;
 
 class UserStatusController extends Controller
@@ -18,21 +16,8 @@ class UserStatusController extends Controller
             // Retrieve the authenticated user
             $user = $request->user();
 
-            // Construct the status data
             $status = [
-                'materials' => [
-                    // 'limit' => $user->limit_generate_material,
-                    'used' => MaterialHistories::where('user_id', $user->id)->count(),
-                ],
-                'syllabus' => [
-                    // 'limit' => $user->limit_generate_syllabus,
-                    'used' => SyllabusHistories::where('user_id', $user->id)->count(),
-                ],
-                'exercise' => [
-                    // 'limit' => $user->limit_generate_exercise,
-                    'used' => ExerciseHistories::where('user_id', $user->id)->count(),
-                ],
-                'all' => [
+                'generate' => [
                     'limit' => $user->limit_generate,
                     'used' => $user->generateAllSum(),
                 ]
@@ -42,7 +27,7 @@ class UserStatusController extends Controller
             $notificationMessage = null;
 
             // Check if user is approaching the generate limit
-            if ($status['all']['used'] >= 15 && $status['all']['used'] < 20) {
+            if ($status['generate']['used'] >= $status['generate']['limit'] - 5 && $status['generate']['used'] < $status['generate']['limit']) {
                 // Send notification directly
                 $this->sendNotification($user, 'Anda hampir mencapai limit untuk melakukan generasi.');
                 // Set notification message
