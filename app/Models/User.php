@@ -29,7 +29,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * 
+ *
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Provider[] $providers
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\MaterialHistories[] $materialHistory
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\SyllabusHistories[] $syllabusHistory
@@ -190,6 +190,16 @@ class User extends Authenticatable
         return $this->hasMany(ModulAjarHistories::class, 'user_id', 'id');
     }
 
+        /**
+     * Get the modul ajar history for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    // public function rubrikNilaiHistory()
+    // {
+    //     return $this->hasMany(RubrikNilaiHistories::class, 'user_id', 'id');
+    // }
+
     /**
      * Get the feedback reviews for the user.
      *
@@ -217,6 +227,7 @@ class User extends Authenticatable
             + $this->hintHistory()->count()
             + $this->alurTujuanPembelajaranHistory()->count()
             + $this->modulAjarHistory()->count()
+            // + $this->rubrikNilaiHistory()->count()
         );
     }
 
