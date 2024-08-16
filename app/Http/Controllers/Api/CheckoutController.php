@@ -10,6 +10,7 @@ use App\Models\PaymentMethod;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\TransactionPayment;
+use App\Services\PaydisiniService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -85,6 +86,8 @@ class CheckoutController extends Controller
         $itemId = $request->input('item_id');
         $paymentMethodId = $request->input('payment_method_id');
 
+
+
         // Begin transaction
         DB::beginTransaction();
 
@@ -117,40 +120,104 @@ class CheckoutController extends Controller
 
             // Calculate total amount (this example assumes no discounts or additional fees)
             $amountSub = $item->price;
-            $amountFee = $paymentMethod->fee;
-            $amountTotal = $amountSub + $amountFee;
+            // $amountFee = $paymentMethod->fee;
+            $amountTotal = $amountSub;
+
+            $unique_code = 'BR-' . now()->format('ymd') . '-' . str_pad(random_int(0, 999999999), 9, '0', STR_PAD_LEFT);
+
+            $paydisini = new PaydisiniService('5a619921d520811105e2880f5ef13f1b');
+
+            // Menyiapkan data untuk transaksi baru
+            $transactionData = [
+                'unique_code' => $unique_code,
+                'service' => $paymentMethod->provider_code,
+                'amount' => $amountTotal,
+                'note' => '-',
+                'valid_time' => 3600,
+                'ewallet_phone' => null,
+                'customer_email' => null,
+                'type_fee' => 1,
+                'payment_guide' => 'TRUE',
+                'callback_count' => 3,
+                'return_url' => 'https://pos.theaxe.online'
+            ];
+
+            // Create new transaction payment
+            $transactionResponse    = $paydisini->createNewTransaction($transactionData);
+            $responseData           = $transactionResponse;
+
+            // dd($transactionResponse);
+
+            // Check transaction
+            if ($responseData['success']) {
+                if (isset($responseData['data']['pay_id'])) {
+                    $paymentArray['success']                    = true;
+                    $paymentArray['data']['pay_id']             = $responseData['data']['pay_id'] ?? '';
+                    $paymentArray['data']['unique_code']        = $responseData['data']['unique_code'] ?? '';
+                    $paymentArray['data']['service']            = $responseData['data']['service'] ?? '';
+                    $paymentArray['data']['service_name']       = $responseData['data']['service_name'] ?? '';
+                    $paymentArray['data']['amount']             = $responseData['data']['amount'] ?? 0;
+                    $paymentArray['data']['balance']            = $responseData['data']['balance'] ?? 0;
+                    $paymentArray['data']['fee']                = $responseData['data']['fee'] ?? 0;
+                    $paymentArray['data']['type_fee']           = $responseData['data']['type_fee'] ?? '';
+                    $paymentArray['data']['note']               = $responseData['data']['note'] ?? '';
+                    $paymentArray['data']['status']             = $responseData['data']['status'] ?? '';
+                    $paymentArray['data']['expired']            = $responseData['data']['expired'] ?? '';
+                    $paymentArray['data']['checkout_url']       = $responseData['data']['checkout_url'] ?? '';
+                    $paymentArray['data']['checkout_url_v1']    = $responseData['data']['checkout_url_v1'] ?? '';
+                    $paymentArray['data']['checkout_url_v2']    = $responseData['data']['checkout_url_v2'] ?? '';
+                    $paymentArray['data']['checkout_url_v3']    = $responseData['data']['checkout_url_v3'] ?? '';
+                    $paymentArray['data']['checkout_url_beta']  = $responseData['data']['checkout_url_beta'] ?? '';
+                }
+
+                if (isset($responseData['data']['qrcode_url'])) {
+                    $paymentArray['data']['type']       = 'qris';
+                    $paymentArray['data']['qrcode_url'] = $responseData['data']['qrcode_url'] ?? '';
+                    $paymentArray['data']['qr_content'] = $responseData['data']['qr_content'] ?? '';
+                }
+
+                if (isset($responseData['data']['virtual_account'])) {
+                    $paymentArray['data']['type']               = 'va';
+                    $paymentArray['data']['virtual_account']    = $responseData['data']['virtual_account'] ?? '';
+                }
+            } else {
+                $status                     = 'pending';
+                $paymentArray['success']    = false;
+                $paymentArray['msg']        = $responseData['msg'] ?? 'Unknown error';
+                $paymentArray['debug']      = $paymentMethod;
+            }
 
             // Create the transaction
             $transaction = Transaction::create([
                 'id_user' => auth()->id(),
                 'transaction_date' => now(),
-                'transaction_code' => uniqid('TX-'),
+                'transaction_code' => $unique_code,
                 'transaction_name' => $item->name,
                 'amount_sub' => $amountSub,
-                'amount_fee' => $amountFee,
-                'amount_total' => $amountTotal,
+                'amount_fee' => $paymentArray['data']['fee'],
+                'amount_total' => $amountSub + $paymentArray['data']['fee'],
                 'status' => 'pending',
             ]);
 
             // Create transaction payment
             $transactionPayment = TransactionPayment::create([
                 'id_transaction' => $transaction->id,
-                'pay_id' => uniqid('PAY-'),
-                // 'unique_code' => strtoupper(str_random(10)),
-                'service' => $paymentMethod->code,
-                'service_name' => $paymentMethod->name,
-                'amount' => $amountTotal,
-                'balance' => $amountSub,
-                'fee' => $amountFee,
-                'type_fee' => $paymentMethod->type_fee,
-                'status' => 'pending',
-                'expired' => now()->addHours(2),
-                'qrcode_url' => $paymentMethod->qrcode_url,
-                'virtual_account' => $paymentMethod->virtual_account,
-                'checkout_url' => $paymentMethod->checkout_url,
-                'checkout_url_v2' => $paymentMethod->checkout_url_v2,
-                'checkout_url_v3' => $paymentMethod->checkout_url_v3,
-                'checkout_url_beta' => $paymentMethod->checkout_url_beta,
+                'pay_id' => $paymentArray['data']['pay_id'] ?? null,
+                'unique_code' => $paymentArray['data']['unique_code'] ?? null,
+                'service' => $paymentArray['data']['service'] ?? null,
+                'service_name' => $paymentArray['data']['service_name'] ?? null,
+                'amount' => $paymentArray['data']['amount'] ?? 0,
+                'balance' => $paymentArray['data']['balance'] ?? 0,
+                'fee' => $paymentArray['data']['fee'] ?? 0,
+                'type_fee' => $paymentArray['data']['type_fee'] ?? null,
+                'status' => $paymentArray['data']['status'] ?? null,
+                'expired' => $paymentArray['data']['expired'] ?? null,
+                'qrcode_url' => $paymentArray['data']['qrcode_url'] ?? null,
+                'virtual_account' => $paymentArray['data']['virtual_account'] ?? null,
+                'checkout_url' => $paymentArray['data']['checkout_url'] ?? null,
+                'checkout_url_v2' => $paymentArray['data']['checkout_url_v2'] ?? null,
+                'checkout_url_v3' => $paymentArray['data']['checkout_url_v3'] ?? null,
+                'checkout_url_beta' => $paymentArray['data']['checkout_url_beta'] ?? null,
             ]);
 
             // Create transaction detail
@@ -179,7 +246,8 @@ class CheckoutController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to place order: ' . $e->getMessage(),
-                'data' => null,
+                'data' => null,               
+                'payment' => $responseData
             ], 500);
         }
     }

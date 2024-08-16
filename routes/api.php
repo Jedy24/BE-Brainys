@@ -165,6 +165,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Checkout
     Route::group(['prefix' => 'checkout'], function () {
         Route::post('/get-info', [CheckoutController::class, 'getInfo']);
+        Route::post('/place-order', [CheckoutController::class, 'placeOrder']);
     });
 });
 
