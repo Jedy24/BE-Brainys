@@ -458,7 +458,7 @@ class ModulAjarController extends Controller
             "informasi_umum": {
                 "alokasi_waktu": "(Berupa berapa pekan, berapa JP, berapa pertemuan)", //Pastikan sesuai dengan format.
                 "kompetensi_awal": "{Kompetensi Awal}",
-                "profil_pelajar_pancasila": "{Profil Pelajar Pancasila}",
+                "profil_pelajar_pancasila": "{Profil Pelajar Pancasila}", // Berupa string
                 "target_peserta_didik": "{Target Peserta Didik}",
                 "model_pembelajaran": "{Model Pembelajaran}"
             },
@@ -576,7 +576,10 @@ class ModulAjarController extends Controller
                     "{Glosarium Materi 4}",
                     "{Glosarium Materi 5}",
                     "{Glosarium Materi 6}",
-                    "{Glosarium Materi 7}"
+                    "{Glosarium Materi 7}",
+                    "{Glosarium Materi 8}",
+                    "{Glosarium Materi 9}",
+                    "{Glosarium Materi 10}",
                 ],
                 "daftar_pustaka": [
                     "{Daftar Pustaka 1}",
