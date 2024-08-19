@@ -17,7 +17,7 @@ class UserStatusController extends Controller
             $user = $request->user();
 
             $status = [
-                'generate' => [
+                'all' => [
                     'limit' => $user->limit_generate,
                     'used' => $user->generateAllSum(),
                 ]
@@ -27,7 +27,7 @@ class UserStatusController extends Controller
             $notificationMessage = null;
 
             // Check if user is approaching the generate limit
-            if ($status['generate']['used'] >= $status['generate']['limit'] - 5 && $status['generate']['used'] < $status['generate']['limit']) {
+            if ($status['all']['used'] >= $status['all']['limit'] - 5 && $status['all']['used'] < $status['all']['limit']) {
                 // Send notification directly
                 $this->sendNotification($user, 'Anda hampir mencapai limit untuk melakukan generasi.');
                 // Set notification message
