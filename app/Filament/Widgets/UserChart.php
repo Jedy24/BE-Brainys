@@ -9,11 +9,8 @@ use Filament\Widgets\ChartWidget;
 class UserChart extends ChartWidget
 {
     protected static ?int $sort = 4;
-
     protected static ?string $heading = 'User Activity Last 7 Days';
-    
     protected static ?string $maxHeight = '500px';
-    
     protected int | string | array $columnSpan = 'full';
 
     protected function getData(): array
@@ -42,9 +39,7 @@ class UserChart extends ChartWidget
         }
 
         // Merge and fill missing dates with zeros
-        $mergeData = function ($data) use ($dates) {
-            return array_values(array_replace($dates, $data->toArray()));
-        };
+        $mergeData = fn($data) => array_values(array_replace($dates, $data->toArray()));
 
         return [
             'datasets' => [
@@ -63,7 +58,7 @@ class UserChart extends ChartWidget
                     'fill' => false,
                 ]
             ],
-            'labels' => array_keys($dates),
+            'labels' => array_map(fn($date) => Carbon::parse($date)->format('d M Y'), array_keys($dates)),
         ];
     }
 
@@ -80,11 +75,8 @@ class UserChart extends ChartWidget
                     [
                         'ticks' => [
                             'beginAtZero' => true,
-                            'stepSize' => 1,  // Memaksa interval antar ticks menjadi bilangan bulat.
-                            'callback' => function ($value) {
-                                return intval($value) == $value ? $value : null;  // Menghilangkan desimal
-                            },
-                            'suggestedMax' => 10, // Sesuaikan berdasarkan maksimal data yang Anda perkirakan.
+                            'stepSize' => 1,
+                            'callback' => fn($value) => intval($value) == $value ? $value : null,
                         ]
                     ]
                 ]
