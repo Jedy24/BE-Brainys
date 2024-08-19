@@ -27,10 +27,10 @@ class CapaianPembelajaranController extends Controller
                     'fase' => 'Fase D | Kelas 7 - 9 SMP',
                 ],
                 [
-                    'fase' => 'Fase E | Kelas 10 SMA',
+                    'fase' => 'Fase E | Kelas 10 SMA/SMK',
                 ],
                 [
-                    'fase' => 'Fase F | Kelas 11 - 12 SMA',
+                    'fase' => 'Fase F | Kelas 11 - 12 SMA/SMK',
                 ]
             ];
 
