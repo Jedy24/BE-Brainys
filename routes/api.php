@@ -24,8 +24,10 @@ use App\Http\Controllers\Api\GamificationController;
 use App\Http\Controllers\Api\OpenAIController;
 use App\Http\Controllers\Api\PackageController;
 use App\Http\Controllers\Api\SendInvitationController;
+use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\UserInvitationController;
 use App\Http\Controllers\Service\CapaianPembelajaranController;
+use App\Models\Transaction;
 
 /*
 |--------------------------------------------------------------------------
@@ -158,6 +160,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Package
     Route::group(['prefix' => 'subscription'], function () {
+        Route::get('/history', [TransactionController::class, 'index']);
         Route::get('/package', [PackageController::class, 'getPackage']);
         Route::get('/extra-credit', [ExtraCreditController::class, 'getExtraCredit']);
     });
