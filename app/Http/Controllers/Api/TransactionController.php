@@ -17,13 +17,13 @@ class TransactionController extends Controller
             $transactions = Transaction::with('details')
                 ->where('id_user', $userId)
                 ->orderBy('created_at', 'desc')
-                ->paginate(10);
+                ->get();
 
-            $transactions->getCollection()->transform(function ($transaction) {
+            $transactions->transform(function ($transaction) {
                 $transaction->amount_sub = intval($transaction->amount_sub);
                 $transaction->amount_fee = intval($transaction->amount_fee);
                 $transaction->amount_total = intval($transaction->amount_total);
-                
+
                 $transaction->details->transform(function ($detail) {
                     return [
                         'item_type' => $detail->item_type,
@@ -36,10 +36,26 @@ class TransactionController extends Controller
                 return $transaction;
             });
 
+            $perPage = 8;
+            $page = request('page', 1);
+            $pagedData = $transactions->slice(($page - 1) * $perPage, $perPage)->values();
+
+            $urlPrefix = 'https://be.brainys.oasys.id/api/';
+            $pagedData = $pagedData->map(function ($item) use ($urlPrefix) {
+                // $item['url_api_data'] = $urlPrefix . $item['type'] . '/subscription/history/' . $item['id'];
+                return $item;
+            });
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Transactions retrieved successfully',
-                'data' => $transactions,
+                'data' => $pagedData,
+                'pagination' => [
+                    'current_page' => $page,
+                    'per_page' => $perPage,
+                    'total' => $transactions->count(),
+                    'last_page' => ceil($transactions->count() / $perPage),
+                ]
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
