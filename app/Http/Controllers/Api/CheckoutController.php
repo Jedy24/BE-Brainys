@@ -47,7 +47,12 @@ class CheckoutController extends Controller
         }
 
         // Ambil payment methods dengan status true dan kelompokkan berdasarkan kategori
-        $paymentMethods = PaymentMethod::where('status', true)->get()->groupBy('category')->map(function ($group) {
+        $paymentMethods = PaymentMethod::where('status', true)->get()->groupBy('category')->map(function ($group, $category) use ($item) {
+            // Jika kategori virtual_account dan harga item kurang dari 10.000, return array kosong
+            if ($category === 'virtual_account' && $item->price < 10000) {
+                return [];
+            }
+
             return $group->map(function ($paymentMethod) {
                 return [
                     'id' => $paymentMethod->id,
@@ -246,7 +251,7 @@ class CheckoutController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to place order: ' . $e->getMessage(),
-                'data' => null,               
+                'data' => null,
                 'payment' => $responseData
             ], 500);
         }
