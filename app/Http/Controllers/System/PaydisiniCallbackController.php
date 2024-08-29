@@ -3,8 +3,13 @@
 namespace App\Http\Controllers\System;
 
 use App\Http\Controllers\Controller;
+use App\Models\ExtraCredit;
+use App\Models\Package;
 use App\Models\Transaction;
 use App\Models\TransactionPayment;
+use App\Models\User;
+use App\Models\UserPackage;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -32,6 +37,7 @@ class PaydisiniCallbackController extends Controller
         $status     = $request->input('status');
         $signature  = $request->input('signature');
 
+        // API Key
         $apiKey = 'XXX';
 
         // Generate the expected signature
@@ -42,14 +48,42 @@ class PaydisiniCallbackController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid signature', 'apikey' => $apiKey, 'siganture' => $expectedSignature, 'signature_make' => $signature], 400);
         }
 
+        $transaction = Transaction::with('details')
+            ->where('transaction_code', $uniqueCode)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
         // Process the payment status
         if ($status === 'Success') {
-            // Update the SalesOrder record status to 'completed'
+            if ($transaction->details->item_type === 'PACKAGE') {
+                $expiredAt = Carbon::now();
+                $package = Package::find($transaction->details->item_id);
+
+                if ($package->type === 'monthly') {
+                    $expiredAt = $expiredAt->addMonth();
+                } elseif ($package->type === 'annually') {
+                    $expiredAt = $expiredAt->addYear();
+                }
+
+                UserPackage::create([
+                    'id_user' => $transaction->id_user,
+                    'id_package' => $transaction->details->item_id,
+                    'enroll_at' => Carbon::now(),
+                    'expired_at' => $expiredAt,
+                ]);
+
+                User::where('id', $transaction->id_user)->increment('limit_generate', $transaction->details->credit_add_monthly);
+            } else if ($transaction->details->item_type === 'CREDIT') {
+                $credit = ExtraCredit::find($transaction->details->item_id);
+                $credit_amount = $credit->credit_amount;
+
+                User::where('id', $transaction->id_user)->increment('limit_generate', $credit_amount);
+            }
+
             Transaction::where('transaction_code', $uniqueCode)->update(['status' => 'completed']);
             TransactionPayment::where('unique_code', $uniqueCode)->update(['status' => $status]);
             Log::info("Payment with unique code {$uniqueCode} was successful.");
         } elseif ($status === 'Canceled') {
-            // Update the SalesOrder record status to 'cancelled'
             Transaction::where('transaction_code', $uniqueCode)->update(['status' => 'canceled']);
             TransactionPayment::where('unique_code', $uniqueCode)->update(['status' => $status]);
             Log::info("Payment with unique code {$uniqueCode} was canceled.");
