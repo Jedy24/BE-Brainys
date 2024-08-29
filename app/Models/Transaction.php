@@ -55,4 +55,12 @@ class Transaction extends Model
     {
         return $this->hasMany(TransactionDetail::class, 'id_transaction');
     }
+
+    /**
+     * Get the payment for the transaction.
+     */
+    public function payment(): HasMany
+    {
+        return $this->hasMany(TransactionPayment::class, 'id_transaction');
+    }
 }

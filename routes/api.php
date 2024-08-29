@@ -163,6 +163,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/history', [TransactionController::class, 'index']);
         Route::get('/package', [PackageController::class, 'getPackage']);
         Route::get('/extra-credit', [ExtraCreditController::class, 'getExtraCredit']);
+        Route::post('/invoice', [TransactionController::class, 'invoice']);
     });
 
     // Checkout
