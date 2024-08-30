@@ -7,6 +7,7 @@
 /public/ppt_output
 /public/json_example
 /public/excel_output
+/public/pdf_output
 /storage/*.key
 /vendor
 .env

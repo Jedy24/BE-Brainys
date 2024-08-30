@@ -4,13 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
-use icircle\Template\Docx\DocxTemplate;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use PhpOffice\PhpWord\IOFactory;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use icircle\Template\Docx\DocxTemplate;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class TransactionController extends Controller
 {
@@ -74,17 +77,11 @@ class TransactionController extends Controller
     public function invoice(Request $request)
     {
         try {
-            $templatePath   = public_path('word_template/Invoice_Brainys.docx');
-            $docxTemplate   = new DocxTemplate($templatePath);
-            $outputPath     = public_path('word_output/Invoice_Brainys_' . auth()->id() . '-' . md5(time() . '' . rand(1000, 9999)) . '.docx');
-            $outputPdfPath  = public_path('word_output/Invoice_Brainys_' . auth()->id() . '-' . md5(time() . '' . rand(1000, 9999)) . '.pdf');
-            $htmlPath       = public_path('word_output/Invoice_Brainys_' . auth()->id() . '-' . md5(time() . '' . rand(1000, 9999)) . '.html');
-
             $transactionId  = $request->input('id');
             $transaction    = Transaction::with(['user', 'details' => function ($query) {
-                $query->first(); // Ambil hanya entri pertama dari details
+                $query->first();
             }, 'payment' => function ($query) {
-                $query->first(); // Ambil hanya entri pertama dari payment
+                $query->first();
             }])->find($transactionId);
 
             if (!$transaction) {
@@ -95,10 +92,24 @@ class TransactionController extends Controller
             }
 
             if (!in_array($transaction->status, ['success', 'completed'])) {
-                // return response()->json([
-                //     'status' => 'failed',
-                //     'message' => 'Invoice tidak bisa dibuat karena status belum terselesaikan',
-                // ], 400);
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Invoice tidak bisa dibuat karena status belum terselesaikan',
+                ], 400);
+            }
+
+            $pdfFileName = 'Invoice-Brainys-' . auth()->id() . '-' . $transaction->transaction_code . '.pdf';
+            $outputPath = public_path('pdf_output/' . $pdfFileName);
+
+            if (file_exists($outputPath)) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Invoice PDF telah dibuata',
+                    'data' => [
+                        'output_path' => $outputPath,
+                        'download_url' => url('pdf_output/' . $pdfFileName),
+                    ],
+                ], 200);
             }
 
             // Dapatkan detail pertama dan payment pertama
@@ -124,8 +135,8 @@ class TransactionController extends Controller
 
             // Tambahkan data baru ke dalam x_data
             $transactionData = $transaction->toArray();
-            $transactionData['details'] = $firstDetail->toArray();  // Ubah details menjadi hanya detail pertama
-            $transactionData['payment'] = $firstPayment->toArray(); // Ubah payment menjadi hanya payment pertama
+            $transactionData['details'] = $firstDetail->toArray();
+            $transactionData['payment'] = $firstPayment->toArray();
             $transactionData['created_at_format'] = $createdAtFormatted;
             $transactionData['updated_at_format'] = $updatedAtFormatted;
             $transactionData['amount_sub_format'] = $amountSubFormatted;
@@ -136,20 +147,46 @@ class TransactionController extends Controller
             $transactionData['amount_final'] = $amountFinal;
             $transactionData['amount_final_format'] = $amountFinalFormatted;
 
-            // Lakukan operasi merge jika diperlukan
-            $docxTemplate->merge($transactionData, $outputPath, false, false);
+            // Fetch Tailwind CSS from CDN
+            $tailwindCss = Http::get('https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css')->body();
 
-            // Convert the DOCX to PDF using the new method
-            $this->convertDocxToPdf($templatePath, $outputPdfPath);
+            // Render the Blade view to HTML
+            $html = view('document.invoice', compact('transactionData'))->render();
 
-            // Return response
+            // Embed Tailwind CSS into the HTML
+            $html = str_replace(
+                '</head>',
+                '<style>' . $tailwindCss . '</style></head>',
+                $html
+            );
+
+            // Initialize DomPDF and set options
+            $options = new Options();
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('isPhpEnabled', true);
+            $options->set('defaultFont', 'sans-serif');
+            $options->set('chroot', public_path());
+
+            $dompdf = new Dompdf($options);
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'portrait');
+
+            // Render PDF
+            $dompdf->render();
+
+            // Save the PDF to a file
+            $outputPath = public_path('pdf_output/' . $pdfFileName);
+            file_put_contents($outputPath, $dompdf->output());
+
+            // Return the URL of the generated PDF
             return response()->json([
                 'status' => 'success',
-                'message' => 'Invoice telah diterbitkan',
+                'message' => 'Invoice PDF telah dibuat',
                 'data' => [
-                    'output_path' => $outputPdfPath,
-                    'download_url' => url('word_output/' . basename($outputPdfPath)),
+                    'output_path' => $outputPath,
+                    'download_url' => url('pdf_output/' . $pdfFileName),
                 ],
+                // 'data_x' => $transactionData,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
