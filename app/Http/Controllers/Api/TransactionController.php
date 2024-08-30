@@ -148,6 +148,7 @@ class TransactionController extends Controller
             $transactionData['amount_final_format'] = $amountFinalFormatted;
 
             // Fetch Tailwind CSS from CDN
+            ini_set('memory_limit', '1024M');
             $tailwindCss = Http::get('https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css')->body();
 
             // Render the Blade view to HTML
