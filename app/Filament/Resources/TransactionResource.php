@@ -43,11 +43,11 @@ class TransactionResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('id_user')
-                    ->label('Pengguna')
-                    ->relationship('user', 'name')
-                    ->required()
-                    ->disabled(),
+                // Forms\Components\Select::make('id_user')
+                //     ->label('Pengguna')
+                //     ->relationship('user', 'name')
+                //     ->required()
+                //     ->disabled(),
 
                 Forms\Components\DatePicker::make('transaction_date')
                     ->label('Tanggal Transaksi')
