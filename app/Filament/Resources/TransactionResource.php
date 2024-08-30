@@ -99,7 +99,7 @@ class TransactionResource extends Resource
                         'canceled' => 'Dibatalkan',
                         'pending' => 'Menunggu Pembayaran',
                         'success' => 'Selesai',
-                        // 'completed' => 'Selesai',
+                        'completed' => 'Selesai',
                     ])
                     ->required(),
 
@@ -294,13 +294,13 @@ class TransactionResource extends Resource
                         'pending' => 'warning',
                         'canceled' => 'danger',
                         'success' => 'success',
-                        // 'completed' => 'success',
+                        'completed' => 'success',
                     })
                     ->formatStateUsing(fn(string $state): string => match ($state) {
                         'pending' => 'Menunggu',
                         'canceled' => 'Dibatalkan',
                         'success' => 'Selesai',
-                        // 'completed' => 'Selesai',
+                        'completed' => 'Selesai',
                     })
                     ->searchable(),
 
