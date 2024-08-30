@@ -114,8 +114,7 @@ class TransactionResource extends Resource
                                 'CREDIT' => 'CREDIT',
                                 'PACKAGE' => 'PACKAGE',
                             ])
-                            ->reactive()
-                            ->disabled(),
+                            ->reactive(),
 
                         Forms\Components\Select::make('item_id')
                             ->label('ID Item')
@@ -130,8 +129,7 @@ class TransactionResource extends Resource
                                 // Ensure options are valid
                                 return array_filter($options, fn($label) => !is_null($label) && $label !== '') ?: ['0' => 'No Available Options'];
                             })
-                            ->reactive()
-                            ->disabled(),
+                            ->reactive(),
 
                         Forms\Components\TextInput::make('item_price')
                             ->label('Harga Item')
