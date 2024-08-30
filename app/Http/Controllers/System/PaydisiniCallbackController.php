@@ -57,12 +57,13 @@ class PaydisiniCallbackController extends Controller
             ->where('transaction_code', $uniqueCode)
             ->orderBy('created_at', 'desc')
             ->first();
+        $details = $transaction->details->first();
 
         // Process the payment status
         if ($status === 'Success') {
-            if ($transaction->details->item_type === 'PACKAGE') {
+            if ($details->item_type === 'PACKAGE') {
                 $expiredAt = Carbon::now();
-                $package = Package::find($transaction->details->item_id);
+                $package = Package::find($details->item_id);
 
                 if ($package->type === 'monthly') {
                     $expiredAt = $expiredAt->addMonth();
@@ -72,14 +73,14 @@ class PaydisiniCallbackController extends Controller
 
                 UserPackage::create([
                     'id_user' => $transaction->id_user,
-                    'id_package' => $transaction->details->item_id,
+                    'id_package' => $details->item_id,
                     'enroll_at' => Carbon::now(),
                     'expired_at' => $expiredAt,
                 ]);
 
-                User::where('id', $transaction->id_user)->increment('limit_generate', $transaction->details->credit_add_monthly);
-            } else if ($transaction->details->item_type === 'CREDIT') {
-                $credit = ExtraCredit::find($transaction->details->item_id);
+                User::where('id', $transaction->id_user)->increment('limit_generate', $details->credit_add_monthly);
+            } else if ($details->item_type === 'CREDIT') {
+                $credit = ExtraCredit::find($details->item_id);
                 $credit_amount = $credit->credit_amount;
 
                 User::where('id', $transaction->id_user)->increment('limit_generate', $credit_amount);
