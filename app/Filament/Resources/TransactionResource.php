@@ -108,40 +108,40 @@ class TransactionResource extends Resource
                     ->relationship()
                     ->maxItems(1)
                     ->schema([
-                        Forms\Components\Select::make('item_type')
-                            ->label('Tipe Item')
-                            ->options([
-                                'CREDIT' => 'CREDIT',
-                                'PACKAGE' => 'PACKAGE',
-                            ])
-                            ->reactive(),
+                        // Forms\Components\Select::make('item_type')
+                        //     ->label('Tipe Item')
+                        //     ->options([
+                        //         'CREDIT' => 'CREDIT',
+                        //         'PACKAGE' => 'PACKAGE',
+                        //     ])
+                        //     ->reactive(),
 
-                        Forms\Components\Select::make('item_id')
-                            ->label('ID Item')
-                            ->options(function (callable $get) {
-                                $itemType = $get('item_type');
-                                $options = [];
-                                if ($itemType === 'CREDIT') {
-                                    $options = ExtraCredit::pluck('name', 'id')->filter()->toArray();
-                                } elseif ($itemType === 'PACKAGE') {
-                                    $options = Package::pluck('name', 'id')->filter()->toArray();
-                                }
-                                // Ensure options are valid
-                                return array_filter($options, fn($label) => !is_null($label) && $label !== '') ?: ['0' => 'No Available Options'];
-                            })
-                            ->reactive(),
+                        // Forms\Components\Select::make('item_id')
+                        //     ->label('ID Item')
+                        //     ->options(function (callable $get) {
+                        //         $itemType = $get('item_type');
+                        //         $options = [];
+                        //         if ($itemType === 'CREDIT') {
+                        //             $options = ExtraCredit::pluck('name', 'id')->filter()->toArray();
+                        //         } elseif ($itemType === 'PACKAGE') {
+                        //             $options = Package::pluck('name', 'id')->filter()->toArray();
+                        //         }
+                        //         // Ensure options are valid
+                        //         return array_filter($options, fn($label) => !is_null($label) && $label !== '') ?: ['0' => 'No Available Options'];
+                        //     })
+                        //     ->reactive(),
 
-                        Forms\Components\TextInput::make('item_price')
-                            ->label('Harga Item')
-                            ->formatStateUsing(function ($state) {
-                                return 'Rp ' . number_format($state, 0, ',', '.');
-                            })
-                            ->disabled(),
+                        // Forms\Components\TextInput::make('item_price')
+                        //     ->label('Harga Item')
+                        //     ->formatStateUsing(function ($state) {
+                        //         return 'Rp ' . number_format($state, 0, ',', '.');
+                        //     })
+                        //     ->disabled(),
 
-                        Forms\Components\TextInput::make('item_qty')
-                            ->label('Kuantitas Item')
-                            ->default(1)
-                            ->disabled(),
+                        // Forms\Components\TextInput::make('item_qty')
+                        //     ->label('Kuantitas Item')
+                        //     ->default(1)
+                        //     ->disabled(),
                     ]),
 
                 Forms\Components\Repeater::make('payment')
