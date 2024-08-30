@@ -25,6 +25,11 @@ class PaydisiniCallbackController extends Controller
     {
         $allowedIp = '84.247.150.90';
 
+        // method
+        if ($request->isMethod('get')) {
+            return response()->json(['success' => false, 'message' => 'GET method is not allowed'], 405);
+        }
+
         // Validate the request source IP
         if ($request->ip() !== $allowedIp) {
             return response()->json(['success' => false, 'message' => 'Unauthorized IP address'], 403);
