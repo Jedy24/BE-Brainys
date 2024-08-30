@@ -43,7 +43,7 @@ class PaydisiniCallbackController extends Controller
         $signature  = $request->input('signature');
 
         // API Key
-        $apiKey = 'XXX';
+        $apiKey = '5a619921d520811105e2880f5ef13f1b';
 
         // Generate the expected signature
         $expectedSignature = md5($apiKey . $uniqueCode . 'CallbackStatus');
