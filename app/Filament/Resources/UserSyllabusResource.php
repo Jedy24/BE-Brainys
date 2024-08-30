@@ -12,16 +12,17 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\DB;
 
 class UserSyllabusResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 22;
 
-    protected static ?string $navigationGroup = 'Users Modules';
+    protected static ?string $navigationGroup = 'Riwayat Modul Pengguna';
 
-    protected static ?string $navigationLabel = 'Users Syllabus';
+    protected static ?string $navigationLabel = 'Pengguna Modul Silabus';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -32,12 +33,12 @@ class UserSyllabusResource extends Resource
 
     public static function getLabel(): string
     {
-        return 'Users Syllabus';
+        return 'Pengguna Modul Silabus';
     }
 
     public static function getPluralLabel(): string
     {
-        return 'Users Syllabus';
+        return 'Pengguna Modul Silabus';
     }
 
     public static function form(Form $form): Form
@@ -51,37 +52,60 @@ class UserSyllabusResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->heading('Users Syllabus')
-            ->description('Show user generated for syllabus module')
-            ->defaultSort('created_at', 'DESC')
+            ->heading('Pengguna Modul Silabus')
+            ->description('Menampilkan pengguna yang membuat modul silabus')
+            ->defaultSort('last_generated', 'DESC')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Full Name')
-                    ->sortable()
+                    ->label('Nama Lengkap')
+                    // ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->label('Email Address')
-                    ->sortable()
+                    ->label('Alamat Email')
+                    // ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('generate_count')
-                    ->label('Generated Syllabus Count')
-                    ->getStateUsing(fn (User $record) => $record->syllabusHistory()->count())
+                    ->label('Modul Dihasilkan')
+                    // ->sortable()
                     ->alignCenter(),
+                Tables\Columns\TextColumn::make('last_generated')
+                    ->label('Terakhir Membuat')
+                    ->dateTime('d M Y H:i:s')
+                    // ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('User Register')
-                    ->dateTime()
-                    ->sortable()
+                    ->label('Terdaftar Sejak')
+                    ->dateTime('d M Y H:i:s')
+                    // ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
-                //
+                // Filter jika diperlukan
             ])
             ->actions([
-                // Tables\Actions\EditAction::make(),
+                // Actions jika diperlukan
             ])
             ->bulkActions([
-                //
+                // Bulk actions jika diperlukan
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return User::query()
+            ->leftJoin('syllabus_histories', 'users.id', '=', 'syllabus_histories.user_id')
+            ->select(
+                'users.id',
+                'users.name',
+                'users.email',
+                DB::raw('COUNT(syllabus_histories.id) as generate_count'),
+                DB::raw('MAX(syllabus_histories.created_at) as last_generated'),
+                'users.created_at'
+            )
+            ->groupBy('users.id', 'users.name', 'users.email', 'users.created_at')
+            // Menambahkan kondisi having untuk filter generate_count > 0
+            ->having('generate_count', '>', 0)
+            ->orderBy('last_generated', 'DESC'); // Mengatur urutan default berdasarkan last_generated secara descending
     }
 
     public static function getRelations(): array

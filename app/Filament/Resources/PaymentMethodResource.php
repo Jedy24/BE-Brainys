@@ -17,20 +17,20 @@ class PaymentMethodResource extends Resource
 {
     protected static ?string $model = PaymentMethod::class;
 
-    protected static ?int $navigationSort = 11;
+    protected static ?int $navigationSort = 17;
 
-    protected static ?string $navigationGroup = 'System';
+    protected static ?string $navigationGroup = 'Sistem';
 
     protected static ?string $navigationIcon = 'heroicon-o-credit-card';
 
     public static function getLabel(): string
     {
-        return 'Payment Method';
+        return 'Metode Pembayaran';
     }
 
     public static function getPluralLabel(): string
     {
-        return 'Payment Methods';
+        return 'Metode Pembayaran';
     }
 
     public static function form(Form $form): Form
@@ -38,7 +38,7 @@ class PaymentMethodResource extends Resource
         return $form
             ->schema([
                 Forms\Components\FileUpload::make('thumbnail')
-                    ->label('Payment Image')
+                    ->label('Logo')
                     ->image()
                     ->imageEditor()
                     ->imageEditorAspectRatios([
@@ -47,11 +47,11 @@ class PaymentMethodResource extends Resource
                     ->columnSpanFull()
                     ->required(),
                 Forms\Components\TextInput::make('name')
-                    ->label('Payment Name')
+                    ->label('Metode Pembayaran')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('code')
-                    ->label('Payment Code')
+                    ->label('Kode Metode')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Select::make('provider')
@@ -86,15 +86,17 @@ class PaymentMethodResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->heading('Metode Pembayaran')
+            ->description('Kelola metode pembayaran sistem')
             ->columns([
                 Tables\Columns\ImageColumn::make('thumbnail')
-                    ->label('Payment Image')
+                    ->label('Logo')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Payment Name')
+                    ->label('Metode Pembayaran')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('code')
-                    ->label('Payment Code')
+                    ->label('Kode Metode')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('status')
                     ->boolean(),

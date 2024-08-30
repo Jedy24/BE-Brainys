@@ -21,7 +21,23 @@ class TransactionResource extends Resource
 {
     protected static ?string $model = Transaction::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?int $navigationSort = 14;
+
+    protected static ?string $navigationGroup = 'Transaksi';
+
+    protected static ?string $navigationLabel = 'Kelola Transaksi';
+
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+
+    public static function getLabel(): string
+    {
+        return 'Kelola Transaksi';
+    }
+
+    public static function getPluralLabel(): string
+    {
+        return 'Kelola Transaksi';
+    }
 
     public static function form(Form $form): Form
     {
@@ -226,13 +242,15 @@ class TransactionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->heading('Kelola Transkasi')
+            ->description('Kelola pembelian pengguna terhadap transaksi paket atau kredit Brainys')
             ->columns([
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Waktu Transaksi')
                     ->dateTime('d F Y')
                     ->sortable()
-                    ->description(fn($record): string => 'Jam: '.$record->created_at->format('H:i:s')),
+                    ->description(fn($record): string => 'Jam: ' . $record->created_at->format('H:i:s')),
 
                 Tables\Columns\TextColumn::make('transaction_code')
                     ->label('Kode Transaksi')

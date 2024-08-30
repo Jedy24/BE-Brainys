@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Carbon;
 
 /**
  * Class User
@@ -190,16 +191,6 @@ class User extends Authenticatable
         return $this->hasMany(ModulAjarHistories::class, 'user_id', 'id');
     }
 
-        /**
-     * Get the modul ajar history for the user.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    // public function rubrikNilaiHistory()
-    // {
-    //     return $this->hasMany(RubrikNilaiHistories::class, 'user_id', 'id');
-    // }
-
     /**
      * Get the feedback reviews for the user.
      *
@@ -227,7 +218,6 @@ class User extends Authenticatable
             + $this->hintHistory()->count()
             + $this->alurTujuanPembelajaranHistory()->count()
             + $this->modulAjarHistory()->count()
-            // + $this->rubrikNilaiHistory()->count()
         );
     }
 
@@ -239,5 +229,95 @@ class User extends Authenticatable
     public function userPackages()
     {
         return $this->hasMany(UserPackage::class, 'id_user', 'id');
+    }
+
+    /**
+     * Get the last generated timestamp from materialHistory.
+     *
+     * @return \Illuminate\Support\Carbon|null
+     */
+    public function materialHistoryLastGenerated()
+    {
+        return $this->materialHistory()->latest('created_at')->value('created_at');
+    }
+
+    /**
+     * Get the last generated timestamp from syllabusHistory.
+     *
+     * @return \Illuminate\Support\Carbon|null
+     */
+    public function syllabusHistoryLastGenerated()
+    {
+        return $this->syllabusHistory()->latest('created_at')->value('created_at');
+    }
+
+    /**
+     * Get the last generated timestamp from exerciseHistory.
+     *
+     * @return \Illuminate\Support\Carbon|null
+     */
+    public function exerciseHistoryLastGenerated()
+    {
+        return $this->exerciseHistory()->latest('created_at')->value('created_at');
+    }
+
+    /**
+     * Get the last generated timestamp from exerciseV2History.
+     *
+     * @return \Illuminate\Support\Carbon|null
+     */
+    public function exerciseV2HistoryLastGenerated()
+    {
+        return $this->exerciseV2History()->latest('created_at')->value('created_at');
+    }
+
+    /**
+     * Get the last generated timestamp from hintHistory.
+     *
+     * @return \Illuminate\Support\Carbon|null
+     */
+    public function hintHistoryLastGenerated()
+    {
+        return $this->hintHistory()->latest('created_at')->value('created_at');
+    }
+
+    /**
+     * Get the last generated timestamp from bahanAjarHistory.
+     *
+     * @return \Illuminate\Support\Carbon|null
+     */
+    public function bahanAjarHistoryLastGenerated()
+    {
+        return $this->bahanAjarHistory()->latest('created_at')->value('created_at');
+    }
+
+    /**
+     * Get the last generated timestamp from gamificationHistory.
+     *
+     * @return \Illuminate\Support\Carbon|null
+     */
+    public function gamificationHistoryLastGenerated()
+    {
+        return $this->gamificationHistory()->latest('created_at')->value('created_at');
+    }
+
+    /**
+     * Get the last generated timestamp from alurTujuanPembelajaranHistory.
+     *
+     * @return \Illuminate\Support\Carbon|null
+     */
+    public function alurTujuanPembelajaranHistoryLastGenerated()
+    {
+        return $this->alurTujuanPembelajaranHistory()->latest('created_at')->value('created_at');
+    }
+
+    /**
+     * Get the last generated timestamp from modulAjarHistory.
+     *
+     * @return \Illuminate\Support\Carbon|null
+     */
+    public function modulAjarHistoryLastGenerated()
+    {
+        return $this->modulAjarHistory()->latest('created_at')->value('created_at');
     }
 }

@@ -17,7 +17,7 @@ use Filament\Widgets\ChartWidget;
 class ModulesWidget extends ChartWidget
 {
     protected static ?int $sort = 3;
-    protected static ?string $heading = 'Generated Activity Last 7 Days';
+    protected static ?string $heading = 'Aktivitas Modul Dibuat 7 Hari Terakhir';
     protected static ?string $maxHeight = '500px';
     protected int | string | array $columnSpan = 'full';
 

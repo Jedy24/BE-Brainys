@@ -25,7 +25,7 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 11;
 
     protected static ?string $navigationGroup = 'User';
 
@@ -38,12 +38,12 @@ class UserResource extends Resource
 
     public static function getLabel(): string
     {
-        return 'User';
+        return 'Pengguna';
     }
 
     public static function getPluralLabel(): string
     {
-        return 'Users';
+        return 'Pengguna';
     }
 
     public static function form(Form $form): Form
@@ -99,42 +99,42 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->heading('Users')
-            ->description('Manage Brainys users')
+            ->heading('Akun Pengguna')
+            ->description('Kelola akun pengguna Brainys')
             ->defaultSort('created_at', 'DESC')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Full Name')
+                    ->label('Nama Lengkap')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->label('Email Address')
+                    ->label('Alamat Email')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('school_name')
-                    ->label('School Name')
+                    ->label('Instansi')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('profession')
-                    ->label('Profession')
+                    ->label('Profesi')
                     ->sortable(),
                 Tables\Columns\IconColumn::make('profile_completed')
                     ->boolean()
-                    ->label('Profile Complete')
+                    ->label('Kelengkapan Profil')
                     ->alignCenter(),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean()
                     ->label('Active')
                     ->alignCenter(),
                 Tables\Columns\TextColumn::make('limit_generate')
-                    ->label('Limit Generate')
+                    ->label('Batas Pembuatan')
                     ->alignCenter()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('generate_count')
-                    ->label('Generate All Count')
+                    ->label('Jumlah Membuat Modul')
                     ->getStateUsing(fn (User $record) => $record->generateAllSum())
                     ->alignCenter()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Register At')
+                    ->label('Daftar Pada')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),

@@ -13,27 +13,28 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\DB;
 
 class UserGamificationResource extends Resource
 {
     protected static ?string $model = User::class;
     
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 25;
 
-    protected static ?string $navigationGroup = 'Users Modules';
+    protected static ?string $navigationGroup = 'Riwayat Modul Pengguna';
 
-    protected static ?string $navigationLabel = 'Users Gamification';
+    protected static ?string $navigationLabel = 'Pengguna Modul Gamifikasi';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function getLabel(): string
     {
-        return 'Users Gamification';
+        return 'Pengguna Modul Gamifikasi';
     }
 
     public static function getPluralLabel(): string
     {
-        return 'Users Gamification';
+        return 'Pengguna Modul Gamifikasi';
     }
 
     public static function form(Form $form): Form
@@ -47,37 +48,60 @@ class UserGamificationResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->heading('Users Bahan Ajar')
-            ->description('Show user generated for gamification (materi gamifikasi) module')
-            ->defaultSort('created_at', 'DESC')
+            ->heading('Pengguna Modul Gamifikasi')
+            ->description('Menampilkan pengguna yang membuat modul gamifikasi')
+            ->defaultSort('last_generated', 'DESC')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Full Name')
-                    ->sortable()
+                    ->label('Nama Lengkap')
+                    // ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->label('Email Address')
-                    ->sortable()
+                    ->label('Alamat Email')
+                    // ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('generate_count')
-                    ->label('Generated Gamification Count')
-                    ->getStateUsing(fn (User $record) => $record->gamificationHistory()->count())
+                    ->label('Modul Dihasilkan')
+                    // ->sortable()
                     ->alignCenter(),
+                Tables\Columns\TextColumn::make('last_generated')
+                    ->label('Terakhir Membuat')
+                    ->dateTime('d M Y H:i:s')
+                    // ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('User Register')
-                    ->dateTime()
-                    ->sortable()
+                    ->label('Terdaftar Sejak')
+                    ->dateTime('d M Y H:i:s')
+                    // ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
-                //
+                // Filter jika diperlukan
             ])
             ->actions([
-                // 
+                // Actions jika diperlukan
             ])
             ->bulkActions([
-                // 
+                // Bulk actions jika diperlukan
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return User::query()
+            ->leftJoin('gamification_histories', 'users.id', '=', 'gamification_histories.user_id')
+            ->select(
+                'users.id',
+                'users.name',
+                'users.email',
+                DB::raw('COUNT(gamification_histories.id) as generate_count'),
+                DB::raw('MAX(gamification_histories.created_at) as last_generated'),
+                'users.created_at'
+            )
+            ->groupBy('users.id', 'users.name', 'users.email', 'users.created_at')
+            // Menambahkan kondisi having untuk filter generate_count > 0
+            ->having('generate_count', '>', 0)
+            ->orderBy('last_generated', 'DESC'); // Mengatur urutan default berdasarkan last_generated secara descending
     }
 
     public static function getRelations(): array

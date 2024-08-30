@@ -17,20 +17,20 @@ class PackageResource extends Resource
 {
     protected static ?string $model = Package::class;
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 15;
 
-    protected static ?string $navigationGroup = 'Package & Credit';
+    protected static ?string $navigationGroup = 'Produk';
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
 
     public static function getLabel(): string
     {
-        return 'Package';
+        return 'Paket';
     }
 
     public static function getPluralLabel(): string
     {
-        return 'Packages';
+        return 'Paket';
     }
 
     public static function form(Form $form): Form
@@ -38,35 +38,35 @@ class PackageResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->label('Package Name')
+                    ->label('Nama Paket')
                     ->required()
                     ->maxLength(225),
                 Forms\Components\Select::make('type')
-                    ->label('Package Type')
+                    ->label('Tipe Paket')
                     ->options([
                         'free' => 'Free',
-                        'monthly' => 'Monthly',
-                        'annually' => 'Annually',
+                        'monthly' => 'Bulanan',
+                        'annually' => 'Tahunan',
                     ])
                     ->required(),
                 Forms\Components\Textarea::make('description')
-                    ->label('Description')
+                    ->label('Deskripsi')
                     ->required()
                     ->maxLength(525)
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('credit_add_monthly')
-                    ->label('Credit add Monthly')
+                    ->label('Kredit per Bulan')
                     ->required()
                     ->numeric(),
                 Forms\Components\TextInput::make('price')
-                    ->label('Package Price')
+                    ->label('Harga')
                     ->required()
                     ->numeric()
                     ->prefix('Rp'),
                 Forms\Components\Section::make()->schema([
                     Forms\Components\Repeater::make('details')
                         ->relationship()
-                        ->label('Benefit Description')
+                        ->label('Deskripsi Keuntungan')
                         ->schema([
                             Forms\Components\TextInput::make('name')
                                 ->required()
@@ -76,7 +76,7 @@ class PackageResource extends Resource
                         ->reorderableWithButtons()
                         ->cloneable()
                         ->orderColumn('id')
-                        ->addActionLabel('Add Benefit Description')
+                        ->addActionLabel('Tambah Deskripsi Benefit Keuntungan')
                 ]),
             ]);
     }
@@ -84,28 +84,30 @@ class PackageResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->heading('Paket')
+            ->description('Kelola produk paket untuk pengguna')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Package Name')
-                    ->description(fn (Package $record): string => $record->description)
+                    ->label('Nama Paket')
+                    ->description(fn(Package $record): string => $record->description)
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('type')
-                    ->label('Package Type')
+                    ->label('Tipe Paket')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'free' => 'gray',
                         'monthly' => 'primary',
                         'annually' => 'success',
                     })
-                    ->formatStateUsing(fn (string $state) => ucfirst($state)),
+                    ->formatStateUsing(fn(string $state) => ucfirst($state)),
                 Tables\Columns\TextColumn::make('credit_add_monthly')
-                    ->label('Credit Added Monthly')
+                    ->label('Kredit per Bulan')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('price')
-                    ->label('Price (Rp)')
+                    ->label('Harga (Rp)')
                     ->sortable()
-                    ->formatStateUsing(fn (string $state): string => 'Rp ' . number_format($state, 0, ',', '.'))
+                    ->formatStateUsing(fn(string $state): string => 'Rp ' . number_format($state, 0, ',', '.'))
             ])
             ->filters([
                 // Add filters here if needed (e.g., by package type)

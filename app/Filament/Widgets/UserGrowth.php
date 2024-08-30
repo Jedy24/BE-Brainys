@@ -35,16 +35,16 @@ class UserGrowth extends BaseWidget
         // Menghitung persentase perubahan
         $percentageChange = $usersLastWeek > 0 ? (($usersThisWeek - $usersLastWeek) / $usersLastWeek) * 100 : 0;
 
-        $description = round($percentageChange, 2) . '% change from last week';
+        $description = round($percentageChange, 2) . '% perubahan dari pekan lalu';
 
         return [
-            Stat::make('Total Users', $totalUsers)
+            Stat::make('Total Pengguna', $totalUsers)
                 ->description($description)
                 ->descriptionIcon($percentageChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down'),
-            Stat::make('Total Active Users', $totalActiveUsers)
+            Stat::make('Total Pengguna Aktif', $totalActiveUsers)
                 ->description($description)
                 ->descriptionIcon($percentageChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down'),
-            Stat::make('Total Not Active Users', $totalNotActiveUsers)
+            Stat::make('Total Pengguna Tidak Aktif', $totalNotActiveUsers)
                 ->description($description)
                 ->descriptionIcon($percentageChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down'),
         ];

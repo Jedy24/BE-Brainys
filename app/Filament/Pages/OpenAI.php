@@ -10,9 +10,9 @@ class OpenAI extends Page
 {
     protected static string $view = 'filament.pages.open-a-i';
 
-    protected static ?int $navigationSort = 14;
+    protected static ?int $navigationSort = 20;
 
-    protected static ?string $navigationGroup = 'System';
+    protected static ?string $navigationGroup = 'Sistem';
 
     protected static ?string $navigationLabel = 'Open AI';
 

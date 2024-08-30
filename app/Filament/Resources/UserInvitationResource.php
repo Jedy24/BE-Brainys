@@ -24,22 +24,22 @@ class UserInvitationResource extends Resource
 {
     protected static ?string $model = UserInvitation::class;
 
-    protected static ?int $navigationSort = 12;
+    protected static ?int $navigationSort = 13;
 
     protected static ?string $navigationGroup = 'User';
 
-    protected static ?string $navigationLabel = 'Users Invitation';
+    protected static ?string $navigationLabel = 'Undangan Pengguna';
 
     protected static ?string $navigationIcon = 'heroicon-o-user-plus';
 
     public static function getLabel(): string
     {
-        return 'User Invitation';
+        return 'Undangan Pengguna';
     }
 
     public static function getPluralLabel(): string
     {
-        return 'User Invitation';
+        return 'Undangan Pengguna';
     }
 
     public static function form(Form $form): Form
@@ -82,8 +82,8 @@ class UserInvitationResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->heading('Users Invitation')
-            ->description('Manage Brainys Invitation')
+            ->heading('Undangan Pengguna')
+            ->description('Mengelola pengguna yang diundang ke dalam Brainys')
             ->defaultSort('created_at', 'DESC')
             ->columns([
                 Tables\Columns\TextColumn::make('email')
@@ -117,7 +117,7 @@ class UserInvitationResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Action::make('sendInvitation')
-                    ->label('Send Invitation')
+                    ->label('Kirim Undangan')
                     ->icon('heroicon-o-envelope')
                     ->action(function (UserInvitation $record) {
                         static::sendInvitation($record);
@@ -130,7 +130,7 @@ class UserInvitationResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
                 Tables\Actions\BulkAction::make('sendBulkInvitations')
-                    ->label('Send Invitations')
+                    ->label('Kirim Undangan')
                     ->icon('heroicon-o-envelope')
                     ->action(function (array $records) {
                         foreach ($records as $record) {

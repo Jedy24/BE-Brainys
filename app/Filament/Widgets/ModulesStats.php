@@ -21,13 +21,13 @@ class ModulesStats extends BaseWidget
         $totalATPHistory            = User::withCount('alurTujuanPembelajaranHistory')->get()->sum('alur_tujuan_pembelajaran_history_count');
 
         return [
-            Stat::make('Generated Modul Ajar', $totalMaterialHistory),
-            Stat::make('Generated Silabus', $totalSyllabusHistory),
-            Stat::make('Generated Soal', $totalExerciseHistory),
-            Stat::make('Generated Bahan Ajar', $totalBahanAjarHistory),
-            Stat::make('Generated Gamifikasi', $totalGamificationHistory),
-            Stat::make('Generated Kisi-Kisi', $totalHintHistory),
-            Stat::make('Generated ATP', $totalATPHistory),
+            Stat::make('Riwayat Modul Ajar', $totalMaterialHistory),
+            Stat::make('Riwayat Silabus', $totalSyllabusHistory),
+            Stat::make('Riwayat Soal', $totalExerciseHistory),
+            Stat::make('Riwayat Bahan Ajar', $totalBahanAjarHistory),
+            Stat::make('Riwayat Gamifikasi', $totalGamificationHistory),
+            Stat::make('Riwayat Kisi-Kisi', $totalHintHistory),
+            Stat::make('Riwayat ATP', $totalATPHistory),
             Stat::make('Soon <3', 0),
             Stat::make('Soon <3', 0),
         ];

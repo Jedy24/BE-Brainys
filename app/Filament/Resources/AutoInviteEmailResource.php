@@ -17,22 +17,22 @@ class AutoInviteEmailResource extends Resource
 {
     protected static ?string $model = AutoInviteEmail::class;
 
-    protected static ?int $navigationSort = 12;
+    protected static ?int $navigationSort = 18;
 
-    protected static ?string $navigationGroup = 'System';
+    protected static ?string $navigationGroup = 'Sistem';
 
-    protected static ?string $navigationLabel = 'Auto Invitation';
+    protected static ?string $navigationLabel = 'Undangan Email';
 
     protected static ?string $navigationIcon = 'heroicon-m-cursor-arrow-ripple';
 
     public static function getLabel(): string
     {
-        return 'Auto Invitation';
+        return 'Undangan Email';
     }
 
     public static function getPluralLabel(): string
     {
-        return 'Auto Invitation';
+        return 'Undangan Email';
     }
 
     public static function form(Form $form): Form
@@ -40,7 +40,7 @@ class AutoInviteEmailResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('email_domain')
-                    ->label('Email Domain')
+                    ->label('Domain Alamat Email')
                     ->required()
                     ->maxLength(255)
                     ->columnSpanFull(),
@@ -53,15 +53,17 @@ class AutoInviteEmailResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+        ->heading('Undangan Email')
+        ->description('Kelola domain email yang diperbolehkan untuk otomasi undangan')
             ->columns([
                 Tables\Columns\TextColumn::make('email_domain')
-                    ->label('Email Domain')
+                    ->label('Domain Alamat Email')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('is_active')
-                    ->label('Is Active')
+                    ->label('Aktif')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Created At')
+                    ->label('Dibuat Pada')
                     ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')

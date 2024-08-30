@@ -19,22 +19,22 @@ class UserPackageResource extends Resource
 {
     protected static ?string $model = UserPackage::class;
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 12;
 
     protected static ?string $navigationGroup = 'User';
 
-    protected static ?string $navigationLabel = 'Users Package';
+    protected static ?string $navigationLabel = 'Paket Pengguna';
 
     protected static ?string $navigationIcon = 'heroicon-o-user-circle';
 
     public static function getLabel(): string
     {
-        return 'User Package';
+        return 'Paket Pengguna';
     }
 
     public static function getPluralLabel(): string
     {
-        return 'User Packages';
+        return 'Paket Pengguna';
     }
 
     public static function form(Form $form): Form
@@ -113,21 +113,23 @@ class UserPackageResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->heading('Paket Pengguna')
+            ->description('Kelola paket akun pengguna Brainys')
             ->columns([
                 Tables\Columns\TextColumn::make('user.email')
-                    ->label('User Email')
+                    ->label('Alamat Email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('package.name')
-                    ->label('Package')
+                    ->label('Paket Tertaut')
                     ->searchable()
                     ->formatStateUsing(function ($record) {
                         return ucwords($record->package->name) . ' (' . ucwords($record->package->type) . ')';
                     }),
                 Tables\Columns\TextColumn::make('enroll_at')
-                    ->label('Enroll Date')
+                    ->label('Tertaut Pada')
                     ->dateTime(),
                 Tables\Columns\TextColumn::make('expired_at')
-                    ->label('Expiry Date')
+                    ->label('Kadaluarsa Pada')
                     ->dateTime(),
             ])
             ->filters([

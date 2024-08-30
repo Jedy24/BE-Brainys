@@ -17,22 +17,22 @@ class UpdateMessageResource extends Resource
 {
     protected static ?string $model = UpdateMessage::class;
     
-    protected static ?int $navigationSort = 13;
+    protected static ?int $navigationSort = 19;
 
-    protected static ?string $navigationGroup = 'System';
+    protected static ?string $navigationGroup = 'Sistem';
 
-    protected static ?string $navigationLabel = 'Update Message';
+    protected static ?string $navigationLabel = 'Pesan Pembaharuan';
 
     protected static ?string $navigationIcon = 'heroicon-c-megaphone';
 
     public static function getLabel(): string
     {
-        return 'Update Message';
+        return 'Pesan Pembaharuan';
     }
 
     public static function getPluralLabel(): string
     {
-        return 'Update Message';
+        return 'Pesan Pembaharuan';
     }
 
     public static function form(Form $form): Form
@@ -53,6 +53,8 @@ class UpdateMessageResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+        ->heading('Pesan Pembaharuan')
+        ->description('Kelola pembaharuan pesan kepada pengguna')
             ->columns([
                 Tables\Columns\TextColumn::make('version')
                     ->searchable(),

@@ -9,7 +9,7 @@ use Filament\Widgets\ChartWidget;
 class UserChart extends ChartWidget
 {
     protected static ?int $sort = 4;
-    protected static ?string $heading = 'User Activity Last 7 Days';
+    protected static ?string $heading = 'Aktivitas Pengguna 7 Hari Terakhir';
     protected static ?string $maxHeight = '500px';
     protected int | string | array $columnSpan = 'full';
 

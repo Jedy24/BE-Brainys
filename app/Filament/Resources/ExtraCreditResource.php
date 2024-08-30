@@ -17,20 +17,20 @@ class ExtraCreditResource extends Resource
 {
     protected static ?string $model = ExtraCredit::class;
 
-    protected static ?int $navigationSort = 11;
+    protected static ?int $navigationSort = 16;
 
-    protected static ?string $navigationGroup = 'Package & Credit';
+    protected static ?string $navigationGroup = 'Produk';
 
     protected static ?string $navigationIcon = 'heroicon-o-circle-stack';
 
     public static function getLabel(): string
     {
-        return 'Extra Credit';
+        return 'Ekstra Kredit';
     }
 
     public static function getPluralLabel(): string
     {
-        return 'Extra Credits';
+        return 'Ekstra Kredit';
     }
 
     public static function form(Form $form): Form
@@ -38,16 +38,16 @@ class ExtraCreditResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->label('Extra Credit Name')
+                    ->label('Nama Produk Ekstra Kredit')
                     ->required()
                     ->maxLength(255)
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('credit_amount')
-                    ->label('Credit Amount')
+                    ->label('Jumlah Kredit')
                     ->required()
                     ->numeric(),
                 Forms\Components\TextInput::make('price')
-                    ->label('Price (Rp)')
+                    ->label('Harga (Rp)')
                     ->required()
                     ->numeric()
                     ->prefix('Rp'),
@@ -57,17 +57,19 @@ class ExtraCreditResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->heading('Paket')
+            ->description('Kelola produk ekstra kredit untuk pengguna')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Extra Credit Name')
+                    ->label('Nama Produk Ekstra Kredit')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('credit_amount')
-                    ->label('Credit Amount')
+                    ->label('Jumlah Kredit')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('price')
-                    ->label('Price (Rp)')
-                    ->formatStateUsing(fn (string $state): string => 'Rp ' . number_format($state, 0, ',', '.'))
+                    ->label('Harga (Rp)')
+                    ->formatStateUsing(fn(string $state): string => 'Rp ' . number_format($state, 0, ',', '.'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created At')
