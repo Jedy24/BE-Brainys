@@ -7,6 +7,7 @@ use App\Filament\Resources\TransactionResource\RelationManagers;
 use App\Models\ExtraCredit;
 use App\Models\Package;
 use App\Models\Transaction;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -46,7 +47,10 @@ class TransactionResource extends Resource
                 Forms\Components\Select::make('id_user')
                     ->label('Pengguna')
                     ->relationship('user', 'name')
-                    ->required(),
+                    ->required()
+                    ->options(function (callable $get) {
+                        return User::all()->pluck('name', 'id')->toArray();
+                    }),
 
                 Forms\Components\DatePicker::make('transaction_date')
                     ->label('Tanggal Transaksi')
