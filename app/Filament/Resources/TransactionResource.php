@@ -121,13 +121,14 @@ class TransactionResource extends Resource
                             ->label('ID Item')
                             ->options(function (callable $get) {
                                 $itemType = $get('item_type');
+                                $options = [];
                                 if ($itemType === 'CREDIT') {
-                                    return ExtraCredit::pluck('name', 'id')->filter()->toArray();  // Menambahkan filter untuk memastikan label valid
+                                    $options = ExtraCredit::pluck('name', 'id')->filter()->toArray();
+                                } elseif ($itemType === 'PACKAGE') {
+                                    $options = Package::pluck('name', 'id')->filter()->toArray();
                                 }
-                                if ($itemType === 'PACKAGE') {
-                                    return Package::pluck('name', 'id')->filter()->toArray();  // Menambahkan filter untuk memastikan label valid
-                                }
-                                return [];
+                                // Ensure options are valid
+                                return array_filter($options, fn($label) => !is_null($label) && $label !== '') ?: ['0' => 'No Available Options'];
                             })
                             ->reactive()
                             ->disabled(),
