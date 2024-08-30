@@ -248,6 +248,7 @@ class TransactionResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Waktu Transaksi')
                     ->dateTime('d F Y')
+                    ->defaultSort('desc')
                     ->sortable()
                     ->description(fn($record): string => 'Jam: ' . $record->created_at->format('H:i:s')),
 
