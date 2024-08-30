@@ -122,10 +122,14 @@ class TransactionResource extends Resource
                             ->options(function (callable $get) {
                                 $itemType = $get('item_type');
                                 if ($itemType === 'CREDIT') {
-                                    return ExtraCredit::pluck('name', 'id')->toArray();
+                                    return ExtraCredit::pluck('name', 'id')->mapWithKeys(function ($name, $id) {
+                                        return [$id => $name ?? 'Unnamed Item'];  // Memberikan label default jika null
+                                    })->toArray();
                                 }
                                 if ($itemType === 'PACKAGE') {
-                                    return Package::pluck('name', 'id')->toArray();
+                                    return Package::pluck('name', 'id')->mapWithKeys(function ($name, $id) {
+                                        return [$id => $name ?? 'Unnamed Package'];  // Memberikan label default jika null
+                                    })->toArray();
                                 }
                                 return [];
                             })
