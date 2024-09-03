@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\PaymentMethod;
 use App\Models\Transaction;
+use App\Models\TransactionPayment;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
@@ -70,6 +72,97 @@ class TransactionController extends Controller
                 'status' => 'error',
                 'message' => 'Failed to retrieve transactions: ' . $e->getMessage(),
                 'data' => null,
+            ], 500);
+        }
+    }
+
+    public function show(Request $request, $transactionCode)
+    {
+        try {
+            // Find the transaction by transaction_code
+            $transaction = Transaction::where('transaction_code', $transactionCode)->first();
+
+            // Check if the transaction exists
+            if (!$transaction) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Transaction not found',
+                ], 404);
+            }
+
+            // Find the transaction payment by transaction ID
+            $transactionPayment = TransactionPayment::where('id_transaction', $transaction->id)->first();
+
+            // Check if transaction payment exists
+            if (!$transactionPayment) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Transaction payment not found',
+                ], 404);
+            }
+
+            // Find the payment method by id from transaction payment
+            $paymentMethod = PaymentMethod::where('provider_code', $transactionPayment->service)->first();
+
+            // Format the data
+            $data = [
+                'transaction' => [
+                    'id' => $transaction->id,
+                    'id_user' => $transaction->id_user,
+                    'transaction_date' => $transaction->transaction_date,
+                    'transaction_code' => $transaction->transaction_code,
+                    'transaction_name' => $transaction->transaction_name,
+                    'amount_sub' => $transaction->amount_sub,
+                    'amount_fee' => $transaction->amount_fee,
+                    'amount_total' => $transaction->amount_total,
+                    'status' => $transaction->status,
+                    'updated_at' => $transaction->updated_at,
+                    'created_at' => $transaction->created_at,
+                ],
+                'transaction_payment' => $transactionPayment ? [
+                    // 'id' => $transactionPayment->id,
+                    'id_transaction' => $transactionPayment->id_transaction,
+                    'pay_id' => $transactionPayment->pay_id,
+                    'unique_code' => $transactionPayment->unique_code,
+                    'service' => $transactionPayment->service,
+                    'service_name' => $transactionPayment->service_name,
+                    'amount' => $transactionPayment->amount,
+                    'balance' => $transactionPayment->balance,
+                    'fee' => $transactionPayment->fee,
+                    'type_fee' => $transactionPayment->type_fee,
+                    'status' => $transactionPayment->status,
+                    'expired' => $transactionPayment->expired,
+                    'qrcode_url' => $transactionPayment->qrcode_url,
+                    'virtual_account' => $transactionPayment->virtual_account,
+                    'checkout_url' => $transactionPayment->checkout_url,
+                    'checkout_url_v2' => $transactionPayment->checkout_url_v2,
+                    'checkout_url_v3' => $transactionPayment->checkout_url_v3,
+                    'checkout_url_beta' => $transactionPayment->checkout_url_beta,
+                    'updated_at' => $transactionPayment->updated_at,
+                    'created_at' => $transactionPayment->created_at,
+                ] : null,
+                'payment_method' => $paymentMethod ? [
+                    'id' => $paymentMethod->id,
+                    'name' => $paymentMethod->name,
+                    'code' => $paymentMethod->code,
+                    'category' => $paymentMethod->category,
+                    'status' => $paymentMethod->status,
+                    'provider' => $paymentMethod->provider,
+                    'provider_code' => $paymentMethod->provider_code,
+                    'description' => $paymentMethod->description,
+                ] : null,
+            ];
+
+            // Return data in JSON format
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Transaction retrieved successfully',
+                'data' => $data,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to retrieve transaction: ' . $e->getMessage(),
             ], 500);
         }
     }

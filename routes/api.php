@@ -161,6 +161,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Package
     Route::group(['prefix' => 'subscription'], function () {
         Route::get('/history', [TransactionController::class, 'index']);
+        Route::get('/history/{transactionCode}', [TransactionController::class, 'show']);
         Route::get('/package', [PackageController::class, 'getPackage']);
         Route::get('/extra-credit', [ExtraCreditController::class, 'getExtraCredit']);
         Route::post('/invoice', [TransactionController::class, 'invoice']);
