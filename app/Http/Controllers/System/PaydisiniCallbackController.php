@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\System;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PaymentSuccessNotification;
 use App\Models\ExtraCredit;
 use App\Models\Package;
 use App\Models\Transaction;
@@ -85,6 +86,8 @@ class PaydisiniCallbackController extends Controller
 
                 User::where('id', $transaction->id_user)->increment('limit_generate', $credit_amount);
             }
+
+            Mail::to($user->email)->send(new PaymentSuccessNotification($user, $transaction));
 
             Transaction::where('transaction_code', $uniqueCode)->update(['status' => 'completed']);
             TransactionPayment::where('unique_code', $uniqueCode)->update(['status' => $status]);
