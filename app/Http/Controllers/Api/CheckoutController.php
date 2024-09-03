@@ -130,7 +130,7 @@ class CheckoutController extends Controller
 
             $unique_code = 'BR-' . now()->format('ymd') . '-' . str_pad(random_int(0, 999999999), 9, '0', STR_PAD_LEFT);
 
-            $paydisini = new PaydisiniService('5a619921d520811105e2880f5ef13f1b');
+            $paydisini = new PaydisiniService(env('PAYDISINI_KEY'));
 
             // Menyiapkan data untuk transaksi baru
             $transactionData = [
@@ -144,7 +144,7 @@ class CheckoutController extends Controller
                 'type_fee' => 1,
                 'payment_guide' => 'TRUE',
                 'callback_count' => 3,
-                'return_url' => 'https://pos.theaxe.online'
+                'return_url' => 'https://brainys.oasys.id/dashboard'
             ];
 
             // Create new transaction payment
