@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\LoginNotification;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
@@ -10,6 +11,7 @@ use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class LoginController extends Controller
 {
@@ -22,7 +24,7 @@ class LoginController extends Controller
         ]);
 
         /**Jika validasi gagal maka muncul pesan error. */
-        if($validate->fails()){
+        if ($validate->fails()) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'Validasi gagal.',
@@ -71,6 +73,12 @@ class LoginController extends Controller
             'message' => 'Berhasil masuk.',
             'data' => $data,
         ];
+
+        // Send login notification email
+        $loginTime = now();
+        $ipAddress = $request->ip();
+
+        Mail::to($user->email)->send(new LoginNotification($user, $loginTime, $ipAddress));
 
         /**Mengembalikan nilai dalam bentuk JSON. */
         return response()->json($response, 200);
