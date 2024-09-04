@@ -31,7 +31,7 @@ class PaymentSuccessNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Notifikasi Pembayaran Berhasil',
+            subject: 'Notifikasi Pembayaran - ' . $this->transaction->transaction_code . ' Berhasil',
         );
     }
 
