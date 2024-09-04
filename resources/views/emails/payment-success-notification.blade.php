@@ -64,12 +64,12 @@
         <!-- Content -->
         <div class="content">
             <p class="text-lg mb-4">Halo {{ $user->name }},</p>
-            <p class="text-base mb-4">Pembayaran telah berhasil!</p>
-            <p class="text-base mb-2"><strong>Tanggal dan Waktu:</strong> {{ $transaction->transaction_date }}</p>
-            <p class="text-base mb-2"><strong>Harga Pembelian:</strong> {{ $transaction->amount_sub }}</p>
-            <p class="text-base mb-2"><strong>Biaya Admin:</strong> {{ $transaction->amount_fee }}</p>
-            <p class="text-base mb-2"><strong>Total Harga:</strong> {{ $transaction->amount_total }}</p>
-            <p class="text-base mb-2"><strong>Status Pembayaran:</strong> {{ $transaction->status }}</p>
+            <p class="text-base mb-4">Pembayaran Anda telah dibuat dan sudah terverifikasi!</p>
+            <p class="text-base mb-2"><strong>Tanggal:</strong> {{ $transaction->transaction_date }}</p>
+            <p class="text-base mb-2"><strong>Nomor Transaksi:</strong> {{ $transaction->transaction_code }}</p>
+            <p class="text-base mb-2"><strong>Harga Pembelian:</strong> Rp. {{ number_format($transaction->amount_sub, 0, ',', '.') }}</p>
+            <p class="text-base mb-2"><strong>Biaya Admin:</strong> Rp. {{ number_format($transaction->amount_fee, 0, ',', '.') }}</p>
+            <p class="text-base mb-2"><strong>Total Harga:</strong> Rp. {{ number_format($transaction->amount_total, 0, ',', '.') }}</p>
             <p class="text-base mb-4">Jangan menginformasikan bukti dan data pembayaran kepada pihak manapun kecuali Brainys.</p>
             <p class="text-base mt-6">Kami selalu siap membantu Anda jika ada pertanyaan atau masalah. Terima kasih
                 telah menggunakan Brainys!</p>
