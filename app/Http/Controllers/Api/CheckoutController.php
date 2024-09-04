@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Mail\PaymentPendingNotification;
 use App\Models\Package;
 use App\Models\ExtraCredit;
+use App\Models\User;
 use App\Models\PaymentMethod;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
@@ -13,6 +15,7 @@ use App\Models\TransactionPayment;
 use App\Services\PaydisiniService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
 
 class CheckoutController extends Controller
 {
@@ -236,6 +239,10 @@ class CheckoutController extends Controller
 
             // Commit the transaction
             DB::commit();
+
+            //Mail
+            $user = User::where('id', $transaction->id_user)->first();
+            Mail::to($user->email)->send(new PaymentPendingNotification($user, $transaction, $transactionPayment, $paymentMethod));
 
             return response()->json([
                 'status' => 'success',
