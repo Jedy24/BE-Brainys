@@ -63,13 +63,24 @@
 
             <!-- Content -->
             <div class="content">
-                <p class="text-lg mb-4">Halo {{ $user->name }},</p>
-                <p class="text-base mb-4">Menunggu Pembayaran dengan <strong>{{ $transactionPayment->service_name }}</strong> sebelum <strong>
+                <p class="text-lg mb-4">Halo <strong>{{ $user->name }}</strong>,</p>
+                <p class="text-base mb-4">Menunggu Pembayaran dengan <strong>{{ $paymentMethod->name }}</strong> sebelum <strong>
                     {{ $transactionPayment->expired }}</strong></p>
                 <p class="text-base mb-2">Segera lakukan pembayaran dengan detail sebagai berikut:</p>
-                <p class="text-base mb-2"><strong>Nomor Transaksi:</strong> {{ $transaction->transaction_code }}</p>
-                <p class="text-base mb-2"><strong>Total Bayar: </strong> Rp. {{ number_format($transaction->amount_total, 0, ',', '.') }} </p>
-                <p class="text-base mb-2"><strong>Metode Pembayaran:</strong> {{ $transactionPayment->service_name }}</p>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Nomor Transaksi:</strong></td>
+                        <td style="padding: 10px; border-bottom: 1px solid #dddddd;">{{ $transaction->transaction_code }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Total Bayar:</strong></td>
+                        <td style="padding: 10px; border-bottom: 1px solid #dddddd;">Rp. {{ number_format($transaction->amount_total, 0, ',', '.') }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Metode Pembayaran:</strong></td>
+                        <td style="padding: 10px; border-bottom: 1px solid #dddddd;">{{ $transactionPayment->service_name }}</td>
+                    </tr>
+                </table>
                 @if($paymentMethod->category === 'others')
                     <p class="text-base mb-2"><strong>Scan QR Code untuk membayar:</strong></p>
                     <img src="{{ $transactionPayment->qrcode_url }}" alt="QR Code" style="max-width: 200px; height: auto;">
