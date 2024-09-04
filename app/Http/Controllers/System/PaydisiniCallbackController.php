@@ -13,6 +13,7 @@ use App\Models\UserPackage;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class PaydisiniCallbackController extends Controller
 {
@@ -87,6 +88,8 @@ class PaydisiniCallbackController extends Controller
                 User::where('id', $transaction->id_user)->increment('limit_generate', $credit_amount);
             }
 
+            // Email
+            $user = User::where('id', $transaction->id_user)->first();
             Mail::to($user->email)->send(new PaymentSuccessNotification($user, $transaction));
 
             Transaction::where('transaction_code', $uniqueCode)->update(['status' => 'completed']);

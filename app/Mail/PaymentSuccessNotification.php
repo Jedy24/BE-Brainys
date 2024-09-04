@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class LoginNotification extends Mailable
+class PaymentSuccessNotification extends Mailable
 {
     public $user;
     public $transaction;
