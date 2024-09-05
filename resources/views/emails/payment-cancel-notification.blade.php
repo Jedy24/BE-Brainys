@@ -79,12 +79,6 @@
                     <td style="padding: 10px; border-bottom: 1px solid #dddddd;">Rp.
                         {{ number_format($transaction->amount_total, 0, ',', '.') }}</td>
                 </tr>
-                <tr>
-                    <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Metode Pembayaran:</strong>
-                    </td>
-                    <td style="padding: 10px; border-bottom: 1px solid #dddddd;">{{ $transactionPayment->service_name }}
-                    </td>
-                </tr>
             </table>
 
             <p class="text-base mb-4">Anda dapat melakukan pembelian ulang jika masih membutuhkan produk atau layanan
