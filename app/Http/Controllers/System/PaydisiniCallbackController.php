@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\System;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PaymentCancelNotification;
 use App\Mail\PaymentSuccessNotification;
 use App\Models\ExtraCredit;
 use App\Models\Package;
@@ -88,7 +89,7 @@ class PaydisiniCallbackController extends Controller
                 User::where('id', $transaction->id_user)->increment('limit_generate', $credit_amount);
             }
 
-            // Email
+            // Email Payment Sccess
             $user = User::where('id', $transaction->id_user)->first();
             Mail::to($user->email)->send(new PaymentSuccessNotification($user, $transaction));
 
@@ -96,6 +97,10 @@ class PaydisiniCallbackController extends Controller
             TransactionPayment::where('unique_code', $uniqueCode)->update(['status' => $status]);
             Log::info("Payment with unique code {$uniqueCode} was successful.");
         } elseif ($status === 'Canceled') {
+            // Email Payment Sccess
+            $user = User::where('id', $transaction->id_user)->first();
+            Mail::to($user->email)->send(new PaymentCancelNotification($user, $transaction));
+
             Transaction::where('transaction_code', $uniqueCode)->update(['status' => 'canceled']);
             TransactionPayment::where('unique_code', $uniqueCode)->update(['status' => $status]);
             Log::info("Payment with unique code {$uniqueCode} was canceled.");
