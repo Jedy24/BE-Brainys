@@ -133,7 +133,7 @@ class CheckoutController extends Controller
 
             $unique_code = 'BR-' . now()->format('ymd') . '-' . str_pad(random_int(0, 999999999), 9, '0', STR_PAD_LEFT);
 
-            $paydisini = new PaydisiniService(env('PAYDISINI_KEY'));
+            $paydisini = new PaydisiniService(env('PAYDISINI_KEY'), env('PAYDISINI_ID'));
 
             // Menyiapkan data untuk transaksi baru
             $transactionData = [
@@ -141,7 +141,7 @@ class CheckoutController extends Controller
                 'service' => $paymentMethod->provider_code,
                 'amount' => $amountTotal,
                 'note' => '-',
-                'valid_time' => 3600,
+                'valid_time' => 86400,
                 'ewallet_phone' => null,
                 'customer_email' => null,
                 'type_fee' => 1,

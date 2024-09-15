@@ -7,6 +7,7 @@ use GuzzleHttp\Exception\RequestException;
 
 class PaydisiniService
 {
+    private $apiId;
     private $apiUrl;
     private $apiKey;
     private $client;
@@ -16,11 +17,12 @@ class PaydisiniService
      *
      * @param string $apiKey
      */
-    public function __construct(string $apiKey)
+    public function __construct(string $apiKey, string $apiId)
     {
-        $this->apiUrl = 'https://api.paydisini.co.id/v1/';
-        $this->apiKey = $apiKey;
-        $this->client = new Client();
+        $this->apiUrl   = 'https://api.paydisini.co.id/v1/';
+        $this->apiKey   = $apiKey;
+        $this->apiId    = $apiId;
+        $this->client   = new Client();
     }
 
     /**
@@ -49,6 +51,7 @@ class PaydisiniService
 
         $postData = array_merge($data, [
             'key' => $this->apiKey,
+            'merchant_id' => $this->apiId,
             'request' => 'new',
             'signature' => $signature,
         ]);
