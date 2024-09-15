@@ -68,14 +68,25 @@ class PaydisiniCallbackController extends Controller
                 $expiredAt = Carbon::now();
                 $package = Package::find($details->item_id);
 
-                $userPackage = UserPackage::where('id_user', $transaction->id_user)->first();
-                if ($userPackage) {
-                    $expiredAt = Carbon::parse($userPackage->expired_at);
+                $userPackage = UserPackage::where('id_user', $transaction->id_user)
+                    ->with('package')
+                    ->first();
 
-                    if ($package->type === 'monthly') {
-                        $expiredAt = $expiredAt->addMonth();
-                    } elseif ($package->type === 'annually') {
-                        $expiredAt = $expiredAt->addYear();
+                if ($userPackage) {
+                    if ($userPackage->package->type !== 'free') {
+                        $expiredAt = Carbon::parse($userPackage->expired_at);
+                        if ($package->type === 'monthly') {
+                            $expiredAt = $expiredAt->addMonth();
+                        } elseif ($package->type === 'annually') {
+                            $expiredAt = $expiredAt->addYear();
+                        }
+                    } else {
+                        $expiredAt = Carbon::now();
+                        if ($package->type === 'monthly') {
+                            $expiredAt = $expiredAt->addMonth();
+                        } elseif ($package->type === 'annually') {
+                            $expiredAt = $expiredAt->addYear();
+                        }
                     }
 
                     $userPackage->update([
