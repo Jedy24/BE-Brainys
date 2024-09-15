@@ -94,13 +94,10 @@ class CheckoutController extends Controller
         $itemId = $request->input('item_id');
         $paymentMethodId = $request->input('payment_method_id');
 
-
-
         // Begin transaction
         DB::beginTransaction();
 
         try {
-            // Find the item based on the item_type and item_id
             if ($itemType === 'PACKAGE') {
                 $item = Package::find($itemId);
             } else {
@@ -128,9 +125,9 @@ class CheckoutController extends Controller
 
             // Calculate total amount (this example assumes no discounts or additional fees)
             $amountSub = $item->price;
-            // $amountFee = $paymentMethod->fee;
             $amountTotal = $amountSub;
 
+            $user = $request->user();
             $unique_code = 'BR-' . now()->format('ymd') . '-' . str_pad(random_int(0, 999999999), 9, '0', STR_PAD_LEFT);
 
             $paydisini = new PaydisiniService(env('PAYDISINI_KEY'), env('PAYDISINI_ID'));
@@ -143,7 +140,7 @@ class CheckoutController extends Controller
                 'note' => '-',
                 'valid_time' => 10800,
                 'ewallet_phone' => null,
-                'customer_email' => null,
+                'customer_email' => $user->email,
                 'type_fee' => 1,
                 'payment_guide' => 'TRUE',
                 'callback_count' => 3,
