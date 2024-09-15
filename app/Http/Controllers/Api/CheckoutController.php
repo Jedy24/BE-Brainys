@@ -141,7 +141,7 @@ class CheckoutController extends Controller
                 'service' => $paymentMethod->provider_code,
                 'amount' => $amountTotal,
                 'note' => '-',
-                'valid_time' => 86400,
+                'valid_time' => 10800,
                 'ewallet_phone' => null,
                 'customer_email' => null,
                 'type_fee' => 1,
