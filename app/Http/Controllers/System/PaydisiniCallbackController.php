@@ -68,18 +68,35 @@ class PaydisiniCallbackController extends Controller
                 $expiredAt = Carbon::now();
                 $package = Package::find($details->item_id);
 
-                if ($package->type === 'monthly') {
-                    $expiredAt = $expiredAt->addMonth();
-                } elseif ($package->type === 'annually') {
-                    $expiredAt = $expiredAt->addYear();
-                }
+                $userPackage = UserPackage::where('id_user', $transaction->id_user)->first();
+                if ($userPackage) {
+                    $expiredAt = Carbon::parse($userPackage->expired_at);
 
-                UserPackage::create([
-                    'id_user' => $transaction->id_user,
-                    'id_package' => $details->item_id,
-                    'enroll_at' => Carbon::now(),
-                    'expired_at' => $expiredAt,
-                ]);
+                    if ($package->type === 'monthly') {
+                        $expiredAt = $expiredAt->addMonth();
+                    } elseif ($package->type === 'annually') {
+                        $expiredAt = $expiredAt->addYear();
+                    }
+
+                    $userPackage->update([
+                        'id_package' => $details->item_id,
+                        'enroll_at' => Carbon::now(),
+                        'expired_at' => $expiredAt,
+                    ]);
+                } else {
+                    if ($package->type === 'monthly') {
+                        $expiredAt = $expiredAt->addMonth();
+                    } elseif ($package->type === 'annually') {
+                        $expiredAt = $expiredAt->addYear();
+                    }
+
+                    UserPackage::create([
+                        'id_user' => $transaction->id_user,
+                        'id_package' => $details->item_id,
+                        'enroll_at' => Carbon::now(),
+                        'expired_at' => $expiredAt,
+                    ]);
+                }
 
                 User::where('id', $transaction->id_user)->increment('limit_generate', $details->credit_add_monthly);
             } else if ($details->item_type === 'CREDIT') {
@@ -89,7 +106,6 @@ class PaydisiniCallbackController extends Controller
                 User::where('id', $transaction->id_user)->increment('limit_generate', $credit_amount);
             }
 
-            // Email Payment Sccess
             $user = User::where('id', $transaction->id_user)->first();
             Mail::to($user->email)->send(new PaymentSuccessNotification($user, $transaction));
 
