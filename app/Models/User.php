@@ -100,6 +100,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(Provider::class, 'user_id', 'id');
     }
+    
+    /**
+     * Get the user packages for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function userPackages()
+    {
+        return $this->hasMany(UserPackage::class, 'id_user', 'id');
+    }
 
     /**
      * Get the material history for the user.
@@ -219,16 +229,6 @@ class User extends Authenticatable
             + $this->alurTujuanPembelajaranHistory()->count()
             + $this->modulAjarHistory()->count()
         );
-    }
-
-    /**
-     * Get the user packages for the user.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function userPackages()
-    {
-        return $this->hasMany(UserPackage::class, 'id_user', 'id');
     }
 
     /**

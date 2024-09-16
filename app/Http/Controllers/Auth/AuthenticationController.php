@@ -36,12 +36,22 @@ class AuthenticationController extends Controller
         // Get the user's packages with the package names
         $userPackages = $user->userPackages()->with('package')->get()->map(function ($userPackage) {
             return [
-                'package_id' => $userPackage->id,
-                'package_name' => $userPackage->package->name,
+                'user_package_id' => $userPackage->id,
+                'package_id' => $userPackage->package->id,
+                'package_name' =>  $userPackage->package->name . '' .
+                    ($userPackage->package->type === 'monthly'
+                        ? ' (Bulanan)'
+                        : ($userPackage->package->type === 'annually'
+                            ? ' (Tahunan)'
+                            : '')),
                 'package_description' => $userPackage->package->description,
-                'package_description_mod' => 'Mendapatkan '.$userPackage->package->credit_add_monthly.' credit setiap bulannya',
+                'package_description_mod' => 'Mendapatkan ' . $userPackage->package->credit_add_monthly . ' credit setiap bulannya',
                 'credit_add_monthly' => $userPackage->package->credit_add_monthly,
-                'price' => $userPackage->package->price,
+                'price' => $userPackage->package->price, 
+                'enroll_at' => $userPackage->enroll_at,
+                'expired_at' => $userPackage->expired_at,
+                'enroll_at_formatted' => $userPackage->enroll_at->format('d M Y'),
+                'expired_at_formatted' => $userPackage->expired_at->format('d M Y'),
             ];
         });
 
@@ -72,7 +82,8 @@ class AuthenticationController extends Controller
          * Tanpa token tersebut maka user tidak dapat mengakses sumber daya.
          * Mengembalikan nilai dalam bentuk JSON.
          */
-        auth()->user()->tokens()->delete();
+        $request->user()->tokens()->delete();
+
         return response()->json([
             'status' => 'success',
             'message' => 'Berhasil keluar.'
