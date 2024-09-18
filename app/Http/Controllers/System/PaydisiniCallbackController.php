@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Telegram\Bot\Api;
 
 class PaydisiniCallbackController extends Controller
 {
@@ -122,6 +123,24 @@ class PaydisiniCallbackController extends Controller
 
             Transaction::where('transaction_code', $uniqueCode)->update(['status' => 'completed']);
             TransactionPayment::where('unique_code', $uniqueCode)->update(['status' => $status]);
+
+            $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
+            $chatId = env('TELEGRAM_CHAT_ID');
+    
+            $message = "*🎉 Transaksi Sukses Diterima - " . Carbon::now()->format('d M Y') . "🎉*\n\n";
+            $message .= "Transaksi dengan kode: *$uniqueCode* berhasil diproses.\n";
+            $message .= "Pengguna: *{$user->email}*\n";
+            $message .= "Kategori: *{$details->item_type }*\n";
+            $message .= "Item: *{$details->transaction_name }*\n";
+            $message .= "Status: *$status*\n\n";
+            $message .= "Terima kasih! 😊\n";
+    
+            $telegram->sendMessage([
+                'chat_id' => $chatId,
+                'text' => $message,
+                'parse_mode' => 'Markdown',
+            ]);
+            
             Log::info("Payment with unique code {$uniqueCode} was successful.");
         } elseif ($status === 'Canceled') {
             // Email Payment Sccess
