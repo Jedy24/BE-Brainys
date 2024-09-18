@@ -12,7 +12,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('task:check-package-expiry')->dailyAt('06:00');
+        $schedule->command('task:check-package-reminder')->dailyAt('07:00');
+        $schedule->command('task:check-monthly-credit')->dailyAt('01:00');
     }
 
     /**
