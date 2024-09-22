@@ -57,7 +57,7 @@ class CheckMonthlyCredit extends Command
             $addedCreditCount++;
             
             $credit_amount = Package::where('id', $userPackage->id_package)->pluck('credit_add_monthly')->first();
-            User::where('id', $userPackage->id_user)->increment('limit_generate', (int) $credit_amount);
+            User::where('id', $userPackage->id_user)->increment('credit', (int) $credit_amount);
 
             return $userPackage;
         });

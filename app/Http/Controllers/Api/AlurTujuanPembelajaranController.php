@@ -6,6 +6,7 @@ use App\Exports\ATPExport;
 use App\Http\Controllers\Controller;
 use App\Models\AlurTujuanPembelajaranHistories;
 use App\Models\CapaianPembelajaran;
+use App\Models\CreditLog;
 use App\Services\OpenAIService;
 use icircle\Template\Docx\DocxTemplate;
 use Illuminate\Http\Request;
@@ -114,6 +115,17 @@ class AlurTujuanPembelajaranController extends Controller
                 'weeks' => $pekan,
                 'notes' => $deskripsiNotes,
                 'output_data' => $parsedResponse,
+            ]);
+
+            // Decrease user's credit
+            $creditCharge = 1;
+            $user->decrement('credit', $creditCharge);
+
+            // Credit Logging
+            CreditLog::create([
+                'user_id' => $user->id,
+                'amount' => -$creditCharge,
+                'description' => 'Generate ATP',
             ]);
 
             $parsedResponse['id'] = $history->id;
@@ -324,8 +336,8 @@ class AlurTujuanPembelajaranController extends Controller
             "pekan": "' . $pekan . '",
             "alur": [';
 
-            for ($i = 1; $i <= $pekan; $i++) {
-                $prompt .= '
+        for ($i = 1; $i <= $pekan; $i++) {
+            $prompt .= '
                 {
                     "no": ' . $i . ',
                     "tujuan_pembelajaran": "", //Diisi dengan tujuan Pembelajaran Pekan ' . $i . ', minimal 3 sampai 5 kalimat per tujuan pembelajaran, agar detail ya
@@ -337,9 +349,9 @@ class AlurTujuanPembelajaranController extends Controller
                     ],
                     "glosarium": "" //Diiisi dengan Glosarium Pekan ' . $i . '
                 }' . ($i < $pekan ? ',' : '');
-            }
+        }
 
-            $prompt .= '
+        $prompt .= '
             ]
         }';
 

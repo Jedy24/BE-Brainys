@@ -124,8 +124,8 @@ class UserResource extends Resource
                     ->boolean()
                     ->label('Active')
                     ->alignCenter(),
-                Tables\Columns\TextColumn::make('limit_generate')
-                    ->label('Batas Pembuatan')
+                Tables\Columns\TextColumn::make('credit')
+                    ->label('Kredit')
                     ->alignCenter()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('generate_count')

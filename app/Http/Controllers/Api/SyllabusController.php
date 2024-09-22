@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\CreditLog;
 use Illuminate\Http\Request;
 use App\Services\OpenAIService;
 
@@ -83,6 +84,17 @@ class SyllabusController extends Controller
             ]);
 
             $parsedResponse['id'] = $insertData->id;
+
+            // Decrease user's credit
+            $creditCharge = 1;
+            $user->decrement('credit', $creditCharge);
+
+            // Credit Logging
+            CreditLog::create([
+                'user_id' => $user->id,
+                'amount' => -$creditCharge,
+                'description' => 'Generate Silabus',
+            ]);
 
             // return new APIResponse($responseData);
             return response()->json([

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\HintHistories;
 use App\Models\CapaianPembelajaran;
+use App\Models\CreditLog;
 use App\Services\OpenAIService;
 use icircle\Template\Docx\DocxTemplate;
 use Illuminate\Http\Request;
@@ -127,6 +128,17 @@ class HintController extends Controller
                 'notes' => $addNotes,
                 'generate_output' => $parsedResponse,
                 'user_id' => auth()->id(),
+            ]);
+            
+            // Decrease user's credit
+            $creditCharge = 1;
+            $user->decrement('credit', $creditCharge);
+
+            // Credit Logging
+            CreditLog::create([
+                'user_id' => $user->id,
+                'amount' => -$creditCharge,
+                'description' => 'Generate Kisi Kisi',
             ]);
 
             $parsedResponse['id'] = $insertData->id;

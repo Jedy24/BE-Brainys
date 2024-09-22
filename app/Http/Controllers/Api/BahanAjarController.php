@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\BahanAjarHistories;
+use App\Models\CreditLog;
 use App\Services\OpenAIService;
 use App\Services\PPTBahanAjar;
 use icircle\Template\Docx\DocxTemplate;
@@ -83,6 +84,17 @@ class BahanAjarController extends Controller
                 'notes' => $addNotes,
                 'generate_output' => $parsedResponse,
                 'user_id' => auth()->id(),
+            ]);
+            
+            // Decrease user's credit
+            $creditCharge = 1;
+            $user->decrement('credit', $creditCharge);
+
+            // Credit Logging
+            CreditLog::create([
+                'user_id' => $user->id,
+                'amount' => -$creditCharge,
+                'description' => 'Generate Bahan Ajar',
             ]);
 
             $parsedResponse['id'] = $insertData->id;

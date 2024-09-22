@@ -110,12 +110,12 @@ class PaydisiniCallbackController extends Controller
                     ]);
                 }
 
-                User::where('id', $transaction->id_user)->increment('limit_generate', (int) $package->credit_add_monthly);
+                User::where('id', $transaction->id_user)->increment('credit', (int) $package->credit_add_monthly);
             } else if ($details->item_type === 'CREDIT') {
                 $credit = ExtraCredit::find($details->item_id);
                 $credit_amount = $credit->credit_amount;
 
-                User::where('id', $transaction->id_user)->increment('limit_generate', (int) $credit_amount);
+                User::where('id', $transaction->id_user)->increment('credit', (int) $credit_amount);
             }
 
             $user = User::where('id', $transaction->id_user)->first();

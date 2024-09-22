@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\CreditLog;
 use App\Models\GamificationHistories;
 use App\Services\OpenAIService;
 use App\Services\PPTGamification;
@@ -88,6 +89,17 @@ class GamificationController extends Controller
                 'game_scheme' => $request->input('game_scheme'),
                 'output_data' => $parsedResponse,
                 'user_id' => auth()->id(),
+            ]);
+            
+            // Decrease user's credit
+            $creditCharge = 1;
+            $user->decrement('credit', $creditCharge);
+
+            // Credit Logging
+            CreditLog::create([
+                'user_id' => $user->id,
+                'amount' => -$creditCharge,
+                'description' => 'Generate Gamifikasi',
             ]);
 
             $parsedResponse['id'] = $insertData->id;

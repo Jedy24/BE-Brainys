@@ -18,6 +18,7 @@ class UserStatusController extends Controller
 
             $status = [
                 'all' => [
+                    'credit' => $user->credit,
                     'limit' => $user->limit_generate,
                     'used' => $user->generateAllSum(),
                 ]

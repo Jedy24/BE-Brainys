@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ModulAjarHistories;
 use App\Models\CapaianPembelajaran;
+use App\Models\CreditLog;
 use App\Services\OpenAIService;
 use icircle\Template\Docx\DocxTemplate;
 use Illuminate\Http\Request;
@@ -27,7 +28,7 @@ class ModulAjarController extends Controller
         try {
             // Input validation
             $request->validate([
-                'name'  =>'required',
+                'name'  => 'required',
                 'phase' => 'required',
                 'subject' => 'required',
                 'element' => 'required',
@@ -45,7 +46,7 @@ class ModulAjarController extends Controller
                 ], 400);
             }
 
-            // Check if the user has less than 20 limit generate
+            // Check if the user has less than the limit generate
             if ($user->generateAllSum() >= $user->limit_generate) {
                 return response()->json([
                     'status' => 'failed',
@@ -67,6 +68,7 @@ class ModulAjarController extends Controller
             $elemen         = $request->input('element');
             $addNotes       = $request->input('notes');
 
+            // Get Capaian Pembelajaran
             $finalData = CapaianPembelajaran::where('fase', $faseKelas)
                 ->where('mata_pelajaran', $mataPelajaran)
                 ->where('element', $elemen)
@@ -83,14 +85,14 @@ class ModulAjarController extends Controller
 
             $capaianPembelajaran = $finalData[0]->capaian_pembelajaran;
 
-            $prompt         = $this->prompt($faseKelas, $mataPelajaran, $elemen, $capaianPembelajaran, $addNotes);
+            // Create prompt
+            $prompt = $this->prompt($faseKelas, $mataPelajaran, $elemen, $capaianPembelajaran, $addNotes);
 
             // Send the message to OpenAI
             $resMessage = $this->openAI->sendMessage($prompt);
-
             $parsedResponse = json_decode($resMessage, true);
-            $user = $request->user();
 
+            // Map Fase Kelas
             $faseToKelas = [
                 'Fase A' => 'Kelas 1 - 2 SD',
                 'Fase B' => 'Kelas 3 - 4 SD',
@@ -102,15 +104,16 @@ class ModulAjarController extends Controller
 
             $kelas = isset($faseToKelas[$faseKelas]) ? "{$faseKelas} ({$faseToKelas[$faseKelas]})" : $faseKelas;
 
-            $parsedResponse['informasi_umum']['nama_modul_ajar']        = $namaModulAjar;
-            $parsedResponse['informasi_umum']['penyusun']               = $user->name;
-            $parsedResponse['informasi_umum']['jenjang_sekolah']        = $user->school_name;
-            $parsedResponse['informasi_umum']['fase_kelas']             = $kelas;
-            $parsedResponse['informasi_umum']['mata_pelajaran']         = $mataPelajaran;
-            $parsedResponse['informasi_umum']['element']                = $elemen;
-            $parsedResponse['informasi_umum']['capaian_pembelajaran']   = $capaianPembelajaran;
+            // Add additional information
+            $parsedResponse['informasi_umum']['nama_modul_ajar'] = $namaModulAjar;
+            $parsedResponse['informasi_umum']['penyusun'] = $user->name;
+            $parsedResponse['informasi_umum']['jenjang_sekolah'] = $user->school_name;
+            $parsedResponse['informasi_umum']['fase_kelas'] = $kelas;
+            $parsedResponse['informasi_umum']['mata_pelajaran'] = $mataPelajaran;
+            $parsedResponse['informasi_umum']['element'] = $elemen;
+            $parsedResponse['informasi_umum']['capaian_pembelajaran'] = $capaianPembelajaran;
 
-            // Construct the response data for success
+            // Insert data into ModulAjarHistories
             $insertData = ModulAjarHistories::create([
                 'name' => $namaModulAjar,
                 'phase' => $faseKelas,
@@ -118,12 +121,23 @@ class ModulAjarController extends Controller
                 'element' => $elemen,
                 'notes' => $addNotes,
                 'output_data' => $parsedResponse,
-                'user_id' => auth()->id(),
+                'user_id' => $user->id,
             ]);
 
+            // Decrease user's credit
+            $creditCharge = 1;
+            $user->decrement('credit', $creditCharge);
+
+            // Credit Logging
+            CreditLog::create([
+                'user_id' => $user->id,
+                'amount' => -$creditCharge,
+                'description' => 'Generate Modul Ajar',
+            ]);
+
+            // Add ID to response
             $parsedResponse['id'] = $insertData->id;
 
-            // return new APIResponse($responseData);
             return response()->json([
                 'status' => 'success',
                 'message' => 'Modul ajar berhasil dihasilkan',
@@ -137,6 +151,7 @@ class ModulAjarController extends Controller
             ], 500);
         }
     }
+
 
     public function convertToWord(Request $request)
     {
@@ -242,13 +257,13 @@ class ModulAjarController extends Controller
 
                 $kompetensiDasar = new RichText();
 
-                $addBoldText = function($text, $container) {
+                $addBoldText = function ($text, $container) {
                     $run = new Run($text);
                     $run->getFont()->setBold(true);
                     $container->addText($run);
                 };
 
-                $addNormalText = function($text, $container) {
+                $addNormalText = function ($text, $container) {
                     $run = new Run($text);
                     $container->addText($run);
                 };
@@ -288,7 +303,7 @@ class ModulAjarController extends Controller
 
             $glosariumMateri = '';
             foreach ($data['lampiran']['glosarium_materi'] as $index => $tujuan) {
-                $glosariumMateri .= ($index + 1) . ') '. $tujuan . PHP_EOL;
+                $glosariumMateri .= ($index + 1) . ') ' . $tujuan . PHP_EOL;
             }
             $sheet->setCellValue('B36', $glosariumMateri);
 
@@ -595,5 +610,4 @@ class ModulAjarController extends Controller
 
         return $prompt;
     }
-
 }
