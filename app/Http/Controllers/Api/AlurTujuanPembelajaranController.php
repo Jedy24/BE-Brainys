@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AlurTujuanPembelajaranHistories;
 use App\Models\CapaianPembelajaran;
 use App\Models\CreditLog;
+use App\Models\ModuleCreditCharge;
 use App\Services\OpenAIService;
 use icircle\Template\Docx\DocxTemplate;
 use Illuminate\Http\Request;
@@ -46,7 +47,9 @@ class AlurTujuanPembelajaranController extends Controller
             }
 
             // Check if the user has less than 20 material histories
-            if ($user->generateAllSum() >= $user->limit_generate) {
+            $moduleCredit = ModuleCreditCharge::where('slug', 'alur-tujuan-pembelajaran')->first();
+            $creditCharge = $moduleCredit->credit_charged_generate ?? 1;
+            if ($user->credit < $creditCharge) {
                 return response()->json([
                     'status' => 'failed',
                     'message' => 'Anda telah mencapai batas maksimal untuk riwayat bahan ajar.',
@@ -118,7 +121,6 @@ class AlurTujuanPembelajaranController extends Controller
             ]);
 
             // Decrease user's credit
-            $creditCharge = 1;
             $user->decrement('credit', $creditCharge);
 
             // Credit Logging

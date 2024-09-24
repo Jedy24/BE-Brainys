@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ModulAjarHistories;
 use App\Models\CapaianPembelajaran;
 use App\Models\CreditLog;
+use App\Models\ModuleCreditCharge;
 use App\Services\OpenAIService;
 use icircle\Template\Docx\DocxTemplate;
 use Illuminate\Http\Request;
@@ -47,11 +48,14 @@ class ModulAjarController extends Controller
             }
 
             // Check if the user has less than the limit generate
-            if ($user->generateAllSum() >= $user->limit_generate) {
+            $moduleCredit = ModuleCreditCharge::where('slug', 'modul-ajar')->first();
+            $creditCharge = $moduleCredit->credit_charged_generate ?? 1;
+            if ($user->credit < $creditCharge) {
                 return response()->json([
                     'status' => 'failed',
                     'message' => 'Anda telah mencapai batas maksimal untuk riwayat modul ajar.',
                     'data' => [
+                        'user_credit' => $user->credit,
                         'generated_all_num' => $user->generateAllSum(),
                         'limit_all_num' => $user->limit_generate
                     ],
@@ -125,7 +129,6 @@ class ModulAjarController extends Controller
             ]);
 
             // Decrease user's credit
-            $creditCharge = 1;
             $user->decrement('credit', $creditCharge);
 
             // Credit Logging

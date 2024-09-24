@@ -26,7 +26,7 @@ class UserInvitationResource extends Resource
 
     protected static ?int $navigationSort = 13;
 
-    protected static ?string $navigationGroup = 'User';
+    protected static ?string $navigationGroup = 'Pengguna';
 
     protected static ?string $navigationLabel = 'Undangan Pengguna';
 

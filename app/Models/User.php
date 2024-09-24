@@ -62,6 +62,7 @@ class User extends Authenticatable
         'otp_expiry',
         'otp_verified_at',
         'profile_completed',
+        'credit',
         'limit_generate',
         'school_name',
         'school_level',

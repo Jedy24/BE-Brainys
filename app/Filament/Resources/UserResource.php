@@ -27,7 +27,7 @@ class UserResource extends Resource
 
     protected static ?int $navigationSort = 11;
 
-    protected static ?string $navigationGroup = 'User';
+    protected static ?string $navigationGroup = 'Pengguna';
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
@@ -73,9 +73,9 @@ class UserResource extends Resource
                 Forms\Components\TextInput::make('profession')
                     ->placeholder('Profession')
                     ->label('Profession'),
-                Forms\Components\TextInput::make('limit_generate')
-                    ->label('Limit Generate')
-                    ->placeholder('Limit Generate'),
+                Forms\Components\TextInput::make('credit')
+                    ->label('Kredit')
+                    ->placeholder('Kredit'),
                 Forms\Components\Select::make('roles')
                     ->label('Roles')
                     ->options([

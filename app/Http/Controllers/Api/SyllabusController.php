@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\CreditLog;
+use App\Models\ModuleCreditCharge;
 use Illuminate\Http\Request;
 use App\Services\OpenAIService;
 
@@ -42,15 +43,14 @@ class SyllabusController extends Controller
             }
 
             // Check if the user has less than 20 syllabus histories
-            if ($user->generateAllSum() >= $user->limit_generate) {
+            $moduleCredit = ModuleCreditCharge::where('slug', 'silabus')->first();
+            $creditCharge = $moduleCredit->credit_charged_generate ?? 1;
+            if ($user->credit < $creditCharge) {
                 return response()->json([
                     'status' => 'failed',
                     'message' => 'Anda telah mencapai batas maksimal untuk riwayat silabus.',
                     'data' => [
-                        // 'generated_num' => $user->syllabusHistory()->count(),
-                        // 'generated_syllabus_num' => $user->syllabusHistory()->count(),
-                        // 'generated_material_num' => $user->materialHistory()->count(),
-                        // 'generated_exercise_num' => $user->exerciseHistory()->count(),
+                        'user_credit' => $user->credit,
                         'generated_all_num' => $user->generateAllSum(),
                         'limit_all_num' => $user->limit_generate
                     ],
@@ -86,7 +86,6 @@ class SyllabusController extends Controller
             $parsedResponse['id'] = $insertData->id;
 
             // Decrease user's credit
-            $creditCharge = 1;
             $user->decrement('credit', $creditCharge);
 
             // Credit Logging

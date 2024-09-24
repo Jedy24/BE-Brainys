@@ -21,7 +21,7 @@ class UserPackageResource extends Resource
 
     protected static ?int $navigationSort = 12;
 
-    protected static ?string $navigationGroup = 'User';
+    protected static ?string $navigationGroup = 'Pengguna';
 
     protected static ?string $navigationLabel = 'Paket Pengguna';
 

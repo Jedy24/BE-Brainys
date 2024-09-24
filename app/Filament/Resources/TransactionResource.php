@@ -39,6 +39,20 @@ class TransactionResource extends Resource
         return 'Kelola Transaksi';
     }
 
+    public static function getNavigationBadge(): ?string
+    {
+        $todayCompletedTransactions = Transaction::where('status', 'success')
+            ->whereDate('created_at', now()->toDateString())
+            ->count();
+
+        return $todayCompletedTransactions > 0 ? (string) $todayCompletedTransactions : 0;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return static::getNavigationBadge() > 0 ? 'success' : 'primary';
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -99,7 +113,7 @@ class TransactionResource extends Resource
                         'canceled' => 'Dibatalkan',
                         'pending' => 'Menunggu Pembayaran',
                         'success' => 'Selesai',
-                        'completed' => 'Selesai',
+                        // 'completed' => 'Selesai',
                     ])
                     ->required(),
 

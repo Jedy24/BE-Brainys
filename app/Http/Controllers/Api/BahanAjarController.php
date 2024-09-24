@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\BahanAjarHistories;
 use App\Models\CreditLog;
+use App\Models\ModuleCreditCharge;
 use App\Services\OpenAIService;
 use App\Services\PPTBahanAjar;
 use icircle\Template\Docx\DocxTemplate;
@@ -44,15 +45,14 @@ class BahanAjarController extends Controller
             }
 
             // Check if the user has less than 20 limit generate
-            if ($user->generateAllSum() >= $user->limit_generate) {
+            $moduleCredit = ModuleCreditCharge::where('slug', 'bahan-ajar')->first();
+            $creditCharge = $moduleCredit->credit_charged_generate ?? 1;
+            if ($user->credit < $creditCharge) {
                 return response()->json([
                     'status' => 'failed',
                     'message' => 'Anda telah mencapai batas maksimal untuk riwayat bahan ajar.',
                     'data' => [
-                        // 'generated_num' => $user->syllabusHistory()->count(),
-                        // 'generated_syllabus_num' => $user->syllabusHistory()->count(),
-                        // 'generated_material_num' => $user->materialHistory()->count(),
-                        // 'generated_exercise_num' => $user->exerciseHistory()->count(),
+                        'user_credit' => $user->credit,
                         'generated_all_num' => $user->generateAllSum(),
                         'limit_all_num' => $user->limit_generate
                     ],
@@ -87,7 +87,6 @@ class BahanAjarController extends Controller
             ]);
             
             // Decrease user's credit
-            $creditCharge = 1;
             $user->decrement('credit', $creditCharge);
 
             // Credit Logging

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\CreditLog;
 use App\Models\GamificationHistories;
+use App\Models\ModuleCreditCharge;
 use App\Services\OpenAIService;
 use App\Services\PPTGamification;
 use icircle\Template\Docx\DocxTemplate;
@@ -46,11 +47,14 @@ class GamificationController extends Controller
             }
 
             // Check if the user has less than 20 material histories
-            if ($user->generateAllSum() >= $user->limit_generate) {
+            $moduleCredit = ModuleCreditCharge::where('slug', 'gamifikasi')->first();
+            $creditCharge = $moduleCredit->credit_charged_generate ?? 1;
+            if ($user->credit < $creditCharge) {
                 return response()->json([
                     'status' => 'failed',
-                    'message' => 'Anda telah mencapai batas maksimal untuk riwayat bahan ajar.',
+                    'message' => 'Anda telah mencapai batas maksimal untuk riwayat gamifikasi.',
                     'data' => [
+                        'user_credit' => $user->credit,
                         'generated_all_num' => $user->generateAllSum(),
                         'limit_all_num' => $user->limit_generate
                     ],
@@ -92,7 +96,6 @@ class GamificationController extends Controller
             ]);
             
             // Decrease user's credit
-            $creditCharge = 1;
             $user->decrement('credit', $creditCharge);
 
             // Credit Logging
