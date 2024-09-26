@@ -10,13 +10,16 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
-use App\Notifications\OtpNotification;
-use App\Notifications\ResetPasswordNotification;
+// use App\Notifications\OtpNotification;
+use App\Mail\OtpNotification;
+use App\Mail\ResetPasswordNotification;
+// use App\Notifications\ResetPasswordNotification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\UserInvitation;
 use App\Models\UserNotification;
+use Illuminate\Support\Facades\Mail;
 
 class AuthenticationController extends Controller
 {
@@ -47,7 +50,7 @@ class AuthenticationController extends Controller
                 'package_description' => $userPackage->package->description,
                 'package_description_mod' => 'Mendapatkan ' . $userPackage->package->credit_add_monthly . ' credit setiap bulannya',
                 'credit_add_monthly' => $userPackage->package->credit_add_monthly,
-                'price' => $userPackage->package->price, 
+                'price' => $userPackage->package->price,
                 'enroll_at' => $userPackage->enroll_at,
                 'expired_at' => $userPackage->expired_at,
                 'enroll_at_formatted' => $userPackage->enroll_at->format('d M Y'),
@@ -173,7 +176,7 @@ class AuthenticationController extends Controller
         $user->save();
 
         /**Mengirim pesan reset password ke email. */
-        $user->notify(new ResetPasswordNotification($token, $user->email));
+        Mail::to($user->email)->send(new ResetPasswordNotification($user));
 
         /**Mengembalikan nilai dalam bentuk JSON.
          * Menampilkan pesan sukses.
@@ -373,7 +376,7 @@ class AuthenticationController extends Controller
         $user->save();
 
         /** Mengirim ulang kode OTP ke email user. */
-        $user->notify(new OtpNotification($otp));
+        Mail::to($user->email)->send(new OtpNotification($user));
 
         /** Respon sukses. */
         return response()->json([

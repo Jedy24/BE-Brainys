@@ -11,7 +11,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use App\Notifications\OtpNotification;
+use App\Mail\OtpNotification;
+use Illuminate\Support\Facades\Mail;
 
 class RegisterController extends Controller
 {
@@ -46,8 +47,8 @@ class RegisterController extends Controller
         $user->otp_expiry = now()->addMinutes(2);
         $user->save();
 
-        /**Mengirim kode OTP ke email user. */
-        $user->notify(new OtpNotification($otp));
+        //Mail
+        Mail::to($user->email)->send(new OtpNotification($user));
 
         $data['user'] = $user;
 
