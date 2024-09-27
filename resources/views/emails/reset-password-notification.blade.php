@@ -46,6 +46,7 @@
             font-size: 22px;
             font-weight: bold;
             margin-bottom: 24px;
+            color: #000000;
         }
 
         .text-base {
