@@ -35,7 +35,7 @@ class PaymentPendingNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Menunggu Pembayaran ' . $this->transactionPayment->service_name . ' untuk pembayaran - '. $this->transaction->transaction_code,
+            subject: 'Kami Menunggu Pembayaran Anda',
         );
     }
 
