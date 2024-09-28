@@ -54,6 +54,13 @@
             color: #000000;
         }
 
+        .text-va {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            margin-top: 4px;
+            color: #000000;
+        }
+
         .content {
             padding: 30px;
             text-align: left;
@@ -85,14 +92,22 @@
             background-color: #f9f9f9;
             padding: 20px;
             border-radius: 8px;
-            margin-top: 20px;
+            margin-top: 16px;
             text-align: left;
         }
 
         .instructions-title {
             font-size: 18px;
             font-weight: 600;
-            margin-bottom: 12px;
+            margin-bottom: 0px;
+            text-align: center;
+            color: #637381;
+        }
+
+        .instructions-sub-title {
+            font-size: 16px;
+            margin-top: 0px;
+            margin-bottom: 10px;
             text-align: center;
             color: #637381;
         }
@@ -125,6 +140,49 @@
         .btn-primary:hover {
             background-color: #3758F9;
             color: white;
+        }
+
+        .va-box {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            font-size: 16px;
+        }
+
+        .va-number {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .va-number .va-text {
+            margin-right: auto;
+        }
+
+        .copy-btn {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            text-decoration: none;
+            color: #3758F9;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .copy-btn:hover {
+            text-decoration: underline;
+        }
+
+        .copy-icon {
+            width: 20px;
+            margin-right: 8px;
         }
     </style>
 </head>
@@ -167,12 +225,24 @@
                     <img src="{{ $transactionPayment->qrcode_url }}" alt="QR Code" style="max-width: 200px; height: auto;">
                 </div>
             @else
-                <p class="text-base">Ikuti instruksi pembayaran VA di bawah ini:</p>
-                <p class="text-base">Virtual Account: <span class="bold-text"> {{ $transactionPayment->virtual_account }} </span></p>
+            <p class="text-base">Ikuti instruksi pembayaran VA di bawah ini</strong></p>
+                <div class="va-box">
+                    <p class="text-va">Gunakan nomor VA di bawah ini untuk pembayaran</p>
+                    <div class="va-number">
+                        <span class="va-text">{{ $transactionPayment->virtual_account }}</span>
+                        <a href="#" class="copy-btn" onclick="copyToClipboard('{{ $transactionPayment->virtual_account }}')">
+                            <img src="https://cdn-icons-png.flaticon.com/512/1827/1827933.png" alt="Salin" class="copy-icon">
+                            <span>Salin</span>
+                        </a>
+                    </div>
+                </div>
             @endif
 
             <div class="instruction">
                 <p class="instructions-title">Cara melakukan pembayararan {{ $paymentMethod->name }} :</p>
+                @if ($paymentMethod->category === "virtual_account")
+                    <p class="instructions-sub-title">Pastikan transfer sesuai nominal yang tertera</p>
+                @endif
                 @if($paymentMethod->id === 1)
                     <p class="instructions-list">{!! $paymentMethod->description !!}</p>
                 @elseif($paymentMethod->id === 2)
@@ -204,6 +274,17 @@
             <p class="text-sm">© 2024 PT Oasys Edutech Indonesia</p>
         </div>
     </div>
+
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert('Nomor VA berhasil disalin ke clipboard: ' + text);
+            }, function(err) {
+                console.error('Gagal menyalin teks: ', err);
+            });
+        }
+    </script>
 </body>
 
 </html>
+
