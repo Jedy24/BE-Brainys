@@ -97,17 +97,23 @@
             color: #637381;
         }
 
-        .instructions-list {
-            font-size: 16px !important;
-            line-height: 1.6 !important;
-            color: #637381 !important;
+        .instructions-list p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #637381;
         }
+        .instructions-list ul {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #637381;
+        }
+
 
         .btn-primary {
             display: inline-block;
             padding: 10px 50px;
             background-color: #3758F9;
-            color: white;
+            color: white !important;
             text-align: center;
             border-radius: 5px;
             text-decoration: none;
@@ -118,6 +124,7 @@
 
         .btn-primary:hover {
             background-color: #3758F9;
+            color: white;
         }
     </style>
 </head>
@@ -187,7 +194,7 @@
 
             <p class="text-base" style="text-align: center;">Atau akses pembayaran dengan klik tombol di bawah:</p>
             <div style="text-align: center; margin-top: 10px;">
-                <a href="" class="btn-primary">Bayar Sekarang</a>
+                <a href="https://staging.brainys.oasys.id/order/detail/{{ $transaction->transaction_code }}" class="btn-primary">Bayar Sekarang</a>
                 <a href="https://api.whatsapp.com/send?phone=6288242021092" class="help-link">Bantuan</a>
             </div>
         </div>
