@@ -112,17 +112,11 @@
             color: #637381;
         }
 
-        .instructions-list p {
+        .instructions-list {
             font-size: 16px;
             line-height: 1.6;
-            color: #637381;
+            color: #3d3d3d;
         }
-        .instructions-list ul {
-            font-size: 16px;
-            line-height: 1.6;
-            color: #637381;
-        }
-
 
         .btn-primary {
             display: inline-block;
@@ -230,10 +224,10 @@
                     <p class="text-va">Gunakan nomor VA di bawah ini untuk pembayaran</p>
                     <div class="va-number">
                         <span class="va-text">{{ $transactionPayment->virtual_account }}</span>
-                        <a href="#" class="copy-btn" onclick="copyToClipboard('{{ $transactionPayment->virtual_account }}')">
+                        {{-- <a href="javascript:void(0);" class="copy-btn" onclick="copyToClipboard('{{ $transactionPayment->virtual_account }}')">
                             <img src="https://cdn-icons-png.flaticon.com/512/1827/1827933.png" alt="Salin" class="copy-icon">
                             <span>Salin</span>
-                        </a>
+                        </a> --}}
                     </div>
                 </div>
             @endif
@@ -275,7 +269,7 @@
         </div>
     </div>
 
-    <script>
+    {{-- <script>
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(function() {
                 alert('Nomor VA berhasil disalin ke clipboard: ' + text);
@@ -283,7 +277,7 @@
                 console.error('Gagal menyalin teks: ', err);
             });
         }
-    </script>
+    </script> --}}
 </body>
 
 </html>
