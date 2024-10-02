@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\PackageController;
 use App\Http\Controllers\Api\SendInvitationController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\UserInvitationController;
+use App\Http\Controllers\System\CommandController;
 use App\Http\Controllers\Service\CapaianPembelajaranController;
 use App\Models\Transaction;
 
@@ -197,3 +198,10 @@ Route::group(['prefix' => 'capaian-pembelajaran'], function () {
 });
 
 Route::post('/send-invitation', [SendInvitationController::class, 'sendInvitation'])->name('api.send-invitation');
+
+// Command CRON JOB
+Route::group(['prefix' => 'commands', 'controller' => CommandController::class], function () {
+    Route::get('/check-monthly-credit', 'checkMonthlyCredit');
+    Route::get('/check-package-expiry', 'checkPackageExpiry');
+    Route::get('/check-package-reminder', 'checkPackageReminder');
+});
