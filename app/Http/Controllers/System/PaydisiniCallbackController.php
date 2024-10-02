@@ -57,7 +57,7 @@ class PaydisiniCallbackController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid signature', 'apikey' => $apiKey, 'siganture' => $expectedSignature, 'signature_make' => $signature], 400);
         }
 
-        $transaction = Transaction::with('details')
+        $transaction = Transaction::with('details', 'payment')
             ->where('transaction_code', $uniqueCode)
             ->orderBy('created_at', 'desc')
             ->first();

@@ -1,85 +1,59 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('emails.layout')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notifikasi Pembayaran Berhasil</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+@section('title', 'Notifikasi Pembayaran Berhasil')
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7f8fa;
-            color: #333333;
-            margin: 0;
-            padding: 0;
-        }
+@section('content')
+    <p class="title mb-4">Pembayaran Berhasil!</p>
+    <p class="text-base mb-4">Tagihan pembayaran Anda dengan nomor <strong>{{ $transaction->transaction_code }}</strong>.
+        telah dibuat dan berhasil diverifikasi.</p>
 
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+    <p class="text-base mb-2">Detail Transaksi:</p>
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+        <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Nomor Transaksi</strong></td>
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">{{ $transaction->transaction_code }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Jenis Transaksi</strong></td>
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">{{ $transaction->transaction_name }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Harga Paket</strong></td>
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">Rp.
+                {{ number_format($transaction->amount_sub, 0, ',', '.') }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Biaya Admin</strong></td>
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">Rp.
+                {{ number_format($transaction->amount_fee, 0, ',', '.') }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Total</strong></td>
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">Rp.
+                {{ number_format($transaction->amount_total, 0, ',', '.') }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Metode Pembayaran</strong></td>
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">{{ $transaction->payment->service_name }}</td>
+        </tr>
+    </table>
 
-        .header {
-            background-color: #f0f4f8;
-            padding: 20px;
-            text-align: center;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-        }
+    <p class="text-base mb-4">Masuk ke Brainys untuk memulai pengalaman dan menggunakan manfaat lebih dari Paket yang Anda
+        pilih.</p>
 
-        .header img {
-            max-width: 150px;
-            height: auto;
-        }
+    {{-- Button Disini --}}
+    <a href="{{ url(
+        env('BRAINYS_MODE') === 'STAGING'
+            ? 'https://staging.brainys.oasys.id/langganan/daftar-paket'
+            : 'https://brainys.oasys.id/langganan/daftar-paket',
+    ) }}"
+        class="btn-primary">
+        Masuk ke Brainys
+    </a>
 
-        .content {
-            padding: 30px;
-            text-align: left;
-        }
+    <p class="text-base mt-6">Terima kasih telah menggunakan Brainys. Jika ada pertanyaan atau masalah, jangan
+        ragu untuk menghubungi tim dukungan kami untuk bantuan lebih lanjut.</p>
+    <a href="https://api.whatsapp.com/send?phone=6288242021092" class="help-link">Bantuan</a>
 
-        .footer {
-            background-color: #f0f4f8;
-            color: #888888;
-            padding: 20px;
-            text-align: center;
-            border-bottom-left-radius: 8px;
-            border-bottom-right-radius: 8px;
-        }
-    </style>
-</head>
 
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <img src="https://be.brainys.oasys.id/img/Logo@2x.png" alt="Brainys Logo">
-        </div>
-
-        <!-- Content -->
-        <div class="content">
-            <p class="text-lg mb-4">Halo {{ $user->name }},</p>
-            <p class="text-base mb-4">Pembayaran Anda telah dibuat dan sudah terverifikasi!</p>
-            <p class="text-base mb-2"><strong>Tanggal:</strong> {{ $transaction->transaction_date }}</p>
-            <p class="text-base mb-2"><strong>Nomor Transaksi:</strong> {{ $transaction->transaction_code }}</p>
-            <p class="text-base mb-2"><strong>Harga Pembelian:</strong> Rp. {{ number_format($transaction->amount_sub, 0, ',', '.') }}</p>
-            <p class="text-base mb-2"><strong>Biaya Admin:</strong> Rp. {{ number_format($transaction->amount_fee, 0, ',', '.') }}</p>
-            <p class="text-base mb-2"><strong>Total Harga:</strong> Rp. {{ number_format($transaction->amount_total, 0, ',', '.') }}</p>
-            <p class="text-base mb-4">Jangan menginformasikan bukti dan data pembayaran kepada pihak manapun kecuali Brainys.</p>
-            <p class="text-base mt-6">Kami selalu siap membantu Anda jika ada pertanyaan atau masalah. Terima kasih
-                telah menggunakan Brainys!</p>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            <p class="text-sm">© 2024 PT Oasys Edutech Indonesia</p>
-        </div>
-    </div>
-</body>
-
-</html>
+@endsection
