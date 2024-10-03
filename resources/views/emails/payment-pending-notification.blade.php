@@ -88,9 +88,21 @@
             <td class="text-base" style="padding: 10px; border-bottom: 1px solid #dddddd;">Nomor Transaksi</td>
             <td class="text-base" style="padding: 10px; border-bottom: 1px solid #dddddd;"><span class="bold-text">{{ $transaction->transaction_code }}</span></td>
         </tr>
+        @php
+            use App\Models\Package;
+
+            $transactionDetail = $transaction->details->first();
+            if ($transactionDetail && $transactionDetail->item_type === 'PACKAGE') {
+                $package = Package::find($transactionDetail->item_id);
+                $packageType = $package->type === 'annually' ? 'Tahunan' : ($package->type === 'monthly' ? 'Bulanan' : '');
+                $jenisTransaksi = 'Pembelian ' . $transaction->transaction_name . ' (' . $packageType . ')';
+            } else {
+                $jenisTransaksi = 'Pembelian ' . $transaction->transaction_name;
+            }
+        @endphp
         <tr>
             <td class="text-base" style="padding: 10px; border-bottom: 1px solid #dddddd;">Jenis Transaksi</td>
-            <td class="text-base" style="padding: 10px; border-bottom: 1px solid #dddddd;"><span class="bold-text">{{ $transaction->transaction_name }}</span></td>
+            <td class="text-base" style="padding: 10px; border-bottom: 1px solid #dddddd;"><span class="bold-text">{{ $jenisTransaksi }}</span></td>
         </tr>
         <tr>
             <td class="text-base" style="padding: 10px; border-bottom: 1px solid #dddddd;">Total</td>
@@ -136,7 +148,7 @@
         ) }}"
            class="btn-primary">
            Bayar Sekarang
-        </a>        
+        </a>
         <a href="https://api.whatsapp.com/send?phone=6288242021092" class="help-link">Bantuan</a>
     </div>
 @endsection
