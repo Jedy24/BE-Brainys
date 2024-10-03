@@ -8,7 +8,7 @@
             display: inline-block;
             padding: 12px 24px;
             background-color: #3758F9;
-            color: #ffffff;
+            color: white !important;
             text-decoration: none;
             border-radius: 4px;
             font-size: 16px;
@@ -17,6 +17,7 @@
 
         .btn-primary:hover {
             background-color: #0056b3;
+            color: white;
         }
     </style>
 @endsection
