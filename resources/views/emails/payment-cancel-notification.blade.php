@@ -13,11 +13,13 @@
             <td style="padding: 10px; border-bottom: 1px solid #dddddd;">{{ $transaction->transaction_code }}</td>
         </tr>
         @php
-            if ($transaction->detail->item_type === 'PACKAGE') {
-                $package = Package::find($transaction->detail->item_id);
+            use App\Models\Package;
+
+            if ($transaction->details->item_type === 'PACKAGE') {
+                $package = Package::find($transaction->details->item_id);
                 $packageType =
                     $package->type === 'annually' ? 'Tahunan' : ($package->type === 'monthly' ? 'Bulanan' : '');
-                $jenisTransaksi = 'Pembelian ' . $record->transaction_name . ' (' . $packageType . ')';
+                $jenisTransaksi = 'Pembelian ' . $transaction->transaction_name . ' (' . $packageType . ')';
             } else {
                 $jenisTransaksi = 'Pembelian ' . $transaction->transaction_name;
             }
