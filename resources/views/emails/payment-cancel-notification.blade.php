@@ -75,7 +75,7 @@
             class="btn-primary">
             Buat Transaksi Baru
         </a>
-    </div>s
+    </div>
 
     <p class="text-base mt-6">Terima kasih telah menggunakan Brainys. Jika ada pertanyaan atau masalah, jangan
         ragu untuk menghubungi tim dukungan kami untuk bantuan lebih lanjut.</p>
