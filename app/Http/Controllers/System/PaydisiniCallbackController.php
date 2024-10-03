@@ -27,7 +27,7 @@ class PaydisiniCallbackController extends Controller
      */
     public function handle(Request $request)
     {
-        $allowedIp = '84.247.150.90';
+        $allowedIp = '194.233.92.170';
 
         // method
         if ($request->isMethod('get')) {
