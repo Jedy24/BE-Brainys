@@ -31,7 +31,7 @@ class PaymentCancelNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Transaksi ' . $this->transaction->transaction_code . ' Dibatalkan',
+            subject: 'Tagihan Pembayaran ' . $this->transaction->transaction_code . ' Dibatalkan',
         );
     }
 
