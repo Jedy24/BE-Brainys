@@ -73,18 +73,19 @@
         </tr>
     </table>
 
-    <p class="text-base mb-4">Masuk ke Brainys untuk memulai pengalaman dan menggunakan manfaat lebih dari Paket yang Anda
+    <p class="text-base mb-2">Masuk ke Brainys untuk memulai pengalaman dan menggunakan manfaat lebih dari Paket yang Anda
         pilih.</p>
 
     {{-- Button Disini --}}
-    <a href="{{ url(
-        env('BRAINYS_MODE') === 'STAGING'
-            ? 'https://staging.brainys.oasys.id/langganan/daftar-paket'
-            : 'https://brainys.oasys.id/langganan/daftar-paket',
-    ) }}"
-        class="btn-primary">
-        Masuk ke Brainys
-    </a>
+    <div style="text-align: center;">
+        <a href="{{ url(
+            env('BRAINYS_MODE') === 'STAGING'
+                ? 'https://staging.brainys.oasys.id/langganan/daftar-paket'
+                : 'https://brainys.oasys.id/langganan/daftar-paket',
+        ) }}" class="btn-primary">
+            Masuk ke Brainys
+        </a>
+    </div>    
 
     <p class="text-base mt-6">Terima kasih telah menggunakan Brainys. Jika ada pertanyaan atau masalah, jangan
         ragu untuk menghubungi tim dukungan kami untuk bantuan lebih lanjut.</p>
