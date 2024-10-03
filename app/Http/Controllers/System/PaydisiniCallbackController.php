@@ -35,9 +35,9 @@ class PaydisiniCallbackController extends Controller
         }
 
         // Validate the request source IP
-        if ($request->ip() !== $allowedIp) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized IP address'], 403);
-        }
+        // if ($request->ip() !== $allowedIp) {
+        //     return response()->json(['success' => false, 'message' => 'Unauthorized IP address'], 403);
+        // }
 
         // Retrieve parameters from the request
         $key        = $request->input('key');
