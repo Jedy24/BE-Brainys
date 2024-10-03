@@ -128,21 +128,29 @@ class PaydisiniCallbackController extends Controller
 
             $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
             $chatId = env('TELEGRAM_CHAT_ID');
-    
+
+            if ($transaction->details->item_type === 'PACKAGE') {
+                $package = Package::find($transaction->details->item_id);
+                $packageType = $package->type === 'annually' ? 'Tahunan' : ($package->type === 'monthly' ? 'Bulanan' : '');
+                $jenisTransaksi = 'Pembelian ' . $transaction->transaction_name . ' (' . $packageType . ')';
+            } else {
+                $jenisTransaksi = 'Pembelian ' . $transaction->transaction_name;
+            }
+
             $message = "*🎉 Transaksi Sukses Diterima - " . Carbon::now()->format('d M Y') . "🎉*\n\n";
             $message .= "Transaksi dengan kode: *$uniqueCode* berhasil diproses.\n";
             $message .= "Pengguna: *{$user->email}*\n";
-            $message .= "Kategori: *{$details->item_type }*\n";
-            $message .= "Item: *{$details->transaction_name }*\n";
+            $message .= "Kategori: *{$details->item_type}*\n";
+            $message .= "Item: *{$jenisTransaksi}*\n";
             $message .= "Status: *$status*\n\n";
             $message .= "Terima kasih! 😊\n";
-    
+
             $telegram->sendMessage([
                 'chat_id' => $chatId,
                 'text' => $message,
                 'parse_mode' => 'Markdown',
             ]);
-            
+
             Log::info("Payment with unique code {$uniqueCode} was successful.");
         } elseif ($status === 'Canceled') {
             // Email Payment Sccess
