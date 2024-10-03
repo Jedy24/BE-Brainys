@@ -66,14 +66,16 @@
         yang sama. Mohon perhatikan batas waktu pembayaran untuk memastikan transaksi Anda berhasil.</p>
 
     {{-- Button Disini --}}
-    <a href="{{ url(
-        env('BRAINYS_MODE') === 'STAGING'
-            ? 'https://staging.brainys.oasys.id/langganan/daftar-paket'
-            : 'https://brainys.oasys.id/langganan/daftar-paket',
-    ) }}"
-        class="btn-primary">
-        Buat Transaksi Baru
-    </a>
+    <div style="text-align: center;">
+        <a href="{{ url(
+            env('BRAINYS_MODE') === 'STAGING'
+                ? 'https://staging.brainys.oasys.id/langganan/daftar-paket'
+                : 'https://brainys.oasys.id/langganan/daftar-paket',
+        ) }}"
+            class="btn-primary">
+            Buat Transaksi Baru
+        </a>
+    </div>s
 
     <p class="text-base mt-6">Terima kasih telah menggunakan Brainys. Jika ada pertanyaan atau masalah, jangan
         ragu untuk menghubungi tim dukungan kami untuk bantuan lebih lanjut.</p>
