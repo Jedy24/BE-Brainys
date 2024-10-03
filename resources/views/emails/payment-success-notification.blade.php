@@ -15,7 +15,7 @@
             text-decoration: none;
             font-size: 16px;
             font-weight: 600;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         .btn-primary:hover {
