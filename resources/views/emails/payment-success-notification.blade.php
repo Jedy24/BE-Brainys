@@ -37,8 +37,10 @@
             <td style="padding: 10px; border-bottom: 1px solid #dddddd;">{{ $transaction->transaction_code }}</td>
         </tr>
         @php
+            use App\Models\Package;
+
             if ($transaction->details->item_type === 'PACKAGE') {
-                $package = Package::find($transaction->detail->item_id);
+                $package = Package::find($transaction->details->item_id);
                 $packageType =
                     $package->type === 'annually' ? 'Tahunan' : ($package->type === 'monthly' ? 'Bulanan' : '');
                 $jenisTransaksi = 'Pembelian ' . $transaction->transaction_name . ' (' . $packageType . ')';
