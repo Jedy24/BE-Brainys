@@ -2,6 +2,29 @@
 
 @section('title', 'Notifikasi Pembayaran Berhasil')
 
+@section('styles')
+    <!-- Additional styles specific to this template -->
+    <style>
+        .btn-primary {
+            display: inline-block;
+            padding: 10px 50px;
+            background-color: #3758F9;
+            color: white !important;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        .btn-primary:hover {
+            background-color: #3758F9;
+            color: white;
+        }
+    </style>
+@endsection
+
 @section('content')
     <p class="title mb-4">Pembayaran Berhasil!</p>
     <p class="text-base mb-4">Tagihan pembayaran Anda dengan nomor <strong>{{ $transaction->transaction_code }}</strong>.
@@ -13,9 +36,19 @@
             <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Nomor Transaksi</strong></td>
             <td style="padding: 10px; border-bottom: 1px solid #dddddd;">{{ $transaction->transaction_code }}</td>
         </tr>
+        @php
+            if ($transaction->detail->item_type === 'PACKAGE') {
+                $package = Package::find($transaction->detail->item_id);
+                $packageType =
+                    $package->type === 'annually' ? 'Tahunan' : ($package->type === 'monthly' ? 'Bulanan' : '');
+                $jenisTransaksi = 'Pembelian ' . $record->transaction_name . ' (' . $packageType . ')';
+            } else {
+                $jenisTransaksi = 'Pembelian ' . $transaction->transaction_name;
+            }
+        @endphp
         <tr>
             <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Jenis Transaksi</strong></td>
-            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">{{ $transaction->transaction_name }}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">{{ $jenisTransaksi }}</td>
         </tr>
         <tr>
             <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Harga Paket</strong></td>

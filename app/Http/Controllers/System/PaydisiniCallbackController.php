@@ -62,6 +62,7 @@ class PaydisiniCallbackController extends Controller
             ->orderBy('created_at', 'desc')
             ->first();
         $details = $transaction->details->first();
+        $transaction->details = $transaction->details->frist();
         $transaction->payment = $transaction->payment->first();
 
         // Process the payment status

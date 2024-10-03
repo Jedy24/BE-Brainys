@@ -12,9 +12,19 @@
             <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Nomor Transaksi</strong></td>
             <td style="padding: 10px; border-bottom: 1px solid #dddddd;">{{ $transaction->transaction_code }}</td>
         </tr>
+        @php
+            if ($transaction->detail->item_type === 'PACKAGE') {
+                $package = Package::find($transaction->detail->item_id);
+                $packageType =
+                    $package->type === 'annually' ? 'Tahunan' : ($package->type === 'monthly' ? 'Bulanan' : '');
+                $jenisTransaksi = 'Pembelian ' . $record->transaction_name . ' (' . $packageType . ')';
+            } else {
+                $jenisTransaksi = 'Pembelian ' . $transaction->transaction_name;
+            }
+        @endphp
         <tr>
             <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Jenis Transaksi</strong></td>
-            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">{{ $transaction->transaction_name }}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">{{ $jenisTransaksi }}</td>
         </tr>
         <tr>
             <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Total</strong></td>
