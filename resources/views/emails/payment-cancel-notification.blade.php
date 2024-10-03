@@ -2,6 +2,29 @@
 
 @section('title', 'Pembatalan Transaksi')
 
+@section('styles')
+    <!-- Additional styles specific to this template -->
+    <style>
+        .btn-primary {
+            display: inline-block;
+            padding: 10px 50px;
+            background-color: #3758F9;
+            color: white !important;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            background-color: #3758F9;
+            color: white;
+        }
+    </style>
+@endsection
+
 @section('content')
     <p class="title mb-4">Pembayaran Dibatalkan</p>
     <p class="text-base mb-4">Tagihan pembayaran Anda dengan nomor <strong>{{ $transaction->transaction_code }}</strong>.
