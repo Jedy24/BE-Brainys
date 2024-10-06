@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use App\Models\UserInvitation;
-use App\Notifications\InvitationNotification;
+use App\Mail\SendInvitationNotification;
+// use App\Notifications\InvitationNotification;
 
 class SendInvitationController extends Controller
 {
@@ -15,6 +17,7 @@ class SendInvitationController extends Controller
             'email' => 'required|email',
         ]);
 
+        // Mencari undangan yang sesuai
         $invitation = UserInvitation::where('email', $request->email)
             ->where('is_used', false)
             ->where('expired_at', '>', now())
@@ -28,7 +31,9 @@ class SendInvitationController extends Controller
         }
 
         try {
-            $invitation->notify(new InvitationNotification($invitation->invite_code));
+            // Mengirim email undangan
+            Mail::to($request->email)->send(new SendInvitationNotification($invitation));
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Invitation sent successfully'
