@@ -6,10 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Exports\ReportUserAddedCreditExport;
 use App\Exports\ReportUserExpiredExport;
 use App\Exports\ReportUserReminderExport;
+use App\Mail\FreePlanNotification;
+use App\Mail\PackageReminderNotification;
 use App\Models\Package;
 use App\Models\User;
 use App\Models\UserPackage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Telegram\Bot\Api;
@@ -111,6 +114,10 @@ class CommandController extends Controller
                     'enroll_at' => $now,
                     'expired_at' => $now,
                 ]);
+
+                $user = User::find($userPackage->id_user);
+
+                Mail::to($user->email)->send(new FreePlanNotification($user, $userPackage));
             }
         });
 
@@ -142,40 +149,65 @@ class CommandController extends Controller
     public function checkPackageReminder()
     {
         $now = Carbon::now();
-        $threeDaysFromNow = $now->addDays(3);
+        $sevenDaysFromNow = $now->copy()->addDays(7);
+        $oneDayFromNow = $now->copy()->addDay();
 
         // Fetch IDs of free packages
         $freePackageIds = Package::where('type', 'free')->pluck('id');
 
-        // Fetch user packages that will expire within the next three days
-        $userPackages = UserPackage::with('package', 'user')
-            ->whereBetween('expired_at', [$now, $threeDaysFromNow])
+        // Fetch user packages that will expire in 7 days
+        $userPackagesSevenDays = UserPackage::with('package', 'user')
+            ->whereBetween('expired_at', [$now, $sevenDaysFromNow])
             ->whereNotIn('id_package', $freePackageIds)
             ->get();
 
-        $reminderCount = 0;
+        // Fetch user packages that will expire in 1 day
+        $userPackagesOneDay = UserPackage::with('package', 'user')
+            ->whereBetween('expired_at', [$now, $oneDayFromNow])
+            ->whereNotIn('id_package', $freePackageIds)
+            ->get();
+
+        $reminderSevenDaysCount = 0;
+        $reminderOneDayCount = 0;
 
         $formattedDate = $now->format('d-m-Y');
         $fileName = "reminder_user_packages_{$formattedDate}.xlsx";
         $filePath = "public/report/{$fileName}";
 
-        // Generate the Excel report
-        Excel::store(new ReportUserReminderExport($now), $filePath);
+        // Generate the Excel report for 7 days reminder
+        Excel::store(new ReportUserReminderExport($now, 7), $filePath);
 
-        // Calculate days remaining for each user package
-        $userPackages->map(function ($userPackage) use ($now, &$reminderCount) {
-            $reminderCount++;
+        // Generate the Excel report for 1 day reminder
+        Excel::store(new ReportUserReminderExport($now, 1), $filePath);
+
+        // Calculate days remaining for each user package (7 days)
+        $userPackagesSevenDays->map(function ($userPackage) use ($now, &$reminderSevenDaysCount) {
+            $reminderSevenDaysCount++;
             $daysRemaining = Carbon::parse($userPackage->expired_at)->diffInDays($now, false);
             $userPackage->days_remaining = $daysRemaining;
+
+            // Kirim email atau notifikasi lain ke user untuk 7 hari sebelum expired
+            Mail::to($userPackage->user->email)->send(new PackageReminderNotification($userPackage->user, $userPackage->package, $userPackage));
         });
 
-        // Send the report to Telegram
+        // Calculate days remaining for each user package (1 day)
+        $userPackagesOneDay->map(function ($userPackage) use ($now, &$reminderOneDayCount) {
+            $reminderOneDayCount++;
+            $daysRemaining = Carbon::parse($userPackage->expired_at)->diffInDays($now, false);
+            $userPackage->days_remaining = $daysRemaining;
+
+            // Kirim email atau notifikasi lain ke user untuk 1 hari sebelum expired
+            Mail::to($userPackage->user->email)->send(new PackageReminderNotification($userPackage->user, $userPackage->package, $userPackage));
+        });
+
+        // Send the report to Telegram for 7 days reminder
         $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
         $chatId = env('TELEGRAM_CHAT_ID');
 
-        $message = "*✨ Laporan Pengguna Masa Aktif Paket Akan Berakhir - " . Carbon::now()->format('d M Y') . "✨*\n\n";
-        $message .= "Jumlah Pengguna Paket Akan Berakhir: *$reminderCount Pengguna*\n\n";
-        $message .= "Semua pengguna dengan masa aktif paket akan berakhir sudah diberikan notifikasi.\n\n";
+        $message = "*✨ Laporan Pengguna Paket Akan Berakhir - " . Carbon::now()->format('d M Y') . "✨*\n\n";
+        $message .= "Jumlah Pengguna Paket Akan Berakhir dalam 7 hari: *$reminderSevenDaysCount Pengguna*\n";
+        $message .= "Jumlah Pengguna Paket Akan Berakhir dalam 1 hari: *$reminderOneDayCount Pengguna*\n\n";
+        $message .= "Semua pengguna sudah diberikan notifikasi.\n\n";
         $message .= "Terima Kasih!😎\n";
 
         $telegram->sendDocument([
@@ -185,6 +217,6 @@ class CommandController extends Controller
             'parse_mode' => 'Markdown',
         ]);
 
-        return response()->json(['status' => 'success', 'message' => 'Package reminder check completed and report sent to Telegram.']);
+        return response()->json(['status' => 'success', 'message' => 'Package reminder check for 7 and 1 day completed and report sent to Telegram.']);
     }
 }

@@ -14,7 +14,7 @@
         </ul>
     </p>
     <p class="text-base">
-        Paket gratis ini akan diperpanjang secara otomatis pada 2 Oktober 2024. Untuk terus menggunakan Brainys dengan
+        Paket gratis ini akan diperpanjang secara otomatis pada {{ $userPackage->expired_at->format('d M Y') }}. Untuk terus menggunakan Brainys dengan
         manfaat lebih besar, aktifkan kembali langganan paket berbayar di bawah ini
     </p>
 

@@ -9,9 +9,10 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class FreePlanNotification extends Mailable
+class PackageReminderNotification extends Mailable
 {
     public $user;
+    public $package;
     public $userPackage;
 
     use Queueable, SerializesModels;
@@ -19,9 +20,10 @@ class FreePlanNotification extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct($user, $userPackage)
+    public function __construct($user, $package, $userPackage)
     {
         $this->user = $user;
+        $this->package = $package;
         $this->userPackage = $userPackage;
     }
 
@@ -31,7 +33,7 @@ class FreePlanNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Anda Saat Ini Menggunakan Paket Gratis',
+            subject: 'Tagihan Perpanjangan '.$this->package->name.' Telah Terbit',
         );
     }
 
@@ -41,7 +43,7 @@ class FreePlanNotification extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.free-plan-notification',
+            view: 'emails-package-reminder-notification',
         );
     }
 
