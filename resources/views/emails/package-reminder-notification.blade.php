@@ -2,6 +2,29 @@
 
 @section('title', 'Tagihan Perpanjangan ' . $package->name . ' Telah Terbit')
 
+@section('styles')
+    <!-- Additional styles specific to this template -->
+    <style>
+        .btn-primary {
+            display: inline-block;
+            padding: 10px 50px;
+            background-color: #3758F9;
+            color: white !important;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            background-color: #3758F9;
+            color: white;
+        }
+    </style>
+@endsection
+
 @section('content')
     <p class="title">Paket anda Segera Berakhir {{ $userPackage->days_remaining }} Hari Lagi.</p>
 
