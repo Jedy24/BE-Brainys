@@ -171,14 +171,15 @@ class CommandController extends Controller
         $reminderOneDayCount = 0;
 
         $formattedDate = $now->format('d-m-Y');
-        $fileName = "reminder_user_packages_{$formattedDate}.xlsx";
-        $filePath = "public/report/{$fileName}";
 
-        // Generate the Excel report for 7 days reminder
-        Excel::store(new ReportUserReminderExport($now, 7), $filePath);
+        // Generate separate Excel reports for 7 days and 1 day reminders
+        $fileNameSevenDays = "reminder_user_packages_7days_{$formattedDate}.xlsx";
+        $filePathSevenDays = "public/report/{$fileNameSevenDays}";
+        Excel::store(new ReportUserReminderExport(7), $filePathSevenDays);
 
-        // Generate the Excel report for 1 day reminder
-        Excel::store(new ReportUserReminderExport($now, 1), $filePath);
+        $fileNameOneDay = "reminder_user_packages_1day_{$formattedDate}.xlsx";
+        $filePathOneDay = "public/report/{$fileNameOneDay}";
+        Excel::store(new ReportUserReminderExport(1), $filePathOneDay);
 
         // Calculate days remaining for each user package (7 days)
         $userPackagesSevenDays->map(function ($userPackage) use ($now, &$reminderSevenDaysCount) {
@@ -200,7 +201,7 @@ class CommandController extends Controller
             Mail::to($userPackage->user->email)->send(new PackageReminderNotification($userPackage->user, $userPackage->package, $userPackage));
         });
 
-        // Send the report to Telegram for 7 days reminder
+        // Send the report to Telegram for both 7 days and 1 day reminders
         $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
         $chatId = env('TELEGRAM_CHAT_ID');
 
@@ -210,9 +211,18 @@ class CommandController extends Controller
         $message .= "Semua pengguna sudah diberikan notifikasi.\n\n";
         $message .= "Terima Kasih!😎\n";
 
+        // Send 7 days report
         $telegram->sendDocument([
             'chat_id' => $chatId,
-            'document' => InputFile::create(Storage::path($filePath), $fileName),
+            'document' => InputFile::create(Storage::path($filePathSevenDays), $fileNameSevenDays),
+            'caption' => $message,
+            'parse_mode' => 'Markdown',
+        ]);
+
+        // Send 1 day report
+        $telegram->sendDocument([
+            'chat_id' => $chatId,
+            'document' => InputFile::create(Storage::path($filePathOneDay), $fileNameOneDay),
             'caption' => $message,
             'parse_mode' => 'Markdown',
         ]);
