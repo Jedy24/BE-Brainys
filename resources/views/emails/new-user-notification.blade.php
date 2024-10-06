@@ -36,8 +36,8 @@
     <div style="text-align: center;">
         <a href="{{ url(
             env('BRAINYS_MODE') === 'STAGING'
-                ? 'https://staging.brainys.oasys.id'
-                : 'https://brainys.oasys.id',
+                ? 'https://staging.brainys.oasys.id/dashboard'
+                : 'https://brainys.oasys.id/dashboard',
         ) }}" class="btn-primary">
             Masuk ke Brainys
         </a>
