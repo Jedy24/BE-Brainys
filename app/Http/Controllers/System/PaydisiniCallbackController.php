@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\System;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ExtraCreditNotification;
 use App\Mail\PaymentCancelNotification;
 use App\Mail\PaymentSuccessNotification;
+use App\Mail\PremiumPlanNotification;
 use App\Models\ExtraCredit;
 use App\Models\Package;
 use App\Models\Transaction;
@@ -133,8 +135,12 @@ class PaydisiniCallbackController extends Controller
                 $package = Package::find($transaction->details->item_id);
                 $packageType = $package->type === 'annually' ? 'Tahunan' : ($package->type === 'monthly' ? 'Bulanan' : '');
                 $jenisTransaksi = 'Pembelian ' . $transaction->transaction_name . ' (' . $packageType . ')';
-            } else {
+
+                Mail::to($user->email)->send(new PremiumPlanNotification($user, $transaction));
+            } else if ($transaction->details->item_type === 'CREDIT') {
                 $jenisTransaksi = 'Pembelian ' . $transaction->transaction_name;
+                
+                Mail::to($user->email)->send(new ExtraCreditNotification($user, $transaction));
             }
 
             $message = "*🎉 Transaksi Sukses Diterima - " . Carbon::now()->format('d M Y') . "🎉*\n\n";
