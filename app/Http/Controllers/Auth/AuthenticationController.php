@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 // use App\Notifications\OtpNotification;
 use App\Mail\OtpNotification;
 use App\Mail\ResetPasswordNotification;
+use App\Mail\NewUserNotification;
 // use App\Notifications\ResetPasswordNotification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -432,6 +433,8 @@ class AuthenticationController extends Controller
          */
         $user->profile_completed = true;
         $user->save();
+
+        Mail::to($user->email)->send(new NewUserNotification($user));
 
         $data['user'] = $user;
 
