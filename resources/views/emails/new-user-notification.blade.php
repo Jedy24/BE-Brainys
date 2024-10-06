@@ -1,6 +1,6 @@
 @extends('emails.layout')
 
-@section('title', 'OTP Notification')
+@section('title', 'New User Notification')
 
 @section('styles')
     <!-- Additional styles specific to this template -->
@@ -30,7 +30,6 @@
     <p class="text-base">Kami tidak sabar menunggu Anda mencoba semua template yang
         ada di Brainys, mulai dari modul ajar, bahan ajar hingga kisi-kisi
         soal dan alur tujuan pembelajaran yang sudah berbasis kurikulum merdeka.
-    </span>
     </p>
 
     {{-- Button Disini --}}
