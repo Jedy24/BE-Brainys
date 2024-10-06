@@ -149,21 +149,21 @@ class CommandController extends Controller
     public function checkPackageReminder()
     {
         $now = Carbon::now();
-        $sevenDaysFromNow = $now->copy()->addDays(7);
-        $oneDayFromNow = $now->copy()->addDay();
+        $sevenDaysFromNow = $now->copy()->addDays(7)->startOfDay();
+        $oneDayFromNow = $now->copy()->addDay()->startOfDay();
 
         // Fetch IDs of free packages
         $freePackageIds = Package::where('type', 'free')->pluck('id');
 
-        // Fetch user packages that will expire in 7 days
+        // Fetch user packages that will expire in exactly 7 days
         $userPackagesSevenDays = UserPackage::with('package', 'user')
-            ->whereBetween('expired_at', [$now, $sevenDaysFromNow])
+            ->whereDate('expired_at', '=', $sevenDaysFromNow)
             ->whereNotIn('id_package', $freePackageIds)
             ->get();
 
-        // Fetch user packages that will expire in 1 day
+        // Fetch user packages that will expire in exactly 1 day
         $userPackagesOneDay = UserPackage::with('package', 'user')
-            ->whereBetween('expired_at', [$now, $oneDayFromNow])
+            ->whereDate('expired_at', '=', $oneDayFromNow)
             ->whereNotIn('id_package', $freePackageIds)
             ->get();
 
