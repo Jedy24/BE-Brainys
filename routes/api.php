@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\UserInvitationController;
 use App\Http\Controllers\System\CommandController;
 use App\Http\Controllers\Service\CapaianPembelajaranController;
+use App\Http\Controllers\Service\ModuleCreditChargeController;
 use App\Models\Transaction;
 
 /*
@@ -195,6 +196,12 @@ Route::group(['prefix' => 'capaian-pembelajaran'], function () {
     Route::post('/mata-pelajaran', [CapaianPembelajaranController::class, 'getMataPelajaran']);
     Route::post('/element', [CapaianPembelajaranController::class, 'getElement']);
     Route::post('/final', [CapaianPembelajaranController::class, 'getFinalData']);
+});
+
+// Module Credit Info Charge
+Route::group(['prefix' => 'module-credit-charges'], function () {
+    Route::get('/', [ModuleCreditChargeController::class, 'getAllData']);
+    Route::get('/{slug}', [ModuleCreditChargeController::class, 'getDataBySlug']);
 });
 
 Route::post('/send-invitation', [SendInvitationController::class, 'sendInvitation'])->name('api.send-invitation');
