@@ -17,7 +17,7 @@
         }
     @endphp
 
-    <p class="text-base">Terima kasih anda telah berlangganan [{{ $package->name }} ({{ $packageType }})] di Brainys!
+    <p class="text-base">Terima kasih anda telah berlangganan {{ $package->name }} ({{ $packageType }}) di Brainys!
     </p>
 
     <p class="text-base">

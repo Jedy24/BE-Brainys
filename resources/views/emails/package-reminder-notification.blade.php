@@ -32,7 +32,7 @@
         $packageType = $package->type === 'annually' ? 'Tahunan' : ($package->type === 'monthly' ? 'Bulanan' : '');
     @endphp
 
-    <p class="text-base">Tagihan [{{ $package->name }} ({{ $packageType }})] Anda telah terbit, segera lakukan pembayaran
+    <p class="text-base">Tagihan {{ $package->name }} ({{ $packageType }}) Anda telah terbit, segera lakukan pembayaran
         sebelum <b>{{ $userPackage->expired_at->format('d M Y') }}</b>.
         Untuk terus menggunakan Brainys dengan manfaat lebih banyak.</p>
 
