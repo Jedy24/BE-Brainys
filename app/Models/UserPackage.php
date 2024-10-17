@@ -33,6 +33,7 @@ class UserPackage extends Model
     protected $fillable = [
         'id_user',
         'id_package',
+        'is_renewable',
         'enroll_at',
         'expired_at',
     ];

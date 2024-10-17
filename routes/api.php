@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\GamificationController;
 use App\Http\Controllers\Api\OpenAIController;
 use App\Http\Controllers\Api\PackageController;
 use App\Http\Controllers\Api\SendInvitationController;
+use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\UserInvitationController;
 use App\Http\Controllers\System\CommandController;
@@ -165,6 +166,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/history', [TransactionController::class, 'index']);
         Route::get('/history/{transactionCode}', [TransactionController::class, 'show']);
         Route::get('/package', [PackageController::class, 'getPackage']);
+        Route::get('/package/cancel', [SubscriptionController::class, 'cancelSubscription']);
         Route::get('/extra-credit', [ExtraCreditController::class, 'getExtraCredit']);
         Route::post('/invoice', [TransactionController::class, 'invoice']);
     });

@@ -54,6 +54,7 @@ class AuthenticationController extends Controller
                 'price' => $userPackage->package->price,
                 'enroll_at' => $userPackage->enroll_at,
                 'expired_at' => $userPackage->expired_at,
+                'is_renewable' => $userPackage->is_renewable,
                 'enroll_at_formatted' => $userPackage->enroll_at->format('d M Y'),
                 'expired_at_formatted' => $userPackage->expired_at->format('d M Y'),
             ];
