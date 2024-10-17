@@ -43,6 +43,15 @@ class SubscriptionController extends Controller
             ], 400);
         }
 
+        // Check if the subscription is already non-renewable
+        if ($userPackage->is_renewable === false) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Langganan sudah dibatalkan sebelumnya.',
+                'data' => null
+            ], 400);
+        }
+
         // Check if expired_at is less than 7 days away
         $now = Carbon::now();
         if ($userPackage->expired_at && $userPackage->expired_at->diffInDays($now) < 7) {
