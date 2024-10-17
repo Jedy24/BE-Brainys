@@ -44,7 +44,7 @@ class SubscriptionController extends Controller
         }
 
         // Check if the subscription is already non-renewable
-        if ($userPackage->is_renewable === false) {
+        if ($userPackage->is_renewable === false || $userPackage->is_renewable === 0) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Langganan sudah dibatalkan sebelumnya.',
