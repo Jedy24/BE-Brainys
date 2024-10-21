@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulate Cron Job</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">Simulate Cron Job</h2>
+
+        <!-- Form untuk memilih route dan simulated date -->
+        <form id="cronJobForm">
+            <div class="mb-3">
+                <label for="route" class="form-label">Select Task</label>
+                <select class="form-select" id="route" required>
+                    <option value="" disabled selected>Select a task</option>
+                    <option value="check-monthly-credit">Check Monthly Credit</option>
+                    <option value="check-package-expiry">Check Package Expiry</option>
+                    <option value="check-package-reminder">Check Package Reminder</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="simulatedDate" class="form-label">Simulated Date</label>
+                <input type="date" class="form-control" id="simulatedDate" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="submitButton">
+                <span id="submitButtonText">Run Task</span>
+                <span id="loadingSpinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+                    style="display: none;"></span>
+            </button>
+        </form>
+
+        <!-- Result Notification -->
+        <div id="resultNotification" class="mt-4" style="display: none;">
+            <div class="alert" role="alert" id="resultMessage"></div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS + Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- AJAX Handling -->
+    <script>
+        $(document).ready(function () {
+            $('#cronJobForm').on('submit', function (e) {
+                e.preventDefault();
+
+                var route = $('#route').val();
+                var simulatedDate = $('#simulatedDate').val();
+
+                // Validasi input
+                if (!route || !simulatedDate) {
+                    $('#resultMessage').removeClass().addClass('alert alert-danger').text('All fields are required.');
+                    $('#resultNotification').show();
+                    return;
+                }
+
+                // Disable form and show loading spinner
+                $('#submitButton').prop('disabled', true);
+                $('#loadingSpinner').show();
+                $('#submitButtonText').text('Running...');
+
+                // AJAX request to simulate the cron job
+                $.ajax({
+                    url: '/api/commands/' + route + '/' + simulatedDate,
+                    method: 'GET',
+                    success: function (response) {
+                        // Jika response berhasil
+                        $('#resultMessage').removeClass().addClass('alert alert-success').text('Task executed successfully!');
+                        $('#resultNotification').show();
+                    },
+                    error: function (xhr) {
+                        // Jika terjadi error
+                        $('#resultMessage').removeClass().addClass('alert alert-danger').text('Task execution failed. Please check the logs.');
+                        $('#resultNotification').show();
+                    },
+                    complete: function () {
+                        // Re-enable form and hide loading spinner
+                        $('#submitButton').prop('disabled', false);
+                        $('#loadingSpinner').hide();
+                        $('#submitButtonText').text('Run Task');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

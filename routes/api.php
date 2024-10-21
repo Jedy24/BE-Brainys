@@ -210,7 +210,7 @@ Route::post('/send-invitation', [SendInvitationController::class, 'sendInvitatio
 
 // Command CRON JOB
 Route::group(['prefix' => 'commands', 'controller' => CommandController::class], function () {
-    Route::get('/check-monthly-credit', 'checkMonthlyCredit');
-    Route::get('/check-package-expiry', 'checkPackageExpiry');
-    Route::get('/check-package-reminder', 'checkPackageReminder');
+    Route::get('/check-monthly-credit/{simulatedDate?}', 'checkMonthlyCredit');
+    Route::get('/check-package-expiry/{simulatedDate?}', 'checkPackageExpiry');
+    Route::get('/check-package-reminder/{simulatedDate?}', 'checkPackageReminder');
 });

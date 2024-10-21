@@ -26,9 +26,9 @@ class CommandController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function checkMonthlyCredit()
+    public function checkMonthlyCredit($simulatedDate = null)
     {
-        $now = Carbon::now();
+        $now = $simulatedDate ? Carbon::parse($simulatedDate) : Carbon::now();
         $dayNow = $now->day;
 
         // Fetch annually based package IDs
@@ -60,9 +60,9 @@ class CommandController extends Controller
         $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
         $chatId = env('TELEGRAM_CHAT_ID');
 
-        $message = "*✨ Laporan Pengguna Ditambahkan Kredit Bulanan - " . Carbon::now()->format('d M Y') . "✨*\n\n";
+        $message = "*✨ Laporan Pengguna Ditambahkan Kredit Bulanan - " . $now->format('d M Y') . "✨*\n\n";
         $message .= "Jumlah Pengguna Ditambahkan Kredit: *$addedCreditCount Pengguna*\n\n";
-        $message .= "Semua pengguna dengan _enroll_ tanggal " . Carbon::now()->format('d') . " sudah ditambahkan kredit bulanannya.\n\n";
+        $message .= "Semua pengguna dengan _enroll_ tanggal " . $now->format('d') . " sudah ditambahkan kredit bulanannya.\n\n";
         $message .= "Terima Kasih!😎\n";
 
         $telegram->sendDocument([
@@ -81,9 +81,9 @@ class CommandController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function checkPackageExpiry()
+    public function checkPackageExpiry($simulatedDate = null)
     {
-        $now = Carbon::now();
+        $now = $simulatedDate ? Carbon::parse($simulatedDate) : Carbon::now();
 
         // Fetch IDs of free packages
         $freePackageIds = Package::where('type', 'free')->pluck('id');
@@ -125,7 +125,7 @@ class CommandController extends Controller
         $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
         $chatId = env('TELEGRAM_CHAT_ID');
 
-        $message = "*✨ Laporan Pengguna Masa Aktif Paket Berakhir - " . Carbon::now()->format('d M Y') . "✨*\n\n";
+        $message = "*✨ Laporan Pengguna Masa Aktif Paket Berakhir - " . $now->format('d M Y') . "✨*\n\n";
         $message .= "Jumlah Pengguna Kadaluarsa: *$expiredCount Pengguna*\n\n";
         $message .= "Semua pengguna dengan masa aktif paket berlangganan sudah diubah ke paket FREE.\n\n";
         $message .= "Terima Kasih!😎\n";
@@ -146,9 +146,9 @@ class CommandController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function checkPackageReminder()
+    public function checkPackageReminder($simulatedDate = null)
     {
-        $now = Carbon::now();
+        $now = $simulatedDate ? Carbon::parse($simulatedDate) : Carbon::now();
         $sevenDaysFromNow = $now->copy()->addDays(7)->startOfDay();
         $oneDayFromNow = $now->copy()->addDay()->startOfDay();
 
@@ -205,7 +205,7 @@ class CommandController extends Controller
         $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
         $chatId = env('TELEGRAM_CHAT_ID');
 
-        $message = "*✨ Laporan Pengguna Paket Akan Berakhir - " . Carbon::now()->format('d M Y') . "✨*\n\n";
+        $message = "*✨ Laporan Pengguna Paket Akan Berakhir - " . $now->format('d M Y') . "✨*\n\n";
         $message .= "Jumlah Pengguna Paket Akan Berakhir dalam 7 hari: *$reminderSevenDaysCount Pengguna*\n";
         $message .= "Jumlah Pengguna Paket Akan Berakhir dalam 1 hari: *$reminderOneDayCount Pengguna*\n\n";
         $message .= "Semua pengguna sudah diberikan notifikasi.\n\n";
