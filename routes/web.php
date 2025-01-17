@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\System\PaydisiniCallbackController;
+use App\Http\Controllers\System\XenditCallbackController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,3 +20,4 @@ Route::get('/', function () {
 });
 
 Route::post('/callback/paydisini', [PaydisiniCallbackController::class, 'handle']);
+Route::post('/callback/xendit', [XenditCallbackController::class, 'handle']);

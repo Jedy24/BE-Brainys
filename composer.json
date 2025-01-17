@@ -24,7 +24,8 @@
         "paragonie/random_compat": "^9.99",
         "phpoffice/phppresentation": "dev-master",
         "phpoffice/phpword": "^1.2",
-        "tecnickcom/tcpdf": "^6.7"
+        "tecnickcom/tcpdf": "^6.7",
+        "xendit/xendit-php": "^6.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
