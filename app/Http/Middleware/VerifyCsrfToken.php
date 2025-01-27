@@ -18,5 +18,6 @@ class VerifyCsrfToken extends Middleware
         'api/capaian-pembelajaran/final',
         'api/capaian-pembelajaran/final',
         'callback/paydisini',
+        'callback/xendit',
     ];
 }
