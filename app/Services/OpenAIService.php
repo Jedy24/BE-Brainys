@@ -431,9 +431,9 @@ class OpenAIService
         return $prompt;
     }
 
-    public function generateSyllabusPromptBeta($subject, $grade, $nip, $notes)
+    public function generateSyllabusPromptBeta($namaSilabus, $mataPelajaran, $tingkatKelas, $addNotes)
     {
-        $prompt = 'Buatkan silabus untuk mata pelajaran ' . $subject . ' pada tingkat ' . $grade . ' dengan NIP/NIK ' . $nip . ' dengan memperhatikan catatan khusus berikut: ' . $notes . '.
+        $prompt = 'Buatkan silabus dengan nama ' . $namaSilabus . ' untuk mata pelajaran ' . $mataPelajaran . ' pada tingkat ' . $tingkatKelas .  ' dengan memperhatikan catatan khusus berikut: ' . $addNotes . '.
 
         Jelaskan jenjang sekolah, alokasi waktu, kompetensi inti (KI), kompetensi dasar, materi pembelajaran, dan kegiatan pembelajaran yang relevan.
 
@@ -447,12 +447,12 @@ class OpenAIService
 
         {
             "informasi_umum": {
+                "nama_silabus" : "",
                 "mata_pelajaran" : "",
                 "nama_sekolah" : "",
                 "jenjang_sekolah" : "",
                 "tingkat_kelas": "",
                 "nama_guru": "",
-                "nip" : ""
             },
             "silabus_pembelajaran": {
                 "mata_pelajaran" : "",
