@@ -15,6 +15,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use PhpOffice\PhpSpreadsheet\RichText\Run;
+use Carbon\Carbon;
 
 class MailController extends Controller
 {
@@ -63,10 +64,10 @@ class MailController extends Controller
             }
 
             // Parameters
-            $namaSurat  = $request->input('name_surat');
-            $jenisSurat        = $request->input('jenis_surat');
+            $namaSurat    = $request->input('nama_surat');
+            $jenisSurat   = $request->input('jenis_surat');
             $tujuanSurat  = $request->input('tujuan_surat');
-            $addNotes       = $request->input('notes');
+            $addNotes     = $request->input('notes');
 
             // Send the message to OpenAI
             $prompt = $this->prompt($namaSurat, $jenisSurat, $tujuanSurat, $addNotes);
@@ -78,7 +79,11 @@ class MailController extends Controller
             $parsedResponse['informasi_umum']['jenis_surat'] = $jenisSurat;
             $parsedResponse['informasi_umum']['tujuan_surat'] = $tujuanSurat;
             $parsedResponse['informasi_umum']['nama_sekolah'] = $user->school_name;
-            $parsedResponse['informasi_umum']['tanggal'] = Date('D','M','Y');
+            $parsedResponse['informasi_umum']['nama_penulis'] = $user->name;
+            $parsedResponse['informasi_umum']['jabatan'] = $user->profession;
+            Carbon::setLocale('id');
+            $parsedResponse['informasi_umum']['tanggal'] = Carbon::now()->translatedFormat('j F Y');
+
 
             // Insert data into ModulAjarHistories
             $insertData = MailHistories::create([
@@ -234,156 +239,33 @@ class MailController extends Controller
 
         nomor_surat: Berkaitan dengan nomor surat dengan format kode klasifikasi/nomor surat/tahun.
         hal: Perihal surat yang berkaitan dengan jenis_surat.
-        elemen_gamifikasi: Gamification elements consisting of titles and descriptions.
-        misi_dan_tantangan: Missions and challenges with types, descriptions, and points.
-        langkah_implementasi: Create the `langkah_implementasi` section which will be displayed as instructions for students, including:
-            step: Numbered steps for implementation.
-            title: Brief titles for each step.
-            description: Detailed instructions for each step presented as an array. Minimum 2 points.
-
-        Game Scheme Explanation:
-        - For individual game scheme: Each student competes individually, earning points and achievements based on their own efforts.
-        - For group game scheme: Students collaborate in teams to complete missions and challenges, fostering teamwork and collective achievement.
+        isi_surat: Isi konten utama dari surat yang berkaitan dengan nama_surat dan jenis_surat.
+        hari_tanggal: Hari, tanggal, bulan, dan tahun dilangsungkannya acara.
+        waktu: Jam pelaksanaan acara yang akan dilakukan sampai acara tersebut selesai.
+        tempat: Tempat spesifik dimana acara tersebut dilakukan.
+        penutup: Bagian penutup dari surat yang berisi ucapan terima kasih kepada orang yang ditujukan melalui tujuan_surat secara sopan dan formal.
 
         {
-            "informasi_umum": {
-                "alokasi_waktu": "(Berupa berapa pekan, berapa JP, berapa pertemuan)", //Pastikan sesuai dengan format.
-                "kompetensi_awal": "{Kompetensi Awal}",
-                "profil_pelajar_pancasila": "{Profil Pelajar Pancasila}", // Berupa string
-                "target_peserta_didik": "{Target Peserta Didik}",
-                "model_pembelajaran": "{Model Pembelajaran}"
+            "informasi_umum":{
+                "nama_surat": ' . $namaSurat . '
+                "jenis_surat": ' . $jenisSurat . '
+                "tujuan_surat": ' . $tujuanSurat . '
             },
-            "sarana_dan_prasarana": {
-                "sumber_belajar": "{Sumber Belajar}",
-                "lembar_kerja_peserta_didik": "{Lembar Kerja Peserta Didik}"
+            "pembuka_surat": {
+                "nomor_surat": "",
+                "hal": ""
             },
-            "tujuan_kegiatan_pembelajaran": {
-                "tujuan_pembelajaran_topik": ["{Tujuan Pembelajaran Topik}"], // Berikan minimal 4 item.
-                "tujuan_pembelajaran_pertemuan": ["{Tujuan Pembelajaran Pertemuan}"] // Tanpa menuliskan pertemuan ke berapa, jumlahnya menyesuaikan dengan alokasi_waktu informasi_umum. Misalkan alokasi_waktu 8 pertemuan maka ada 8 item tujuan_pembelajaran_pertemuan.
+            "konten_surat":{
+                "isi_surat": "",
+                "hari_tanggal": "",
+                "waktu": "",
+                "tempat": "",
             },
-            "pemahaman_bermakna": {
-                "topik": "{Topik, berupa 1 paragraf}"
+            "akhir_surat"{
+                "penutup": "",
             },
-            "pertanyaan_pemantik": ["", "", "", ""],
-            "kompetensi_dasar": [
-                {
-                    "nama_kompetensi_dasar": "{Nama Kompetensi Dasar}",
-                    "materi_pembelajaran": [
-                        {
-                            "materi": "{Materi}",
-                            "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
-                            "indikator": "{Indikator}",
-                            "nilai_karakter": "{Nilai Karakter}",
-                            "kegiatan_pembelajaran": "{Kegiatan Pembelajaran}",
-                            "alokasi_waktu": "{Alokasi Waktu, berupa berapa pertemuan}",
-                            "penilaian": [
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                },
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                }
-                            ]
-                        },
-                        {
-                            "materi": "{Materi}",
-                            "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
-                            "indikator": "{Indikator}",
-                            "nilai_karakter": "{Nilai Karakter}",
-                            "kegiatan_pembelajaran": "{Kegiatan Pembelajaran}",
-                            "alokasi_waktu": "{Alokasi Waktu, berupa berapa pertemuan}",
-                            "penilaian": [
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                },
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                }
-                            ]
-                        },
-                        {
-                            "materi": "{Materi}",
-                            "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
-                            "indikator": "{Indikator}",
-                            "nilai_karakter": "{Nilai Karakter}",
-                            "kegiatan_pembelajaran": "{Kegiatan Pembelajaran}",
-                            "alokasi_waktu": "{Alokasi Waktu, berupa berapa pertemuan}",
-                            "penilaian": [
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "nama_kompetensi_dasar": "{Nama Kompetensi Dasar}",
-                    "materi_pembelajaran": [
-                        {
-                            "materi": "{Materi}",
-                            "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
-                            "indikator": "{Indikator}",
-                            "nilai_karakter": "{Nilai Karakter}",
-                            "kegiatan_pembelajaran": "{Kegiatan Pembelajaran}",
-                            "alokasi_waktu": "{Alokasi Waktu, berupa berapa pertemuan}",
-                            "penilaian": [
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                },
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                }
-                            ]
-                        },
-                        {
-                            "materi": "{Materi}",
-                            "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
-                            "indikator": "{Indikator}",
-                            "nilai_karakter": "{Nilai Karakter}",
-                            "kegiatan_pembelajaran": "{Kegiatan Pembelajaran}",
-                            "alokasi_waktu": "{Alokasi Waktu, berupa berapa pertemuan}",
-                            "penilaian": [
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ],
-            "lampiran": {
-                "glosarium_materi": [
-                    "{Glosarium Materi 1}",
-                    "{Glosarium Materi 2}",
-                    "{Glosarium Materi 3}",
-                    "{Glosarium Materi 4}",
-                    "{Glosarium Materi 5}",
-                    "{Glosarium Materi 6}",
-                    "{Glosarium Materi 7}",
-                    "{Glosarium Materi 8}",
-                    "{Glosarium Materi 9}",
-                    "{Glosarium Materi 10}",
-                ],
-                "daftar_pustaka": [
-                    "{Daftar Pustaka 1}",
-                    "{Daftar Pustaka 2}",
-                    "{Daftar Pustaka 3}",
-                    "{Daftar Pustaka 4}",
-                    "{Daftar Pustaka 5}"
-                ]
-            }
-        }
         Pastikan mengisi semua field yang ada di atas dengan data dan format yang benar. Terima kasih atas kerja sama Anda.
         ';
-
         return $prompt;
     }
 }
