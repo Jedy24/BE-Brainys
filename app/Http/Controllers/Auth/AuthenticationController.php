@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\UserInvitation;
 use App\Models\UserNotification;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 
 class AuthenticationController extends Controller
@@ -39,6 +40,26 @@ class AuthenticationController extends Controller
 
         // Get the user's packages with the package names
         $userPackages = $user->userPackages()->with('package')->get()->map(function ($userPackage) {
+            // Validasi enroll_at
+            $enrollAtFormatted = 'N/A';
+            if ($userPackage->enroll_at) {
+                try {
+                    $enrollAtFormatted = Carbon::parse($userPackage->enroll_at)->format('d M Y');
+                } catch (\Exception $e) {
+                    $enrollAtFormatted = 'N/A';
+                }
+            }
+
+            // Validasi expired_at
+            $expiredAtFormatted = 'N/A';
+            if ($userPackage->expired_at) {
+                try {
+                    $expiredAtFormatted = Carbon::parse($userPackage->expired_at)->format('d M Y');
+                } catch (\Exception $e) {
+                    $expiredAtFormatted = 'N/A';
+                }
+            }
+
             return [
                 'user_package_id' => $userPackage->id,
                 'package_id' => $userPackage->package->id,
@@ -55,8 +76,8 @@ class AuthenticationController extends Controller
                 'enroll_at' => $userPackage->enroll_at,
                 'expired_at' => $userPackage->expired_at,
                 'is_renewable' => $userPackage->is_renewable,
-                'enroll_at_formatted' => $userPackage->enroll_at->format('d M Y'),
-                'expired_at_formatted' => $userPackage->expired_at->format('d M Y'),
+                'enroll_at_formatted' => $enrollAtFormatted,
+                'expired_at_formatted' => $expiredAtFormatted,
             ];
         });
 
