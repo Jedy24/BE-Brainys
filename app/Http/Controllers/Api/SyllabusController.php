@@ -7,7 +7,7 @@ use App\Models\CreditLog;
 use App\Models\ModuleCreditCharge;
 use Illuminate\Http\Request;
 use App\Services\OpenAIService;
-
+use App\Models\CapaianPembelajaran;
 use App\Models\SyllabusHistories;
 use icircle\Template\Docx\DocxTemplate;
 
@@ -25,9 +25,9 @@ class SyllabusController extends Controller
         try {
             // Input validation
             $request->validate([
-                'subject' => 'required',
+                'name' => 'required',
                 'grade' => 'required',
-                'nip' => 'required',
+                'subject' => 'required',
                 'notes' => 'required',
             ]);
 
@@ -58,26 +58,58 @@ class SyllabusController extends Controller
             }
 
             // Parameters
+            $namaSilabus     = $request->input('name');
+            $faseRaw         = $request->input('grade');
+            $faseSplit       = explode('|', $faseRaw);
+            $faseKelas       = trim($faseSplit[0]);
+            $tingkatKelas    = trim($faseSplit[1]);
             $mataPelajaran   = $request->input('subject');
-            $tingkatKelas    = $request->input('grade');
-            $NIP             = $request->input('nip');
             $addNotes        = $request->input('notes');
-            $prompt          = $this->openAI->generateSyllabusPromptBeta($mataPelajaran, $tingkatKelas, $NIP, $addNotes);
+
+            $finalData = CapaianPembelajaran::where('fase', $faseKelas)
+            ->where('mata_pelajaran', $mataPelajaran)
+            ->select('fase', 'mata_pelajaran', 'element', 'capaian_pembelajaran')
+            ->get();
+
+            if (!$finalData) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Data tidak ditemukan untuk kombinasi fase, mata pelajaran, dan elemen capaian yang diberikan',
+                    'data' => [],
+                ], 400);
+            }
+
+            $capaianPembelajaran = $finalData[0]->capaian_pembelajaran;
+
+            $prompt = $this->openAI->generateSyllabusPromptBeta($namaSilabus, $mataPelajaran, $tingkatKelas, $addNotes);
 
             // Send the message to OpenAI
             $resMessage = $this->openAI->sendMessage($prompt);
-
             $parsedResponse = json_decode($resMessage, true);
+
+            // Map Fase Kelas
+            $faseToKelas = [
+                'Fase A' => 'Kelas 1 - 2 SD',
+                'Fase B' => 'Kelas 3 - 4 SD',
+                'Fase C' => 'Kelas 5 - 6 SD',
+                'Fase D' => 'Kelas 7 - 9 SMP',
+                'Fase E' => 'Kelas 10 SMA',
+                'Fase F' => 'Kelas 11 - 12 SMA'
+            ];
+
+            $tingkatKelas = isset($faseToKelas[$faseKelas]) ? "{$faseKelas} ({$faseToKelas[$faseKelas]})" : $faseKelas;
+
             $user = $request->user();
 
             $parsedResponse['informasi_umum']['nama_guru'] = $user->name;
             $parsedResponse['informasi_umum']['nama_sekolah'] = $user->school_name;
+            $parsedResponse['informasi_umum']['nama_silabus'] = $namaSilabus;
 
             // Construct the response data for success
             $insertData = SyllabusHistories::create([
-                'subject' => $mataPelajaran,
+                'name' => $namaSilabus,
                 'grade' => $tingkatKelas,
-                'nip' => $NIP,
+                'subject' => $mataPelajaran,
                 'notes' => $addNotes,
                 'generate_output' => $parsedResponse,
                 'user_id' => auth()->id(),
@@ -146,7 +178,7 @@ class SyllabusController extends Controller
 
             // Get syllabus histories for the authenticated user
             $syllabusHistories = $user->syllabusHistory()
-                ->select(['id', 'subject', 'grade', 'nip', 'notes', 'user_id', 'created_at', 'updated_at'])
+                ->select(['id', 'name', 'grade', 'subject', 'notes', 'user_id', 'created_at', 'updated_at'])
                 ->get();
 
             if ($syllabusHistories->isEmpty()) {

@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\MaterialController;
 use App\Http\Controllers\Api\SyllabusController;
 use App\Http\Controllers\Api\HintController;
 use App\Http\Controllers\Api\BahanAjarController;
+use App\Http\Controllers\Api\MailController;
 use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\CheckoutControllerV2;
 use App\Http\Controllers\Api\ExerciseControllerV2;
@@ -154,6 +155,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/export-excel', [AlurTujuanPembelajaranController::class, 'convertToExcel']);
         Route::get('/history', [AlurTujuanPembelajaranController::class, 'history']);
         Route::get('/history/{id}', [AlurTujuanPembelajaranController::class, 'historyDetail']);
+    });
+
+    Route::group(['prefix' => 'mail'], function () {
+        Route::post('/generate', [MailController::class, 'generate']);
+        Route::post('/export-word', [MailController::class, 'convertToWord']);
+        Route::get('/history', [MailController::class, 'history']);
+        Route::get('/history/{id}', [MailController::class, 'historyDetail']);
     });
 
     // Feedback

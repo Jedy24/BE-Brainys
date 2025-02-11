@@ -5,15 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SyllabusHistories extends Model
+class MailHistories extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'subject',
-        'grade',
-        'nip',
+        'nama_surat',
+        'jenis_surat',
+        'tujuan_surat',
         'notes',
         'generate_output',
         'user_id'
