@@ -169,7 +169,7 @@ class XenditCallbackController extends Controller
     {
         // $this->updateTransactionStatus($transaction, $transaction->transaction_code, 'expired', 'EXPIRED');
         $this->updateTransactionStatus($transaction, $data['external_id'], 'canceled', $data['status'], $data);
-        // Mail::to($user->email)->send(new PaymentCancelNotification($user, $transaction));
+        Mail::to($user->email)->send(new PaymentCancelNotification($user, $transaction));
         Log::info("Payment with unique code {$transaction->transaction_code} has expired.");
     }
 
@@ -226,7 +226,7 @@ class XenditCallbackController extends Controller
             'parse_mode' => 'Markdown',
         ]);
 
-        // Mail::to($user->email)->send(new PaymentSuccessNotification($user, $transaction));
+        Mail::to($user->email)->send(new PaymentSuccessNotification($user, $transaction));
     }
 
     /**

@@ -53,12 +53,8 @@
         </tr>
         <tr>
             <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Total</strong></td>
-            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">Rp.
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">Rp
                 {{ number_format($transaction->amount_total, 0, ',', '.') }}</td>
-        </tr>
-        <tr>
-            <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Metode Pembayaran</strong></td>
-            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">{{ $transaction->payment->service_name }}</td>
         </tr>
     </table>
 
