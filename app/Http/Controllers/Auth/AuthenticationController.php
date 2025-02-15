@@ -81,6 +81,12 @@ class AuthenticationController extends Controller
             ];
         });
 
+        $credits = [
+            'credit' => $user->credit,
+            'limit' => $user->limit_generate,
+            'used' => $user->generateAllSum(),
+        ];
+
         /**Mengambil data user berupa nama, email, nama sekolah, dan profesi. */
         $response = [
             'status' => 'success',
@@ -92,8 +98,8 @@ class AuthenticationController extends Controller
                 'profession' => $user->profession,
                 'email' => $user->email,
                 'is_active' => $user->is_active,
-                'package' => $userPackages
-                // 'password' => $user->password,
+                'package' => $userPackages,
+                'credits' => $credits
             ],
         ];
 

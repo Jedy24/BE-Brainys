@@ -10,6 +10,7 @@ use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\TransactionPayment;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -22,7 +23,7 @@ class CheckoutControllerV2 extends Controller
     public function placeOrder(Request $request)
     {
         Configuration::setXenditKey(env('XENDIT_SECRET_KEY'));
-        
+
         $request->validate([
             'item_type' => 'required|string|in:PACKAGE,CREDIT',
             'item_id' => 'required|integer',
@@ -78,15 +79,19 @@ class CheckoutControllerV2 extends Controller
 
             $description = 'Pembayaran ' . $item->name;
 
+            $redirect_url = env('BRAINYS_MODE') === 'STAGING'
+                ? 'https://staging.brainys.oasys.id/order/detail/' . $unique_code
+                : 'https://brainys.oasys.id/order/detail/' . $unique_code;
+
             $createInvoiceRequest = new CreateInvoiceRequest([
                 'external_id' => $unique_code,
                 'amount' => $amountTotal,
                 'items' => $items,
                 'description' => $description,
-                'invoice_duration' => 3600,
+                'invoice_duration' => 86400,
                 'customer' => $invoiceCustomerData,
                 'customer_notification_preference' => $notificationPreference,
-                'success_redirect_url' => 'https://staging.brainys.oasys.id',
+                'success_redirect_url' => $redirect_url,
             ]);
 
             $apiInstance        = new InvoiceApi();
@@ -123,7 +128,7 @@ class CheckoutControllerV2 extends Controller
                 'transaction_name' => $item->name,
                 'amount_sub' => $amountSub,
                 'amount_fee' => $paymentArray['data']['fee'] ?? 0,
-                'amount_total' => $amountSub + ( $paymentArray['data']['fee'] ?? 0),
+                'amount_total' => $amountSub + ($paymentArray['data']['fee'] ?? 0),
                 'status' => 'pending',
             ]);
 
@@ -139,7 +144,9 @@ class CheckoutControllerV2 extends Controller
                 'fee' => null,
                 'type_fee' => null,
                 'status' => $paymentArray['status'] ?? null,
-                'expired' => $paymentArray['expiry_date'] ?? null,
+                'expired' => isset($paymentArray['expiry_date'])
+                    ? Carbon::parse($paymentArray['expiry_date'])->setTimezone('Asia/Jakarta')
+                    : null,
                 'qrcode_url' => null,
                 'virtual_account' => null,
                 'checkout_url' => $paymentArray['invoice_url'] ?? null,
@@ -147,7 +154,7 @@ class CheckoutControllerV2 extends Controller
                 'checkout_url_v3' => null,
                 'checkout_url_beta' => null,
             ]);
-            
+
 
             // Create transaction detail
             TransactionDetail::create([
@@ -163,7 +170,7 @@ class CheckoutControllerV2 extends Controller
 
             //Mail
             $user = User::where('id', $transaction->id_user)->first();
-            // Mail::to($user->email)->send(new PaymentPendingNotification($user, $transaction, $transactionPayment, $paymentMethod));
+            Mail::to($user->email)->send(new PaymentPendingNotification($user, $transaction, $transactionPayment, null));
 
             return response()->json([
                 'status' => 'success',

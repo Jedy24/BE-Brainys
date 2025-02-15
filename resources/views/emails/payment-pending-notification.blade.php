@@ -81,8 +81,9 @@
 
 @section('content')
     <p class="title">Menunggu Pembayaran</p>
-    <p class="text-base">Tagihan pembayaran Anda telah terbit dengan metode <span class="bold-text">{{ $paymentMethod->name }}</span></p>
-    <p class="text-base">Segera lakukan pembayaran sebelum <span class="bold-text">{{ $transactionPayment->expired }}</span> dengan rincian pembayaran sebagai berikut:</p>
+    <p class="text-base">Tagihan pembayaran Anda telah terbit</p>
+    <p class="text-base">Segera lakukan pembayaran sebelum <span class="bold-text">{{ $transactionPayment->expired ? $transactionPayment->expired->format('d-m-Y H:i') : '-' }}</span> dengan rincian pembayaran sebagai berikut:</p>
+    
     <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
         <tr>
             <td class="text-base" style="padding: 10px; border-bottom: 1px solid #dddddd;">Nomor Transaksi</td>
@@ -106,38 +107,9 @@
         </tr>
         <tr>
             <td class="text-base" style="padding: 10px; border-bottom: 1px solid #dddddd;">Total</td>
-            <td class="text-base" style="padding: 10px; border-bottom: 1px solid #dddddd;"><span class="bold-text">Rp. {{ number_format($transaction->amount_total, 0, ',', '.') }}</span></td>
-        </tr>
-        <tr>
-            <td class="text-base" style="padding: 10px; border-bottom: 1px solid #dddddd;">Metode Pembayaran</td>
-            <td class="text-base" style="padding: 10px; border-bottom: 1px solid #dddddd;"><span class="bold-text">{{ $transactionPayment->service_name }}</span></td>
+            <td class="text-base" style="padding: 10px; border-bottom: 1px solid #dddddd;"><span class="bold-text">Rp {{ number_format($transaction->amount_total, 0, ',', '.') }}</span></td>
         </tr>
     </table>
-
-    @if($paymentMethod->category === 'others')
-        <p class="text-base">Ikuti instruksi pembayaran QRIS di bawah ini:</p>
-        <div style="text-align: center;">
-            <img src="{{ $transactionPayment->qrcode_url }}" alt="QR Code" style="max-width: 200px; height: auto;">
-        </div>
-    @else
-        <p class="text-base">Ikuti instruksi pembayaran VA di bawah ini:</p>
-        <div class="va-box">
-            <p class="text-va">Gunakan nomor VA di bawah ini untuk pembayaran:</p>
-            <div class="va-number">
-                <span class="va-text">{{ $transactionPayment->virtual_account }}</span>
-            </div>
-        </div>
-    @endif
-
-    <div class="instructions">
-        <p class="instructions-title">Cara melakukan pembayaran {{ $paymentMethod->name }}:</p>
-        @if ($paymentMethod->category === "virtual_account")
-            <p class="instructions-sub-title">Pastikan transfer sesuai nominal yang tertera</p>
-        @endif
-        <div class="instructions-list">
-            {!! $paymentMethod->description !!}
-        </div>
-    </div>
 
     <p class="text-base" style="text-align: center;">Atau akses pembayaran dengan klik tombol di bawah:</p>
     <div style="text-align: center; margin-top: 10px;">

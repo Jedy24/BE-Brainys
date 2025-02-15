@@ -133,7 +133,9 @@ class XenditCallbackController extends Controller
         $expiredAt = Carbon::now();
 
         if ($userPackage && $userPackage->package->type !== 'free') {
-            $expiredAt = Carbon::parse($userPackage->expired_at);
+            if ($userPackage->package->id === $package->id) {
+                $expiredAt = Carbon::parse($userPackage->expired_at);
+            }
         }
 
         if ($package->type === 'monthly') {
@@ -153,6 +155,7 @@ class XenditCallbackController extends Controller
     private function updateUserCredit($details)
     {
         $credit = ExtraCredit::find($details->item_id);
+
         User::where('id', $details->item_id)->increment('credit', (int) $credit->credit_amount);
     }
 
