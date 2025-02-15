@@ -39,8 +39,11 @@
         @php
             use App\Models\Package;
 
-            if ($transaction->details->item_type === 'PACKAGE') {
-                $package = Package::find($transaction->details->item_id);
+            $transactionPayment = $transaction->payment->first();
+            $transactionDetail  = $transaction->details->first();
+
+            if ($transactionDetail && $transactionDetail->item_type === 'PACKAGE') {
+                $package = Package::find($transactionDetail->item_id);
                 $packageType =
                     $package->type === 'annually' ? 'Tahunan' : ($package->type === 'monthly' ? 'Bulanan' : '');
                 $jenisTransaksi = 'Pembelian ' . $transaction->transaction_name . ' (' . $packageType . ')';
@@ -54,22 +57,22 @@
         </tr>
         <tr>
             <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Harga Paket</strong></td>
-            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">Rp.
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">Rp
                 {{ number_format($transaction->amount_sub, 0, ',', '.') }}</td>
         </tr>
         <tr>
             <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Biaya Admin</strong></td>
-            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">Rp.
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">Rp
                 {{ number_format($transaction->amount_fee, 0, ',', '.') }}</td>
         </tr>
         <tr>
             <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Total</strong></td>
-            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">Rp.
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">Rp
                 {{ number_format($transaction->amount_total, 0, ',', '.') }}</td>
         </tr>
         <tr>
             <td style="padding: 10px; border-bottom: 1px solid #dddddd;"><strong>Metode Pembayaran</strong></td>
-            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">{{ $transaction->payment->service_name }}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #dddddd;">{{ $transactionPayment->service_name }}</td>
         </tr>
     </table>
 
@@ -82,10 +85,11 @@
             env('BRAINYS_MODE') === 'STAGING'
                 ? 'https://staging.brainys.oasys.id/langganan/daftar-paket'
                 : 'https://brainys.oasys.id/langganan/daftar-paket',
-        ) }}" class="btn-primary">
+        ) }}"
+            class="btn-primary">
             Masuk ke Brainys
         </a>
-    </div>    
+    </div>
 
     <p class="text-base mt-6">Terima kasih telah menggunakan Brainys. Jika ada pertanyaan atau masalah, jangan
         ragu untuk menghubungi tim dukungan kami untuk bantuan lebih lanjut.</p>
