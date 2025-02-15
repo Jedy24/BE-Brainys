@@ -106,6 +106,7 @@ class XenditCallbackController extends Controller
         if ($userPackage) {
             $userPackage->update([
                 'id_package' => $details->item_id,
+                'is_renewable' => 1,
                 'enroll_at' => Carbon::now(),
                 'expired_at' => $expiredAt,
             ]);
