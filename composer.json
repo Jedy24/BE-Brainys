@@ -24,6 +24,7 @@
         "paragonie/random_compat": "^9.99",
         "phpoffice/phppresentation": "dev-master",
         "phpoffice/phpword": "^1.2",
+        "spatie/laravel-backup": "^9.2",
         "tecnickcom/tcpdf": "^6.7",
         "xendit/xendit-php": "^6.0"
     },

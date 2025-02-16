@@ -12,6 +12,7 @@ use App\Models\Transaction;
 use App\Models\TransactionPayment;
 use App\Models\User;
 use App\Models\UserPackage;
+use App\Services\ReportService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -20,6 +21,18 @@ use Telegram\Bot\Api;
 
 class XenditCallbackController extends Controller
 {
+    protected $reportService;
+
+    /**
+     * Class Constructor
+     *
+     * @param ReportService $reportService Instance of ReportService for handling reports
+     */
+    public function __construct(ReportService $reportService)
+    {
+        $this->reportService = $reportService;
+    }
+
     /**
      * Handle the incoming callback request from Xendit.
      *
@@ -220,12 +233,8 @@ class XenditCallbackController extends Controller
         $message .= "Status: *PAID*\n\n";
         $message .= "Terima kasih! 😊\n";
 
-        $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
-        $telegram->sendMessage([
-            'chat_id' => env('TELEGRAM_CHAT_ID'),
-            'text' => $message,
-            'parse_mode' => 'Markdown',
-        ]);
+        $this->reportService->sendToTelegram(null, null, $message);
+        $this->reportService->sendToDiscordChannel(null, null, $message, '1338678783061917770');
 
         Mail::to($user->email)->send(new PaymentSuccessNotification($user, $transaction));
     }

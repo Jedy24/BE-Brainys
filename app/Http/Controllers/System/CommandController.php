@@ -11,8 +11,13 @@ use App\Mail\PackageReminderNotification;
 use App\Models\Package;
 use App\Models\User;
 use App\Models\UserPackage;
+use App\Services\ReportService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Telegram\Bot\Api;
@@ -20,6 +25,13 @@ use Telegram\Bot\FileUpload\InputFile;
 
 class CommandController extends Controller
 {
+    protected $reportService;
+
+    public function __construct(ReportService $reportService)
+    {
+        $this->reportService = $reportService;
+    }
+
     /**
      * Generate a monthly credit report, increment user credits based on the package,
      * and send the report to a Telegram channel.
@@ -56,21 +68,13 @@ class CommandController extends Controller
             User::where('id', $userPackage->id_user)->increment('credit', (int) $credit_amount);
         });
 
-        // Send the report to Telegram
-        $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
-        $chatId = env('TELEGRAM_CHAT_ID');
-
         $message = "*✨ Laporan Pengguna Ditambahkan Kredit Bulanan - " . $now->format('d M Y') . "✨*\n\n";
         $message .= "Jumlah Pengguna Ditambahkan Kredit: *$addedCreditCount Pengguna*\n\n";
         $message .= "Semua pengguna dengan _enroll_ tanggal " . $now->format('d') . " sudah ditambahkan kredit bulanannya.\n\n";
         $message .= "Terima Kasih!😎\n";
 
-        $telegram->sendDocument([
-            'chat_id' => $chatId,
-            'document' => InputFile::create(Storage::path($filePath), $fileName),
-            'caption' => $message,
-            'parse_mode' => 'Markdown',
-        ]);
+        $this->reportService->sendToTelegram($filePath, $fileName, $message);
+        $this->reportService->sendToDiscordChannel($filePath, $fileName, $message, '1338678891388338338');
 
         return response()->json(['status' => 'success', 'message' => 'Check monthly credit completed and report sent to Telegram.']);
     }
@@ -121,21 +125,13 @@ class CommandController extends Controller
             }
         });
 
-        // Send the report to Telegram
-        $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
-        $chatId = env('TELEGRAM_CHAT_ID');
-
         $message = "*✨ Laporan Pengguna Masa Aktif Paket Berakhir - " . $now->format('d M Y') . "✨*\n\n";
         $message .= "Jumlah Pengguna Kadaluarsa: *$expiredCount Pengguna*\n\n";
         $message .= "Semua pengguna dengan masa aktif paket berlangganan sudah diubah ke paket FREE.\n\n";
         $message .= "Terima Kasih!😎\n";
 
-        $telegram->sendDocument([
-            'chat_id' => $chatId,
-            'document' => InputFile::create(Storage::path($filePath), $fileName),
-            'caption' => $message,
-            'parse_mode' => 'Markdown',
-        ]);
+        $this->reportService->sendToTelegram($filePath, $fileName, $message);
+        $this->reportService->sendToDiscordChannel($filePath, $fileName, $message, '1338679032039997552');
 
         return response()->json(['status' => 'success', 'message' => 'Package expiry check completed and report sent to Telegram.']);
     }
@@ -201,32 +197,58 @@ class CommandController extends Controller
             Mail::to($userPackage->user->email)->send(new PackageReminderNotification($userPackage->user, $userPackage->package, $userPackage));
         });
 
-        // Send the report to Telegram for both 7 days and 1 day reminders
-        $telegram = new Api(env('TELEGRAM_BOT_TOKEN'));
-        $chatId = env('TELEGRAM_CHAT_ID');
-
         $message = "*✨ Laporan Pengguna Paket Akan Berakhir - " . $now->format('d M Y') . "✨*\n\n";
         $message .= "Jumlah Pengguna Paket Akan Berakhir dalam 7 hari: *$reminderSevenDaysCount Pengguna*\n";
         $message .= "Jumlah Pengguna Paket Akan Berakhir dalam 1 hari: *$reminderOneDayCount Pengguna*\n\n";
         $message .= "Semua pengguna sudah diberikan notifikasi.\n\n";
         $message .= "Terima Kasih!😎\n";
 
-        // Send 7 days report
-        $telegram->sendDocument([
-            'chat_id' => $chatId,
-            'document' => InputFile::create(Storage::path($filePathSevenDays), $fileNameSevenDays),
-            'caption' => $message,
-            'parse_mode' => 'Markdown',
-        ]);
+        $this->reportService->sendToTelegram($filePathSevenDays, $fileNameSevenDays, $message);
+        $this->reportService->sendToDiscordChannel($filePathSevenDays, $fileNameSevenDays, $message, '1338679032039997552');
 
-        // Send 1 day report
-        $telegram->sendDocument([
-            'chat_id' => $chatId,
-            'document' => InputFile::create(Storage::path($filePathOneDay), $fileNameOneDay),
-            'caption' => $message,
-            'parse_mode' => 'Markdown',
-        ]);
+        $this->reportService->sendToTelegram($filePathOneDay, $fileNameOneDay, $message);
+        $this->reportService->sendToDiscordChannel($filePathOneDay, $fileNameOneDay, $message, '1340369914644664381');
 
         return response()->json(['status' => 'success', 'message' => 'Package reminder check for 7 and 1 day completed and report sent to Telegram.']);
+    }
+
+    /**
+     * Backup the database, compress the backup file, and send it to Telegram and Discord.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function backupDatabase()
+    {
+        // Jalankan backup menggunakan spatie/laravel-backup
+        $exitCode = Artisan::call('backup:run');
+
+        // Log output dari Artisan command
+        $output = Artisan::output();
+        Log::info("Backup command output: " . $output);
+
+        // Ambil file backup terbaru
+        $backupPath = storage_path('app/backups');
+        $latestBackup = collect(glob("{$backupPath}/*.zip"))->last();
+
+        if (!$latestBackup) {
+            Log::error('No backup file found.');
+            return response()->json(['status' => 'error', 'message' => 'No backup file found.'], 500);
+        }
+
+        $zipFileName = basename($latestBackup);
+
+        // Kirim file backup ke Telegram dan Discord
+        $now = Carbon::now();
+        $message = "*✨ Database Backup - " . $now->format('d M Y H:i:s') . "✨*\n\n";
+        $message .= "Backup database telah berhasil dibuat dan dikompres.\n";
+        $message .= "File backup: `{$zipFileName}`\n\n";
+        $message .= "Terima Kasih!😎\n";
+
+        $this->reportService->sendToTelegram($latestBackup, $zipFileName, $message);
+        $this->reportService->sendToDiscordChannel($latestBackup, $zipFileName, $message, 'YOUR_DISCORD_CHANNEL_ID');
+
+        Log::info("Backup file sent to Telegram and Discord.");
+
+        return response()->json(['status' => 'success', 'message' => 'Database backup completed and report sent to Telegram and Discord.']);
     }
 }

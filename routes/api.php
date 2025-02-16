@@ -223,4 +223,5 @@ Route::group(['prefix' => 'commands', 'controller' => CommandController::class],
     Route::get('/check-monthly-credit/{simulatedDate?}', 'checkMonthlyCredit');
     Route::get('/check-package-expiry/{simulatedDate?}', 'checkPackageExpiry');
     Route::get('/check-package-reminder/{simulatedDate?}', 'checkPackageReminder');
+    Route::get('/backup-database', 'backupDatabase');
 });
