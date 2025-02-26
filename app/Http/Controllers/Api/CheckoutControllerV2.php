@@ -62,9 +62,7 @@ class CheckoutControllerV2 extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Kamu sudah pernah melalukan transaksi & belum terbayar untuk pesanan ini',
-                    'data' => [
-                        'existing_order_id' => $existingTransaction->id,
-                    ],
+                    'data' => $existingTransaction
                 ], 400);
             }
 
