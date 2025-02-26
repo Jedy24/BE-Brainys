@@ -29,7 +29,7 @@ class PackageController extends Controller
 
             // Menentukan tombol berdasarkan kondisi user
             $getButtonStatus = function ($package) use ($userPackageName, $userPackageType, $userCredit) {
-                if ($userPackageName === $package->name) {
+                if ($userPackageName === $package->name && $userPackageType === $package->type) {
                     return [
                         'is_disabled' => true,
                         'label' => 'Terpilih'

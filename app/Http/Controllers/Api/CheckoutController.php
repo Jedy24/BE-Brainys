@@ -123,6 +123,26 @@ class CheckoutController extends Controller
                 ], 400);
             }
 
+            // Cek apakah user sudah memiliki transaksi dengan item yang sama dan status masih pending
+            $existingTransaction = Transaction::where('id_user', auth()->id())
+                ->whereHas('details', function ($query) use ($itemType, $itemId) {
+                    $query->where('item_type', $itemType)
+                        ->where('item_id', $itemId);
+                })
+                ->where('status', 'pending')
+                ->first();
+
+            if ($existingTransaction) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Kamu sudah pernah melalukan transaksi & belum terbayar untuk pesanan ini',
+                    'data' => [
+                        'existing_order_id' => $existingTransaction->id,
+                    ],
+                ], 400);
+            }
+
+
             // Calculate total amount (this example assumes no discounts or additional fees)
             $amountSub = $item->price;
             $amountTotal = $amountSub;
