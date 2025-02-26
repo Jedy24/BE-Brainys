@@ -50,6 +50,24 @@ class CheckoutControllerV2 extends Controller
                 ], 404);
             }
 
+            $existingTransaction = Transaction::where('id_user', auth()->id())
+                ->whereHas('details', function ($query) use ($itemType, $itemId) {
+                    $query->where('item_type', $itemType)
+                        ->where('item_id', $itemId);
+                })
+                ->where('status', 'pending')
+                ->first();
+
+            if ($existingTransaction) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Kamu sudah pernah melalukan transaksi & belum terbayar untuk pesanan ini',
+                    'data' => [
+                        'existing_order_id' => $existingTransaction->id,
+                    ],
+                ], 400);
+            }
+
             // Calculate total amount
             $amountSub = $item->price;
             $amountTotal = $amountSub;
