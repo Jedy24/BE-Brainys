@@ -125,7 +125,7 @@ class CheckoutController extends Controller
 
             // Cek apakah user sudah memiliki transaksi dengan item yang sama dan status masih pending
             $existingTransaction = Transaction::where('id_user', auth()->id())
-                ->whereHas('details', function ($query) use ($itemType, $itemId) {
+                ->whereIn('details', function ($query) use ($itemType, $itemId) {
                     $query->where('item_type', $itemType)
                         ->where('item_id', $itemId);
                 })
