@@ -123,9 +123,8 @@ class CheckoutController extends Controller
                 ], 400);
             }
 
-            // Cek apakah user sudah memiliki transaksi dengan item yang sama dan status masih pending
             $existingTransaction = Transaction::where('id_user', auth()->id())
-                ->whereIn('details', function ($query) use ($itemType, $itemId) {
+                ->whereHas('details', function ($query) use ($itemType, $itemId) {
                     $query->where('item_type', $itemType)
                         ->where('item_id', $itemId);
                 })
@@ -141,7 +140,6 @@ class CheckoutController extends Controller
                     ],
                 ], 400);
             }
-
 
             // Calculate total amount (this example assumes no discounts or additional fees)
             $amountSub = $item->price;
