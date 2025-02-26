@@ -131,6 +131,8 @@ class CheckoutController extends Controller
                 ->where('status', 'pending')
                 ->first();
 
+            dd($existingTransaction->toSql(), $existingTransaction->getBindings());
+
             if ($existingTransaction) {
                 return response()->json([
                     'status' => 'error',
