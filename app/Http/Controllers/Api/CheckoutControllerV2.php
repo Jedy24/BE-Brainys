@@ -56,7 +56,8 @@ class CheckoutControllerV2 extends Controller
                         ->where('item_id', $itemId);
                 })
                 ->where('status', 'pending')
-                ->first();
+                ->orderBy('id', 'DESC')
+                ->last();
 
             if ($existingTransaction) {
                 return response()->json([
