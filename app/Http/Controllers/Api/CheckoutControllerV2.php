@@ -57,7 +57,7 @@ class CheckoutControllerV2 extends Controller
                 })
                 ->where('status', 'pending')
                 ->orderBy('id', 'DESC')
-                ->last();
+                ->first();
 
             if ($existingTransaction) {
                 return response()->json([
@@ -204,7 +204,7 @@ class CheckoutControllerV2 extends Controller
                 'status' => 'error',
                 'message' => 'Failed to place order: ' . $e->getMessage(),
                 'data' => null,
-                'payment' => $responseData
+                // 'payment' => $responseData
             ], 500);
         }
     }
