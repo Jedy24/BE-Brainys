@@ -304,17 +304,35 @@ class ModulAjarController extends Controller
                 $sheet->getRowDimension($row)->setRowHeight(-1);
             }
 
+            $kegiatanAwal = '';
+            foreach ($data['langkah_pembelajaran']['kegiatan_awal'] as $index => $tujuan) {
+                $kegiatanAwal .= ($index + 1) . '. ' . $tujuan . PHP_EOL;
+            }
+            $sheet->setCellValue('B35', $kegiatanAwal);
+
+            $kegiatanInti = '';
+            foreach ($data['langkah_pembelajaran']['kegiatan_inti'] as $index => $tujuan) {
+                $kegiatanInti .= ($index + 1) . '. ' . $tujuan . PHP_EOL;
+            }
+            $sheet->setCellValue('B36', $kegiatanInti);
+
+            $kegiatanPenutup = '';
+            foreach ($data['langkah_pembelajaran']['kegiatan_akhir'] as $index => $tujuan) {
+                $kegiatanPenutup .= ($index + 1) . '. ' . $tujuan . PHP_EOL;
+            }
+            $sheet->setCellValue('B37', $kegiatanPenutup);
+
             $glosariumMateri = '';
             foreach ($data['lampiran']['glosarium_materi'] as $index => $tujuan) {
                 $glosariumMateri .= ($index + 1) . ') ' . $tujuan . PHP_EOL;
             }
-            $sheet->setCellValue('B36', $glosariumMateri);
+            $sheet->setCellValue('B40', $glosariumMateri);
 
             $daftarPustaka = '';
             foreach ($data['lampiran']['daftar_pustaka'] as $index => $tujuan) {
                 $daftarPustaka .= ($index + 1) . ') ' . $tujuan . PHP_EOL;
             }
-            $sheet->setCellValue('B37', $daftarPustaka);
+            $sheet->setCellValue('B41', $daftarPustaka);
 
             // Menyimpan spreadsheet ke file baru
             $fileName = 'Modul_Ajar_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.xlsx';
@@ -437,6 +455,10 @@ class ModulAjarController extends Controller
                          --- tujuan_pembelajaran_materi : Tujuan yang menjadi acuan peserta didik dianggap telah memahami materi pembelajaran.
                          --- indikator : Hasil akhir dari tujuan_pembelajaran_materi.
                          --- alokasi_waktu : Mengambil jatah alokasi_waktu pada informasi_umum. Total alokasi_waktu pada array materi_pembelajaran harus sesuai dengan alokasi_waktu pada informasi_umum.
+        - langkah_pembelajaran : Array yang berisikan langkah-langkah yang akan dilakukan saat pembelajaran berkaitan dengan isi array kompetensi_dasar.
+                -- kegiatan_awal : Bagian dari array langkah_pembelajaran yang berisi kegiatan awal pembelajaran sebelum masuk pembelajaran inti.
+                -- kegiatan_inti : Bagian dari array langkah_pembelajaran yang berisi kegiatan inti pembelajaran sesuai dengan materi pada array materi_pembelajaran.
+                -- kegiatan_akhir : Bagian dari array langkah_pembelajaran yang berisi kegiatan akhir pembelajaran untuk menutup kegiatan pembelajaran.
         - glosarium_materi : Memiliki 10 item yang diurutkan secara alfabet. Setiap item pada Glosarium Materi harus berkaitan dengan mata_pelajaran, capaian_pembelajaran, serta elemen.
         - daftar_pustaka : Memiliki 5 item yang diurutkan secara alfabet. Daftar pustaka merupakan referensi yang digunakan untuk materi pada Modul Ajar. Setiap item pada Daftar Pustaka harus lengkap sesuai tata cara penulisan "petajukobit" yaitu penulis, tahun, judul, kota, penerbit. Pastikan setiap item pada Daftar Pustaka adalah referensi nyata bukan fiktif!
 
@@ -458,7 +480,7 @@ class ModulAjarController extends Controller
         - pertanyaan_pemantik : Pertanyaan untuk peserta didik yang berkaitan dengan mata_pelajaran, element, dan capaian_pembelajaran.
         - kompetensi_dasar : Array yang berisikan rincian materi dalam Modul ajar.
                 -- nama_kompetensi_dasar : Bagian dari array kompetensi_dasar yang berisi nama materi pembelajaran dengan acuan dari mata_pelajaran, elemen, dan capaian_pembelajaran.
-                -- materi_pembelajaran : BAgian dari array kompetensi_dasar yang merupakan materi pembelajaran yang akan dipelajari peserta didik.
+                -- materi_pembelajaran : Bagian dari array kompetensi_dasar yang merupakan materi pembelajaran yang akan dipelajari peserta didik.
                     --- materi : Bagian dari array materi_pembelajaran yang merupakan nama spesifik dari nama_kompetensi_dasar.
                     --- tujuan_pembelajaran_materi : Tujuan yang menjadi acuan peserta didik dianggap telah memahami materi pembelajaran.
                     --- indikator : Hasil akhir dari tujuan_pembelajaran_materi.
@@ -466,6 +488,9 @@ class ModulAjarController extends Controller
                     --- kegiatan_pembelajaran : Kegiatan yang akan dilakukan peserta didik saat mengikuti materi_pembelajaran.
                     --- alokasi_waktu : Perhitungan waktu yang diperlukan peserta didik untuk mengikuti materi pembelajaran.
                     --- penilaian : Penilaian yang akan diberikan kepada peserta didik.
+        - kegiatan_awal : Kegiatan awal sebelum memulai pembelajaran, berikan juga alokasi waktunya dalam menit.
+        - kegiatan_inti : Kegiatan inti pembelajaran yang berkaitan dengan materi dalam materi_pembelajaran, berikan juga alokasi waktunya dalam menit.
+        - kegiatan_akhir : Kegiatan akhir untuk menutup pembelajaran, berikan juga alokasi waktunya dalam menit.
 
 
         Array "tujuan_kegiatan_pembelajaran" sebagai berikut:
@@ -586,6 +611,11 @@ class ModulAjarController extends Controller
                     ]
                 }
             ],
+            "langkah_pembelajaran": {
+                    "kegiatan_awal": ["", ""], //Berikan minimal 2 item, pastikan sesuai dengan format yang diminta dan sertakan alokasi waktu dalam menit.
+                    "kegiatan_inti": ["", "", "", ""] //Pastikan sesuai dengan materi pada materi_pembelajaran, pastikan sesuai dengan format yang diminta diminta dan sertakan alokasi waktu dalam menit.
+                    "kegiatan_akhir": ["", ""], //Berikan minimal 2 item, pastikan sesuai dengan format yang diminta diminta dan sertakan alokasi waktu dalam menit.
+            },
             "lampiran": {
                 "glosarium_materi": [
                     "{Glosarium Materi 1}",
