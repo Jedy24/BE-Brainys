@@ -305,8 +305,11 @@ class ModulAjarController extends Controller
             }
 
             $kegiatanAwal = '';
+            $kegiatanAwal .= "1. Membuka pembelajaran dengan mengajak peserta didik berdoa sesuai dengan agama dan kepercayaan masing-masing (3 menit)" . PHP_EOL;
+            $kegiatanAwal .= "2. Melakukan review materi pembelajaran yang telah dipelajari sebelumnya sebagai pengantar menuju materi baru (5 menit)" . PHP_EOL;
+            $startIndex = 3;
             foreach ($data['langkah_pembelajaran']['kegiatan_awal'] as $index => $tujuan) {
-                $kegiatanAwal .= ($index + 1) . '. ' . $tujuan . PHP_EOL;
+                $kegiatanAwal .= ($index + $startIndex) . '. ' . $tujuan . PHP_EOL;
             }
             $sheet->setCellValue('B35', $kegiatanAwal);
 
@@ -320,6 +323,9 @@ class ModulAjarController extends Controller
             foreach ($data['langkah_pembelajaran']['kegiatan_akhir'] as $index => $tujuan) {
                 $kegiatanPenutup .= ($index + 1) . '. ' . $tujuan . PHP_EOL;
             }
+            $nextIndex = count($data['langkah_pembelajaran']['kegiatan_akhir']) + 1;
+            $kegiatanPenutup .= $nextIndex . '. Mengajak peserta didik menutup kegiatan belajar dengan berdoa sesuai dengan agama dan kepercayaan masing-masing (3 menit)' . PHP_EOL;
+
             $sheet->setCellValue('B37', $kegiatanPenutup);
 
             $glosariumMateri = '';
