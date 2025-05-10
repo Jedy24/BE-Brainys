@@ -41,6 +41,8 @@ use Illuminate\Support\Carbon;
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\GamificationHistories[] $gamificationHistory
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\AlurTujuanPembelajaranHistories[] $alurTujuanPembelajaranHistory
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ModulAjarHistories[] $modulAjarHistory
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\MailHistories[] $mailHistory
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\RubrikNilaiHistories[] $rubrikNilaiHistory
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\FeedbackReview[] $feedbackReviews
  */
 class User extends Authenticatable
@@ -203,6 +205,26 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the mail history for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function mailHistory()
+    {
+        return $this->hasMany(MailHistories::class, 'user_id', 'id');
+    }
+
+    /**
+     * Get the rubrik nilai history for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function rubrikNilaiHistory()
+    {
+        return $this->hasMany(RubrikNilaiHistories::class, 'user_id', 'id');
+    }
+
+    /**
      * Get the feedback reviews for the user.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -229,6 +251,8 @@ class User extends Authenticatable
             + $this->hintHistory()->count()
             + $this->alurTujuanPembelajaranHistory()->count()
             + $this->modulAjarHistory()->count()
+            + $this->mailHistory()->count()
+            + $this->rubrikNilaiHistory()->count()
         );
     }
 
@@ -320,5 +344,25 @@ class User extends Authenticatable
     public function modulAjarHistoryLastGenerated()
     {
         return $this->modulAjarHistory()->latest('created_at')->value('created_at');
+    }
+
+    /**
+     * Get the last generated timestamp from mailHistory.
+     *
+     * @return \Illuminate\Support\Carbon|null
+     */
+    public function mailHistoryLastGenerated()
+    {
+        return $this->mailHistory()->latest('created_at')->value('created_at');
+    }
+
+    /**
+     * Get the last generated timestamp from rubrikNilaiHistory.
+     *
+     * @return \Illuminate\Support\Carbon|null
+     */
+    public function rubrikNilaiHistoryLastGenerated()
+    {
+        return $this->rubrikNilaiHistory()->latest('created_at')->value('created_at');
     }
 }
