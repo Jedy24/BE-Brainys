@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\SyllabusController;
 use App\Http\Controllers\Api\HintController;
 use App\Http\Controllers\Api\BahanAjarController;
 use App\Http\Controllers\Api\MailController;
+use App\Http\Controllers\Api\RubrikNilaiController;
 use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\CheckoutControllerV2;
 use App\Http\Controllers\Api\ExerciseControllerV2;
@@ -157,11 +158,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/history/{id}', [AlurTujuanPembelajaranController::class, 'historyDetail']);
     });
 
+    // Persuratan
     Route::group(['prefix' => 'mail'], function () {
         Route::post('/generate', [MailController::class, 'generate']);
         Route::post('/export-word', [MailController::class, 'convertToWord']);
         Route::get('/history', [MailController::class, 'history']);
         Route::get('/history/{id}', [MailController::class, 'historyDetail']);
+    });
+
+    // Rubrik nilai
+    Route::group(['prefix' => 'rubrik-nilai'], function () {
+        Route::post('/generate', [RubrikNilaiController::class, 'generate']);
+        Route::post('/export-word', [RubrikNilaiController::class, 'convertToWord']);
+        Route::get('/history', [RubrikNilaiController::class, 'history']);
+        Route::get('/history/{id}', [RubrikNilaiController::class, 'historyDetail']);
     });
 
     // Feedback
