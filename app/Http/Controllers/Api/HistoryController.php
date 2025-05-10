@@ -12,6 +12,8 @@ use App\Models\GamificationHistories;
 use App\Models\AlurTujuanPembelajaranHistories;
 use App\Models\ModulAjarHistories;
 use App\Models\ExerciseV2Histories;
+use App\Models\MailHistories;
+use App\Models\RubrikNilaiHistories;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -97,6 +99,26 @@ class HistoryController extends Controller
                     DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
                 ])->get());
 
+            $histories = $histories->concat(MailHistories::where('user_id', $user_id)
+                ->select([
+                    'id',
+                    'nama_surat',
+                    'notes AS description',
+                    DB::raw("'mail' AS type"),
+                    'created_at',
+                    DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
+                ])->get());
+
+            $histories = $histories->concat(RubrikNilaiHistories::where('user_id', $user_id)
+                ->select([
+                    'id',
+                    'name',
+                    'notes AS description',
+                    DB::raw("'rubrik-nilai' AS type"),
+                    'created_at',
+                    DB::raw("DATE_FORMAT(created_at, '%d %b %Y | %H:%i') AS created_at_format"),
+                ])->get());
+
             // Sort the merged collection by created_at in descending order
             $sortedHistory = $histories->sortByDesc('created_at');
 
@@ -138,7 +160,7 @@ class HistoryController extends Controller
         try {
             // Validasi input
             $request->validate([
-                'type' => 'required|in:syllabus,material,exercise,atp,bahan-ajar,gamification,hint',
+                'type' => 'required|in:syllabus,material,exercise,atp,bahan-ajar,gamification,hint,mail,rubrik-nilai',
                 'page' => 'integer|min:1'
             ]);
 
@@ -181,6 +203,14 @@ class HistoryController extends Controller
                     $histories = HintHistories::where('user_id', $user_id)
                         ->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);
                     break;
+                case 'mail':
+                    $histories = MailHistories::where('user_id', $user_id)
+                        ->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);
+                    break;
+                case 'rubrik-nilai':
+                    $histories = RubrikNilaiHistories::where('user_id', $user_id)
+                        ->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);
+                    break;
                 default:
                     throw new \Exception('Invalid history type provided.');
             }
@@ -189,7 +219,7 @@ class HistoryController extends Controller
             $responseData = $histories->getCollection()->map(function ($history) use ($type) {
                 return [
                     'id' => $history->id,
-                    'name' => ($type === 'syllabus' ? $history->subject : $history->name),
+                    'name' => ($type === 'syllabus' ? $history->subject : ($type === 'mail' ? $history->nama_surat : $history->name)),
                     'description' => $history->notes,
                     'type' => $type,
                     'created_at' => $history->created_at->format('d M Y | H:i'),
