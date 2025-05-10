@@ -63,14 +63,14 @@ class RubrikNilaiController extends Controller
             }
 
             // Parameters
-            $namaModulAjar  = $request->input('name');
-            $faseRaw        = $request->input('phase');
-            $faseSplit      = explode('|', $faseRaw);
-            $faseKelas      = trim($faseSplit[0]);
-            $kelas          = trim($faseSplit[1]);
-            $mataPelajaran  = $request->input('subject');
-            $elemen         = $request->input('element');
-            $addNotes       = $request->input('notes');
+            $namaRubrikNilai  = $request->input('name');
+            $faseRaw          = $request->input('phase');
+            $faseSplit        = explode('|', $faseRaw);
+            $faseKelas        = trim($faseSplit[0]);
+            $kelas            = trim($faseSplit[1]);
+            $mataPelajaran    = $request->input('subject');
+            $elemen           = $request->input('element');
+            $addNotes         = $request->input('notes');
 
             // Get Capaian Pembelajaran
             $finalData = CapaianPembelajaran::where('fase', $faseKelas)
@@ -109,21 +109,20 @@ class RubrikNilaiController extends Controller
             $kelas = isset($faseToKelas[$faseKelas]) ? "{$faseKelas} ({$faseToKelas[$faseKelas]})" : $faseKelas;
 
             // Add additional information
-            $parsedResponse['informasi_umum']['nama_modul_ajar'] = $namaModulAjar;
+            $parsedResponse['informasi_umum']['nama_rubrik_nilai'] = $namaRubrikNilai;
             $parsedResponse['informasi_umum']['penyusun'] = $user->name;
             $parsedResponse['informasi_umum']['jenjang_sekolah'] = $user->school_name;
             $parsedResponse['informasi_umum']['fase_kelas'] = $kelas;
             $parsedResponse['informasi_umum']['mata_pelajaran'] = $mataPelajaran;
             $parsedResponse['informasi_umum']['element'] = $elemen;
-            $parsedResponse['informasi_umum']['capaian_pembelajaran'] = $capaianPembelajaran;
 
             $insertData = RubrikNilaiHistories::create([
-                'name' => $namaModulAjar,
+                'name' => $namaRubrikNilai,
                 'phase' => $faseKelas,
                 'subject' => $mataPelajaran,
                 'element' => $elemen,
                 'notes' => $addNotes,
-                'output_data' => $parsedResponse,
+                'generate_output' => $parsedResponse,
                 'user_id' => $user->id,
             ]);
 
@@ -163,9 +162,9 @@ class RubrikNilaiController extends Controller
             $outputPath     = public_path('word_output/Rubrik_Nilai_' . auth()->id() . '_' . md5(time() . '' . rand(1000, 9999)) . '.docx');
 
             $rubrikNilaiId  = $request->input('id');
-            $rubrikNilai    = RubrikNilaiHistories::find($modulAjarId);
+            $rubrikNilai    = RubrikNilaiHistories::find($rubrikNilaiId);
 
-            $data = $rubrikNilai->output_data;
+            $data = $rubrikNilai->generate_output;
             $docxTemplate->merge($data, $outputPath, false, false);
 
             // Assuming the merge operation is successful
@@ -235,7 +234,7 @@ class RubrikNilaiController extends Controller
             // Get a specific hint history by ID for the authenticated user
             $rubrikNilaiHistories = $user->rubrikNilaiHistory()->find($id);
 
-            if (!$modulAjarHistories) {
+            if (!$rubrikNilaiHistories) {
                 return response()->json([
                     'status' => 'failed',
                     'message' => 'Riwayat hasil rubrik nilai tidak tersedia pada akun ini!',
@@ -258,201 +257,43 @@ class RubrikNilaiController extends Controller
         }
     }
 
-    public function prompt($kelas, $mataPelajaran, $elemen, $capaianPembelajaran, $addNotes)
+    public function prompt($kelas, $mataPelajaran, $elemen, $addNotes)
     {
         $prompt = '';
         $prompt .= '
-        Buatlah objek JSON untuk Modul Ajar berdasarkan parameter berikut:
+        Buatlah objek JSON untuk Rubrik Nilai berdasarkan parameter berikut:
 
         - fase_kelas: ' . $kelas . '
         - mata_pelajaran: ' . $mataPelajaran . '
         - element: ' . $elemen . '
-        - capaian_pembelajaran: ' . $capaianPembelajaran . '
 
-        Buatlah Modul ajar dimana array komponen_pembelajaran, tujuan_kegiatan_pembelajaran, pemahaman_bermakna, pertanyaan_pemantik, dan kompetensi_dasar isinya akan berdasarkan mata_pelajaran, capaian_pembelajaran, serta elemen. Catatan tambahan dalam bahasa Indonesia: ' . $addNotes . '
+        Parameter objek JSON tidak perlu menjadi output pada struktur JSON.
 
-        Modul Ajar merupakan materi pembelajaran terstruktur yang digunakan sebagai alat bantu guru dalam proses pengajaran dan proses pembelajaran siswa. Modul Ajar dirancang sedemikian rupa agar dapat mencapai target Capaian Pembelajaran (CP).
+        Buatlah Rubrik Nilai yang berisikan level_pencapaian, deskripsi, dan indikasi_pencapaian. Catatan tambahan dalam bahasa Indonesia: ' . $addNotes . '
 
-        Secara struktur, komponen dari Modul Ajar adalah sebagai berikut:
-        - alokasi_waktu : Alokasi waktu pada bagian informasi_umum merupakan waktu yang dibutuhkan untuk menyelesaikan seluruh Modul Ajar seperti materi dan aktivitas pembelajaran.
-          //Perhatikan: alokasi_waktu memiliki struktur format: berapa pekan, berapa JP, berapa pertemuan. Asumsikan bahwa rasio pekan : JP : pertemuan adalah 1 : 3 : 1.
-        - kompetensi_dasar : Array yang berisikan rincian materi dalam Modul ajar.
-               -- nama_kompetensi_dasar : Bagian dari array kompetensi_dasar yang berisi nama materi pembelajaran dengan acuan dari mata_pelajaran, elemen, dan capaian_pembelajaran.
-               -- materi_pembelajaran : Bagian dari array kompetensi_dasar yang berisi materi pembelajaran yang dibutuhkan untuk menyelesaikan kompetensi dasar.
-                         --- materi : Bagian dari array materi_pembelajaran yang merupakan nama spesifik dari nama_kompetensi_dasar.
-                         --- tujuan_pembelajaran_materi : Tujuan yang menjadi acuan peserta didik dianggap telah memahami materi pembelajaran.
-                         --- indikator : Hasil akhir dari tujuan_pembelajaran_materi.
-                         --- alokasi_waktu : Mengambil jatah alokasi_waktu pada informasi_umum. Total alokasi_waktu pada array materi_pembelajaran harus sesuai dengan alokasi_waktu pada informasi_umum.
-        - glosarium_materi : Memiliki 10 item yang diurutkan secara alfabet. Setiap item pada Glosarium Materi harus berkaitan dengan mata_pelajaran, capaian_pembelajaran, serta elemen.
-        - daftar_pustaka : Memiliki 5 item yang diurutkan secara alfabet. Daftar pustaka merupakan referensi yang digunakan untuk materi pada Modul Ajar. Setiap item pada Daftar Pustaka harus lengkap sesuai tata cara penulisan "petajukobit" yaitu penulis, tahun, judul, kota, penerbit. Pastikan setiap item pada Daftar Pustaka adalah referensi nyata bukan fiktif!
+        Rubrik Nilai merupakan kumpulan kriteria penilaian yang digunakan untuk menilai kemampuan peserta didik dalam mata pelajaran tertentu dengan elemen tertentu.
 
-        Daftar Profil Pelajar Pancasila:
-        - Beriman, Bertakwa kepada Tuhan YME, dan Berakhlak Mulia: Pelajar yang memiliki akhlak baik dalam hubungannya dengan Tuhan, sesama manusia, dan lingkungan, serta menunjukkan sikap beragama, pribadi, sosial, dan kenegaraan yang mulia.
-        - Berkebinekaan Global: Pelajar yang menghargai dan mempertahankan budaya serta identitas lokal sambil terbuka terhadap budaya lain, dengan kemampuan komunikasi dan refleksi interkultural yang baik.
-        - Bergotong Royong: Pelajar yang aktif dalam kolaborasi, berbagi, dan memiliki kepedulian terhadap keberhasilan bersama, mampu bekerja sama untuk mencapai tujuan bersama dengan semangat gotong royong.
-        - Mandiri: Pelajar yang bertanggung jawab atas proses dan hasil belajarnya, menunjukkan kesadaran diri dan kemampuan regulasi diri dalam mengelola belajar dan tantangan pribadi.
-        - Bernalar Kritis: Pelajar yang mampu memproses informasi secara objektif, menganalisis dan mengevaluasi data, serta membuat keputusan berdasarkan refleksi dan penalaran kritis.
-        - Kreatif: Pelajar yang mampu menghasilkan gagasan dan karya yang orisinal, memiliki kemampuan untuk berinovasi dan menciptakan solusi baru yang bermanfaat dan berdampak.
+        Secara struktur, komponen dari Rubrik Nilai adalah sebagai berikut:
+        - pencapaian : Array yang berisikan level_pencapaian, deskripsi, dan indikasi_pencapaian.
+               -- level_pencapaian : Tingkatan penguasaan kompetensi atau kemampuan peserta didik dalam memenuhi kriteria penilaian dengan kategori tertentu.
+               -- deskripsi : Menjelaskan apa yang dapat dilakukan oleh peserta didik pada level pencapaian tertentu.
+               -- indikasi_pencapaian : Indikator konkret atau contoh perilaku peserta didik yang menunjukkan bahwa mereka berada pada level tertentu.
 
-        Sertakan bidang berikut untuk setiap bagian dari Modul Ajar sebagai berikut:
-        - kompetensi_awal : Persyaratan yang perlu dikuasai peserta didik sebelum mengikuti pembelajaran.
-        - profil_pelajar_pancasila: Karakteristik Profil Pelajar Pancasila yang ingin dikembangkan melalui tujuan pembelajaran dengan mengambil maksimal 3 dari 6 daftar Profil Pelajar Pancasila.
-        - target_peserta_didik : Tujuan yang dicapai oleh peserta didik setelah mengikuti pembelajaran.
-        - model_pembelajaran : Metode yang digunakan untuk menyampaikan materi pembelajaran. Misalkan menggunakan tugas proyek, pendekatan tugas, dan sejenisnya.
-        - sumber_belajar : Sumber materi yang digunakan dalam pembelajaran. Berikan dalam bentuk paragraf.
-        - lembar_kerja_peserta_didik : Media yang digunakan peserta didik untuk mengerjakan materi pembelajaran seperti buku catatan, lembar kerja siswa, dan sejenisnya. Berikan dalam bentuk paragraf.
-        - pertanyaan_pemantik : Pertanyaan untuk peserta didik yang berkaitan dengan mata_pelajaran, element, dan capaian_pembelajaran.
-        - kompetensi_dasar : Array yang berisikan rincian materi dalam Modul ajar.
-                -- nama_kompetensi_dasar : Bagian dari array kompetensi_dasar yang berisi nama materi pembelajaran dengan acuan dari mata_pelajaran, elemen, dan capaian_pembelajaran.
-                -- materi_pembelajaran : BAgian dari array kompetensi_dasar yang merupakan materi pembelajaran yang akan dipelajari peserta didik.
-                    --- materi : Bagian dari array materi_pembelajaran yang merupakan nama spesifik dari nama_kompetensi_dasar.
-                    --- tujuan_pembelajaran_materi : Tujuan yang menjadi acuan peserta didik dianggap telah memahami materi pembelajaran.
-                    --- indikator : Hasil akhir dari tujuan_pembelajaran_materi.
-                    --- nilai_karakter : Karakter yang diperlukan oleh peserta didik untuk mengikuti materi pembelajaran.
-                    --- kegiatan_pembelajaran : Kegiatan yang akan dilakukan peserta didik saat mengikuti materi_pembelajaran.
-                    --- alokasi_waktu : Perhitungan waktu yang diperlukan peserta didik untuk mengikuti materi pembelajaran.
-                    --- penilaian : Penilaian yang akan diberikan kepada peserta didik.
+        Isi data level_pencapaian, deskripsi, dan indikasi_pencapaian berkaitan dengan fase kelas, mata pelajaran, dan elemen yang diberikan.
 
+        Struktur data Rubrik Nilai minimal memiliki 5 pencapaian dengan 5 kategori pada level_pencapaian. Level pencapaian menggunakan kata-kata yang mendeskripsikan kemampuan peserta didik secara jelas, positif, dan objektif sesuai tingkat pencapaiannya.
+        Deskripsi menggunakan kalimat yang menjelaskan apa yang dapat dilakukan oleh peserta didik pada level pencapaian tertentu.
+        Indikasi pencapaian menggunakan kalimat yang menjelaskan perilaku peserta didik yang menunjukkan bahwa mereka berada pada level tertentu.
 
-        Array "tujuan_kegiatan_pembelajaran" sebagai berikut:
-        - tujuan_pembelajaran_pertemuan : Tujuan pembelajaran pada setiap pertemuan tanpa menuliskan pertemuan ke berapa. Data untuk tujuan_pembelajaran_pertemuan menyesuaikan jumlah pertemuan dari "alokasi_waktu".
-        - tujuan_pembelajaran_topik : Hasil yang diharapkan dapat dicapai oleh peserta didik setelah mengikuti pembelajaran setiap pertemuan.
-
+        Struktur JSON yang harus dihasilkan:
         {
-            "informasi_umum": {
-                "alokasi_waktu": "(Berupa berapa pekan, berapa JP, berapa pertemuan)", //Pastikan sesuai dengan format.
-                "kompetensi_awal": "{Kompetensi Awal}",
-                "profil_pelajar_pancasila": "{Profil Pelajar Pancasila}", // Berupa string
-                "target_peserta_didik": "{Target Peserta Didik}",
-                "model_pembelajaran": "{Model Pembelajaran}"
-            },
-            "sarana_dan_prasarana": {
-                "sumber_belajar": "{Sumber Belajar}",
-                "lembar_kerja_peserta_didik": "{Lembar Kerja Peserta Didik}"
-            },
-            "tujuan_kegiatan_pembelajaran": {
-                "tujuan_pembelajaran_topik": ["{Tujuan Pembelajaran Topik}"], // Berikan minimal 4 item.
-                "tujuan_pembelajaran_pertemuan": ["{Tujuan Pembelajaran Pertemuan}"] // Tanpa menuliskan pertemuan ke berapa, jumlahnya menyesuaikan dengan alokasi_waktu informasi_umum. Misalkan alokasi_waktu 8 pertemuan maka ada 8 item tujuan_pembelajaran_pertemuan.
-            },
-            "pemahaman_bermakna": {
-                "topik": "{Topik, berupa 1 paragraf}"
-            },
-            "pertanyaan_pemantik": ["", "", "", ""],
-            "kompetensi_dasar": [
+            "pencapaian": [
                 {
-                    "nama_kompetensi_dasar": "{Nama Kompetensi Dasar}",
-                    "materi_pembelajaran": [
-                        {
-                            "materi": "{Materi}",
-                            "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
-                            "indikator": "{Indikator}",
-                            "nilai_karakter": "{Nilai Karakter}",
-                            "kegiatan_pembelajaran": "{Kegiatan Pembelajaran}",
-                            "alokasi_waktu": "{Alokasi Waktu, berupa berapa pertemuan}",
-                            "penilaian": [
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                },
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                }
-                            ]
-                        },
-                        {
-                            "materi": "{Materi}",
-                            "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
-                            "indikator": "{Indikator}",
-                            "nilai_karakter": "{Nilai Karakter}",
-                            "kegiatan_pembelajaran": "{Kegiatan Pembelajaran}",
-                            "alokasi_waktu": "{Alokasi Waktu, berupa berapa pertemuan}",
-                            "penilaian": [
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                },
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                }
-                            ]
-                        },
-                        {
-                            "materi": "{Materi}",
-                            "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
-                            "indikator": "{Indikator}",
-                            "nilai_karakter": "{Nilai Karakter}",
-                            "kegiatan_pembelajaran": "{Kegiatan Pembelajaran}",
-                            "alokasi_waktu": "{Alokasi Waktu, berupa berapa pertemuan}",
-                            "penilaian": [
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "nama_kompetensi_dasar": "{Nama Kompetensi Dasar}",
-                    "materi_pembelajaran": [
-                        {
-                            "materi": "{Materi}",
-                            "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
-                            "indikator": "{Indikator}",
-                            "nilai_karakter": "{Nilai Karakter}",
-                            "kegiatan_pembelajaran": "{Kegiatan Pembelajaran}",
-                            "alokasi_waktu": "{Alokasi Waktu, berupa berapa pertemuan}",
-                            "penilaian": [
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                },
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                }
-                            ]
-                        },
-                        {
-                            "materi": "{Materi}",
-                            "tujuan_pembelajaran_materi": "{Tujuan Pembelajaran Materi}",
-                            "indikator": "{Indikator}",
-                            "nilai_karakter": "{Nilai Karakter}",
-                            "kegiatan_pembelajaran": "{Kegiatan Pembelajaran}",
-                            "alokasi_waktu": "{Alokasi Waktu, berupa berapa pertemuan}",
-                            "penilaian": [
-                                {
-                                    "jenis": "",
-                                    "bobot": 0
-                                }
-                            ]
-                        }
-                    ]
+                    "level_pencapaian": "{Level Pencapaian}",
+                    "deskripsi": ["{Deskripsi 1}", "{Deskripsi 2}", "{Deskripsi 3}", "{Deskripsi 4}", "{Deskripsi 5}"],
+                    "indikasi_pencapaian": ["{Indikasi Pencapaian 1}", "{Indikasi Pencapaian 2}", "{Indikasi Pencapaian 3}", "{Indikasi Pencapaian 4}", "{Indikasi Pencapaian 5}"]
                 }
-            ],
-            "lampiran": {
-                "glosarium_materi": [
-                    "{Glosarium Materi 1}",
-                    "{Glosarium Materi 2}",
-                    "{Glosarium Materi 3}",
-                    "{Glosarium Materi 4}",
-                    "{Glosarium Materi 5}",
-                    "{Glosarium Materi 6}",
-                    "{Glosarium Materi 7}",
-                    "{Glosarium Materi 8}",
-                    "{Glosarium Materi 9}",
-                    "{Glosarium Materi 10}",
-                ],
-                "daftar_pustaka": [
-                    "{Daftar Pustaka 1}",
-                    "{Daftar Pustaka 2}",
-                    "{Daftar Pustaka 3}",
-                    "{Daftar Pustaka 4}",
-                    "{Daftar Pustaka 5}"
-                ]
-            }
+            ]
         }
         Pastikan mengisi semua field yang ada di atas dengan data dan format yang benar. Terima kasih atas kerja sama Anda.
         ';
