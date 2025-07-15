@@ -10,6 +10,8 @@ use App\Services\OpenAIService;
 use App\Services\PPTBahanAjar;
 use icircle\Template\Docx\DocxTemplate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class BahanAjarController extends Controller
 {
@@ -68,47 +70,77 @@ class BahanAjarController extends Controller
 
             // Send the message to OpenAI
             $resMessage = $this->openAI->sendMessage($prompt);
-
             $parsedResponse = json_decode($resMessage, true);
-            $user = $request->user();
+
+            if ($parsedResponse === null) {
+                throw new \Exception('Gagal memproses respons dari AI. Format JSON tidak valid.');
+            }
+
+            $rules = [
+                'informasi_umum'            => 'required|array',
+                'informasi_umum.judul_materi' => 'required|string',
+                'pendahuluan'               => 'required|array',
+                'pendahuluan.definisi'      => 'required|string',
+                'konten'                    => 'required|array',
+                'konten.*.nama_konten'      => 'required|string',
+                'konten.*.isi_konten'       => 'required|string',
+                'studi_kasus'               => 'required|array',
+                'studi_kasus.*.nama_studi_kasus' => 'required|string',
+                'studi_kasus.*.isi_studi_kasus' => 'required|string',
+                'quiz'                      => 'required|array',
+                'quiz.soal_quiz'            => 'required|string',
+                'evaluasi'                  => 'required|array',
+                'evaluasi.isi_evaluasi'     => 'required|string',
+                'lampiran'                  => 'required|array',
+                'lampiran.sumber_referensi' => 'required|array',
+            ];
+
+            $validator = Validator::make($parsedResponse, $rules);
+
+            if ($validator->fails()) {
+                \Log::error('AI Bahan Ajar JSON Structure Failed: ' . $validator->errors()->first());
+                throw new \Exception('Terjadi kesalahan dalam memproses data Bahan Ajar. Silakan coba lagi.');
+            }
 
             $parsedResponse['informasi_umum']['nama_bahan_ajar'] = $namaBahanAjar;
             $parsedResponse['informasi_umum']['penyusun']        = $user->name;
             $parsedResponse['informasi_umum']['instansi']        = $user->school_name;
 
-            // Construct the response data for success
-            $insertData = BahanAjarHistories::create([
-                'name' => $namaBahanAjar,
-                'subject' => $mataPelajaran,
-                'grade' => $tingkatKelas,
-                'notes' => $addNotes,
-                'generate_output' => $parsedResponse,
-                'user_id' => auth()->id(),
-            ]);
-            
-            // Decrease user's credit
-            $user->decrement('credit', $creditCharge);
+            $insertData = DB::transaction(function () use ($user, $creditCharge, $namaBahanAjar, $mataPelajaran, $tingkatKelas, $addNotes, $parsedResponse) {
+                $history = BahanAjarHistories::create([
+                    'name'            => $namaBahanAjar,
+                    'subject'         => $mataPelajaran,
+                    'grade'           => $tingkatKelas,
+                    'notes'           => $addNotes,
+                    'generate_output' => $parsedResponse,
+                    'user_id'         => $user->id,
+                ]);
 
-            // Credit Logging
-            CreditLog::create([
-                'user_id' => $user->id,
-                'amount' => -$creditCharge,
-                'description' => 'Generate Bahan Ajar',
-            ]);
+                // Kurangi kredit user
+                $user->decrement('credit', $creditCharge);
+
+                // Catat log kredit
+                CreditLog::create([
+                    'user_id'     => $user->id,
+                    'amount'      => -$creditCharge,
+                    'description' => 'Generate Bahan Ajar: ' . $namaBahanAjar,
+                ]);
+
+                return $history;
+            });
 
             $parsedResponse['id'] = $insertData->id;
 
-            // return new APIResponse($responseData);
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'Bahan ajar berhasil dihasilkan!',
-                'data' => $parsedResponse,
+                'data'    => $parsedResponse,
             ], 200);
+
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'failed',
+                'status'  => 'failed',
                 'message' => $e->getMessage(),
-                'data' => json_decode($e->getMessage(), true),
             ], 500);
         }
     }

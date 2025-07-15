@@ -10,6 +10,8 @@ use App\Services\OpenAIService;
 use App\Models\CapaianPembelajaran;
 use App\Models\SyllabusHistories;
 use icircle\Template\Docx\DocxTemplate;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class SyllabusController extends Controller
 {
@@ -66,26 +68,41 @@ class SyllabusController extends Controller
             $mataPelajaran   = $request->input('subject');
             $addNotes        = $request->input('notes');
 
-            $finalData = CapaianPembelajaran::where('fase', $faseKelas)
-            ->where('mata_pelajaran', $mataPelajaran)
-            ->select('fase', 'mata_pelajaran', 'element', 'capaian_pembelajaran')
-            ->get();
+            $capaianData = CapaianPembelajaran::where('fase', $faseKelas)
+                ->where('mata_pelajaran', $mataPelajaran)
+                ->get();
 
-            if (!$finalData) {
+            if ($capaianData->isEmpty()) {
                 return response()->json([
                     'status' => 'failed',
-                    'message' => 'Data tidak ditemukan untuk kombinasi fase, mata pelajaran, dan elemen capaian yang diberikan',
-                    'data' => [],
-                ], 400);
+                    'message' => 'Data capaian pembelajaran tidak ditemukan untuk fase dan mata pelajaran yang dipilih.',
+                ], 404);
             }
 
-            $capaianPembelajaran = $finalData[0]->capaian_pembelajaran;
-
             $prompt = $this->openAI->generateSyllabusPromptBeta($namaSilabus, $mataPelajaran, $tingkatKelas, $addNotes);
-
-            // Send the message to OpenAI
             $resMessage = $this->openAI->sendMessage($prompt);
             $parsedResponse = json_decode($resMessage, true);
+
+            if ($parsedResponse === null) {
+                throw new \Exception('Gagal memproses respons dari AI. Format JSON tidak valid.');
+            }
+
+            $rules = [
+                'informasi_umum' => 'required|array',
+                'silabus_pembelajaran' => 'required|array',
+                'informasi_umum.mata_pelajaran' => 'required|string',
+                'silabus_pembelajaran.inti_silabus' => 'required|array',
+                'silabus_pembelajaran.inti_silabus.*.kompetensi_dasar' => 'required|array',
+                'silabus_pembelajaran.inti_silabus.*.materi_pembelajaran' => 'required|array',
+                'silabus_pembelajaran.inti_silabus.*.kegiatan_pembelajaran' => 'required|array',
+            ];
+
+            $validator = Validator::make($parsedResponse, $rules);
+
+            if ($validator->fails()) {
+                \Log::error('AI JSON Structure Failed: ' . $validator->errors()->first());
+                throw new \Exception('Terjadi kesalahan dalam membuat silabus. Silakan coba lagi.');
+            }
 
             // Map Fase Kelas
             $faseToKelas = [
@@ -97,47 +114,47 @@ class SyllabusController extends Controller
                 'Fase F' => 'Kelas 11 - 12 SMA'
             ];
 
-            $tingkatKelas = isset($faseToKelas[$faseKelas]) ? "{$faseKelas} ({$faseToKelas[$faseKelas]})" : $faseKelas;
-
-            $user = $request->user();
+            $tingkatKelasMapped = $faseToKelas[$faseKelas] ?? $faseKelas;
 
             $parsedResponse['informasi_umum']['nama_guru'] = $user->name;
             $parsedResponse['informasi_umum']['nama_sekolah'] = $user->school_name;
             $parsedResponse['informasi_umum']['nama_silabus'] = $namaSilabus;
 
-            // Construct the response data for success
-            $insertData = SyllabusHistories::create([
-                'name' => $namaSilabus,
-                'grade' => $tingkatKelas,
-                'subject' => $mataPelajaran,
-                'notes' => $addNotes,
-                'generate_output' => $parsedResponse,
-                'user_id' => auth()->id(),
-            ]);
+            $insertData = DB::transaction(function () use ($user, $creditCharge, $namaSilabus, $tingkatKelasMapped, $mataPelajaran, $addNotes, $parsedResponse) {
+                $history = SyllabusHistories::create([
+                    'name' => $namaSilabus,
+                    'grade' => $tingkatKelasMapped,
+                    'subject' => $mataPelajaran,
+                    'notes' => $addNotes,
+                    'generate_output' => $parsedResponse,
+                    'user_id' => $user->id,
+                ]);
+
+                // Kurangi kredit user
+                $user->decrement('credit', $creditCharge);
+
+                // Catat log kredit
+                CreditLog::create([
+                    'user_id' => $user->id,
+                    'amount' => -$creditCharge,
+                    'description' => 'Generate Silabus: ' . $namaSilabus,
+                ]);
+
+                return $history;
+            });
 
             $parsedResponse['id'] = $insertData->id;
 
-            // Decrease user's credit
-            $user->decrement('credit', $creditCharge);
-
-            // Credit Logging
-            CreditLog::create([
-                'user_id' => $user->id,
-                'amount' => -$creditCharge,
-                'description' => 'Generate Silabus',
-            ]);
-
-            // return new APIResponse($responseData);
             return response()->json([
                 'status' => 'success',
                 'message' => 'Silabus berhasil dibuat!',
                 'data' => $parsedResponse,
             ], 200);
+
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'failed',
                 'message' => $e->getMessage(),
-                'data' => json_decode($e->getMessage(), true),
             ], 500);
         }
     }

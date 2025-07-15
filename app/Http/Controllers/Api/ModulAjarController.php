@@ -10,6 +10,8 @@ use App\Models\ModuleCreditCharge;
 use App\Services\OpenAIService;
 use icircle\Template\Docx\DocxTemplate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
@@ -73,28 +75,55 @@ class ModulAjarController extends Controller
             $addNotes       = $request->input('notes');
 
             // Get Capaian Pembelajaran
-            $finalData = CapaianPembelajaran::where('fase', $faseKelas)
+            $capaianData = CapaianPembelajaran::where('fase', $faseKelas)
                 ->where('mata_pelajaran', $mataPelajaran)
                 ->where('element', $elemen)
-                ->select('fase', 'mata_pelajaran', 'element', 'capaian_pembelajaran')
-                ->get();
+                ->first();
 
-            if (!$finalData) {
+            if (!$capaianData) {
                 return response()->json([
-                    'status' => 'failed',
-                    'message' => 'Data tidak ditemukan untuk kombinasi fase, mata pelajaran, dan elemen capaian yang diberikan',
-                    'data' => [],
-                ], 400);
+                    'status'  => 'failed',
+                    'message' => 'Data Capaian Pembelajaran tidak ditemukan untuk Fase, Mata Pelajaran, dan Elemen yang dipilih.',
+                ], 404);
             }
+            $capaianPembelajaran = $capaianData->capaian_pembelajaran;
 
-            $capaianPembelajaran = $finalData[0]->capaian_pembelajaran;
-
-            // Create prompt
             $prompt = $this->prompt($faseKelas, $mataPelajaran, $elemen, $capaianPembelajaran, $addNotes);
-
-            // Send the message to OpenAI
             $resMessage = $this->openAI->sendMessage($prompt);
             $parsedResponse = json_decode($resMessage, true);
+
+            if ($parsedResponse === null) {
+                throw new \Exception('Gagal memproses respons dari AI. Format JSON tidak valid.');
+            }
+
+            $rules = [
+                'informasi_umum' => 'required|array',
+                'informasi_umum.alokasi_waktu' => 'required|string',
+                'sarana_dan_prasarana' => 'required|array',
+                'tujuan_kegiatan_pembelajaran' => 'required|array',
+                'tujuan_kegiatan_pembelajaran.tujuan_pembelajaran_topik' => 'required|array',
+                'tujuan_kegiatan_pembelajaran.tujuan_pembelajaran_pertemuan' => 'required|array',
+                'pemahaman_bermakna' => 'required|array',
+                'pemahaman_bermakna.topik' => 'required|string',
+                'pertanyaan_pemantik' => 'required|array',
+                'kompetensi_dasar' => 'required|array',
+                'kompetensi_dasar.*.materi_pembelajaran' => 'required|array',
+                'kompetensi_dasar.*.materi_pembelajaran.*.penilaian' => 'required|array',
+                'langkah_pembelajaran' => 'required|array',
+                'langkah_pembelajaran.kegiatan_awal' => 'required|array',
+                'langkah_pembelajaran.kegiatan_inti' => 'required|array',
+                'langkah_pembelajaran.kegiatan_akhir' => 'required|array',
+                'lampiran' => 'required|array',
+                'lampiran.glosarium_materi' => 'required|array',
+                'lampiran.daftar_pustaka' => 'required|array',
+            ];
+
+            $validator = Validator::make($parsedResponse, $rules);
+
+            if ($validator->fails()) {
+                \Log::error('AI Modul Ajar JSON Structure Failed: ' . $validator->errors()->first());
+                throw new \Exception('Terjadi kesalahan dalam memproses data Modul Ajar. Silakan coba lagi.');
+            }
 
             // Map Fase Kelas
             $faseToKelas = [
@@ -106,55 +135,57 @@ class ModulAjarController extends Controller
                 'Fase F' => 'Kelas 11 - 12 SMA'
             ];
 
-            $kelas = isset($faseToKelas[$faseKelas]) ? "{$faseKelas} ({$faseToKelas[$faseKelas]})" : $faseKelas;
+            $kelasMapped = $faseToKelas[$faseKelas] ?? $faseKelas;
 
             // Add additional information
             $parsedResponse['informasi_umum']['nama_modul_ajar'] = $namaModulAjar;
             $parsedResponse['informasi_umum']['penyusun'] = $user->name;
             $parsedResponse['informasi_umum']['jenjang_sekolah'] = $user->school_name;
-            $parsedResponse['informasi_umum']['fase_kelas'] = $kelas;
+            $parsedResponse['informasi_umum']['fase_kelas'] = $kelasMapped;
             $parsedResponse['informasi_umum']['mata_pelajaran'] = $mataPelajaran;
             $parsedResponse['informasi_umum']['element'] = $elemen;
             $parsedResponse['informasi_umum']['capaian_pembelajaran'] = $capaianPembelajaran;
 
             // Insert data into ModulAjarHistories
-            $insertData = ModulAjarHistories::create([
-                'name' => $namaModulAjar,
-                'phase' => $faseKelas,
-                'subject' => $mataPelajaran,
-                'element' => $elemen,
-                'notes' => $addNotes,
-                'output_data' => $parsedResponse,
-                'user_id' => $user->id,
-            ]);
+            $insertData = DB::transaction(function () use ($user, $creditCharge, $namaModulAjar, $faseKelas, $mataPelajaran, $elemen, $addNotes, $parsedResponse) {
+                $history = ModulAjarHistories::create([
+                    'name' => $namaModulAjar,
+                    'phase' => $faseKelas,
+                    'subject' => $mataPelajaran,
+                    'element' => $elemen,
+                    'notes' => $addNotes,
+                    'output_data' => $parsedResponse,
+                    'user_id' => $user->id,
+                ]);
 
-            // Decrease user's credit
-            $user->decrement('credit', $creditCharge);
+                // Kurangi kredit user
+                $user->decrement('credit', $creditCharge);
 
-            // Credit Logging
-            CreditLog::create([
-                'user_id' => $user->id,
-                'amount' => -$creditCharge,
-                'description' => 'Generate Modul Ajar',
-            ]);
+                // Catat log kredit
+                CreditLog::create([
+                    'user_id' => $user->id,
+                    'amount' => -$creditCharge,
+                    'description' => 'Generate Modul Ajar: ' . $namaModulAjar,
+                ]);
 
-            // Add ID to response
+                return $history;
+            });
+
             $parsedResponse['id'] = $insertData->id;
 
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'Modul ajar berhasil dihasilkan',
-                'data' => $parsedResponse,
+                'data'    => $parsedResponse,
             ], 200);
+
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'failed',
+                'status'  => 'failed',
                 'message' => $e->getMessage(),
-                'data' => json_decode($e->getMessage(), true),
             ], 500);
         }
     }
-
 
     public function convertToWord(Request $request)
     {

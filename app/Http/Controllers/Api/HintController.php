@@ -10,6 +10,8 @@ use App\Models\ModuleCreditCharge;
 use App\Services\OpenAIService;
 use icircle\Template\Docx\DocxTemplate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -94,9 +96,28 @@ class HintController extends Controller
 
             // Send the message to OpenAI
             $resMessage = $this->openAI->sendMessage($prompt);
-
             $parsedResponse = json_decode($resMessage, true);
-            $user = $request->user();
+
+            if ($parsedResponse === null) {
+                throw new \Exception('Gagal memproses respons dari AI. Format JSON tidak valid.');
+            }
+
+            // Aturan validasi yang dinamis sesuai jumlah soal
+            $rules = [
+                'informasi_umum'                         => 'required|array',
+                'informasi_umum.jumlah_soal'             => 'required|integer',
+                'kisi_kisi'                              => 'required|array|size:' . $jumlahSoal,
+                'kisi_kisi.*.nomor'                      => 'required|integer',
+                'kisi_kisi.*.indikator_soal'             => 'required|string|min:10',
+                'kisi_kisi.*.no_soal'                    => 'required|integer',
+            ];
+
+            $validator = Validator::make($parsedResponse, $rules);
+
+            if ($validator->fails()) {
+                // \Log::error('AI Kisi-Kisi JSON Structure Failed: ' . $validator->errors()->first());
+                throw new \Exception('Terjadi kesalahan dalam memproses data Kisi-kisi. Silakan coba lagi.');
+            }
 
             $faseToKelas = [
                 'Fase A' => 'Kelas 1 - 2 SD',
@@ -106,56 +127,55 @@ class HintController extends Controller
                 'Fase E' => 'Kelas 10 SMA',
                 'Fase F' => 'Kelas 11 - 12 SMA'
             ];
-
-            $kelas = isset($faseToKelas[$tingkatKelas]) ? "{$tingkatKelas} ({$faseToKelas[$tingkatKelas]})" : $tingkatKelas;
+            $kelasMapped = $faseToKelas[$tingkatKelas] ?? $tingkatKelas;
 
             $parsedResponse['informasi_umum']['nama_kisi_kisi']                  = $namaKisiKisi;
             $parsedResponse['informasi_umum']['penyusun']                        = $user->name;
             $parsedResponse['informasi_umum']['instansi']                        = $user->school_name;
             $parsedResponse['informasi_umum']['elemen_capaian']                  = $elemenCapaian;
             $parsedResponse['informasi_umum']['pokok_materi']                    = $pokokMateri;
-            $parsedResponse['informasi_umum']['kelas']                           = $kelas;
+            $parsedResponse['informasi_umum']['kelas']                           = $kelasMapped;
             $parsedResponse['informasi_umum']['mata_pelajaran']                  = $mataPelajaran;
             $parsedResponse['informasi_umum']['jumlah_soal']                     = $jumlahSoal;
             $parsedResponse['informasi_umum']['capaian_pembelajaran_redaksi']    = $capaianPembelajaranRedaksi;
             $parsedResponse['informasi_umum']['tahun_penyusunan']                = Date('Y');
 
-            // Construct the response data for success
-            $insertData = HintHistories::create([
-                'name' => $namaKisiKisi,
-                'pokok_materi' => $pokokMateri,
-                'grade' => $tingkatKelas,
-                'subject' => $mataPelajaran,
-                'elemen_capaian' => $elemenCapaian,
-                'jumlah_soal' => $jumlahSoal,
-                'notes' => $addNotes,
-                'generate_output' => $parsedResponse,
-                'user_id' => auth()->id(),
-            ]);
-            
-            // Decrease user's credit
-            $user->decrement('credit', $creditCharge);
+            $insertData = DB::transaction(function () use ($user, $creditCharge, $namaKisiKisi, $pokokMateri, $tingkatKelas, $mataPelajaran, $elemenCapaian, $jumlahSoal, $addNotes, $parsedResponse) {
+                $history = HintHistories::create([
+                    'name'           => $namaKisiKisi,
+                    'pokok_materi'   => $pokokMateri,
+                    'grade'          => $tingkatKelas,
+                    'subject'        => $mataPelajaran,
+                    'elemen_capaian' => $elemenCapaian,
+                    'jumlah_soal'    => $jumlahSoal,
+                    'notes'          => $addNotes,
+                    'generate_output'=> $parsedResponse,
+                    'user_id'        => $user->id,
+                ]);
 
-            // Credit Logging
-            CreditLog::create([
-                'user_id' => $user->id,
-                'amount' => -$creditCharge,
-                'description' => 'Generate Kisi Kisi',
-            ]);
+                $user->decrement('credit', $creditCharge);
+
+                CreditLog::create([
+                    'user_id'     => $user->id,
+                    'amount'      => -$creditCharge,
+                    'description' => 'Generate Kisi-kisi: ' . $namaKisiKisi,
+                ]);
+
+                return $history;
+            });
 
             $parsedResponse['id'] = $insertData->id;
 
-            // return new APIResponse($responseData);
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'Kisi-kisi berhasil dihasilkan',
-                'data' => $parsedResponse,
+                'data'    => $parsedResponse,
             ], 200);
+
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'failed',
+                'status'  => 'failed',
                 'message' => $e->getMessage(),
-                'data' => json_decode($e->getMessage(), true),
             ], 500);
         }
     }

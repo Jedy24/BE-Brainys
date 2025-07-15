@@ -12,6 +12,8 @@ use App\Services\OpenAIService;
 use icircle\Template\Docx\DocxTemplate;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class AlurTujuanPembelajaranController extends Controller
 {
@@ -42,7 +44,7 @@ class AlurTujuanPembelajaranController extends Controller
             if ($user->is_active === 0) {
                 return response()->json([
                     'status' => 'failed',
-                    'message' => 'User tidak aktif. Anda tidak dapat membuat gamifikasi.',
+                    'message' => 'User tidak aktif. Anda tidak dapat membuat alur tujuan pembelajaran.',
                 ], 400);
             }
 
@@ -95,7 +97,31 @@ class AlurTujuanPembelajaranController extends Controller
             $resMessage = $this->openAI->sendMessage($prompt);
             $parsedResponse = json_decode($resMessage, true);
 
-            $user = $request->user();
+            if ($parsedResponse === null) {
+                throw new \Exception('Gagal memproses respons dari AI. Format JSON tidak valid.');
+            }
+
+            $rules = [
+                'fase'                          => 'required|string',
+                'mata_pelajaran'                => 'required|string',
+                'elemen'                        => 'required|string',
+                'capaian_pembelajaran'          => 'required|string',
+                'capaian_pembelajaran_per_tahun' => 'required|string',
+                'pekan'                         => 'required|string',
+                'alur'                          => 'required|array|size:' . $pekan,
+                'alur.*.no'                     => 'required|integer',
+                'alur.*.tujuan_pembelajaran'    => 'required|string',
+                'alur.*.kata_frase_kunci'       => 'required|array',
+                'alur.*.profil_pelajar_pancasila' => 'required|array',
+                'alur.*.glosarium'              => 'required|string',
+            ];
+
+            $validator = Validator::make($parsedResponse, $rules);
+
+            if ($validator->fails()) {
+                \Log::error('AI ATP JSON Structure Failed: ' . $validator->errors()->first());
+                throw new \Exception('Terjadi kesalahan dalam memproses data ATP. Silakan coba lagi.');
+            }
 
             $parsedResponse['informasi_umum']['nama']               = $name;
             $parsedResponse['informasi_umum']['penyusun']           = $user->name;
@@ -109,40 +135,43 @@ class AlurTujuanPembelajaranController extends Controller
             $parsedResponse['informasi_umum']['tahun_penyusunan']   = Date('Y');
 
             // Save to AlurTujuanPembelajaranHistories
-            $history = AlurTujuanPembelajaranHistories::create([
-                'user_id' => $user->id,
-                'name' => $name,
-                'phase' => $fase,
-                'subject' => $mataPelajaran,
-                'element' => $elemen,
-                'weeks' => $pekan,
-                'notes' => $deskripsiNotes,
-                'output_data' => $parsedResponse,
-            ]);
+            $history = DB::transaction(function () use ($user, $name, $fase, $mataPelajaran, $elemen, $pekan, $deskripsiNotes, $parsedResponse, $creditCharge) {
+                $newHistory = AlurTujuanPembelajaranHistories::create([
+                    'user_id'     => $user->id,
+                    'name'        => $name,
+                    'phase'       => $fase,
+                    'subject'     => $mataPelajaran,
+                    'element'     => $elemen,
+                    'weeks'       => $pekan,
+                    'notes'       => $deskripsiNotes,
+                    'output_data' => $parsedResponse,
+                ]);
 
-            // Decrease user's credit
-            $user->decrement('credit', $creditCharge);
+                // Kurangi kredit user
+                $user->decrement('credit', $creditCharge);
 
-            // Credit Logging
-            CreditLog::create([
-                'user_id' => $user->id,
-                'amount' => -$creditCharge,
-                'description' => 'Generate ATP',
-            ]);
+                // Catat log kredit
+                CreditLog::create([
+                    'user_id'     => $user->id,
+                    'amount'      => -$creditCharge,
+                    'description' => 'Generate ATP: ' . $name,
+                ]);
+
+                return $newHistory;
+            });
 
             $parsedResponse['id'] = $history->id;
 
-            // return new APIResponse($responseData);
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'ATP berhasil dihasilkan',
-                'data' => $parsedResponse,
+                'data'    => $parsedResponse,
             ], 200);
+
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'failed',
+                'status'  => 'failed',
                 'message' => $e->getMessage(),
-                'data' => json_decode($e->getMessage(), true),
             ], 500);
         }
     }
@@ -303,9 +332,9 @@ class AlurTujuanPembelajaranController extends Controller
         - capaian_pembelajaran: ' . $capaianPembelajaran . '
         - capaian_pembelajaran_per_tahun: ' . $capaianPembelajaranTahun . '
         - pekan: ' . $pekan . '
-        
+
         Buatlah array bernama "alur" di mana jumlah tujuan pembelajaran sesuai dengan jumlah minggu (pekan) yang ditentukan. Setiap tujuan pembelajaran harus didasarkan pada capaian_pembelajaran dan elemen. Catatan tambahan dalam bahasa Indonesia: ' . $deskripsiNotes . '
-        
+
         Tujuan Pembelajaran (TP) menggambarkan pencapaian tiga aspek kompetensi (pengetahuan, keterampilan, sikap) yang perlu dikembangkan melalui satu atau lebih kegiatan pembelajaran. Tujuan pembelajaran diurutkan secara kronologis berdasarkan urutan pembelajaran dari waktu ke waktu yang menjadi prasyarat untuk mencapai hasil pembelajaran (Capaian Pembelajaran - CP).
 
         Secara operasional, komponen Tujuan Pembelajaran (tujuan_pembelajaran) harus mencakup:
