@@ -204,8 +204,11 @@ class CheckoutControllerV2 extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to place order: ' . $e->getMessage(),
+                'debug_info' => [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
                 'data' => null,
-                // 'payment' => $responseData
             ], 500);
         }
     }
