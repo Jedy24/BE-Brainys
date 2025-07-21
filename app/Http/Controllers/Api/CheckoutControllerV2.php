@@ -187,7 +187,8 @@ class CheckoutControllerV2 extends Controller
 
             //Mail
             $user = User::where('id', $transaction->id_user)->first();
-            Mail::to($user->email)->send(new PaymentPendingNotification($user, $transaction, $transactionPayment, null));
+            $data = null;
+            Mail::to($user->email)->send(new PaymentPendingNotification($user, $transaction, $transactionPayment, $data));
 
             return response()->json([
                 'status' => 'success',
